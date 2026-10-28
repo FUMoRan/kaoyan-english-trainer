@@ -18,8 +18,8 @@ window.App = window.App || {};
     return String(url || '').trim().replace(/\/+$/, '');
   }
 
-  function authHeaders() {
-    const s = App.store.getSettings();
+  function authHeaders(settings) {
+    const s = settings || App.store.getSettings();
     const h = { 'Content-Type': 'application/json' };
     if (s.apiKey) h.Authorization = 'Bearer ' + s.apiKey;
     if (s.provider === 'openrouter') {
@@ -91,7 +91,8 @@ window.App = window.App || {};
   }
 
   async function chat(options) {
-    const settings = App.store.getSettings();
+    const base = App.store.getSettings();
+    const settings = options.override ? Object.assign({}, base, options.override) : base;
     if (!String(settings.apiKey || '').trim()) {
       throw new ApiError('还没填 API Key，点右上角「设置」选服务商并填入 Key。');
     }
@@ -120,7 +121,7 @@ window.App = window.App || {};
       try {
         res = await fetch(url, {
           method: 'POST',
-          headers: authHeaders(),
+          headers: authHeaders(settings),
           body: JSON.stringify(body),
           signal: controller.signal
         });

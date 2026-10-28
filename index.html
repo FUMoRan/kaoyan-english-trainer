@@ -30,6 +30,7 @@
       <button class="tab is-active" id="tab-sentence" role="tab" data-tab="sentence" aria-selected="true" aria-controls="panel-sentence">长难句拆解</button>
       <button class="tab" id="tab-rewrite" role="tab" data-tab="rewrite" aria-selected="false" aria-controls="panel-rewrite">句型魔改</button>
       <button class="tab" id="tab-essay" role="tab" data-tab="essay" aria-selected="false" aria-controls="panel-essay">作文批改</button>
+      <button class="tab" id="tab-review" role="tab" data-tab="review" aria-selected="false" aria-controls="panel-review">复盘</button>
     </nav>
 
     <!-- Tab 1 -->
@@ -37,6 +38,10 @@
       <label class="field">
         <span class="label">英文长难句</span>
         <textarea id="sentence-input" rows="4" placeholder="粘贴一句真题阅读里的长句，例如：The idea that ..."></textarea>
+      </label>
+      <label class="field">
+        <span class="label">先自己划主干（选填，对答案时会并排显示你的版本）</span>
+        <input id="sentence-spine" type="text" spellcheck="false" placeholder="例如：The idea / has shaped / the way we work.">
       </label>
       <div class="row">
         <button id="btn-sentence" class="btn primary">一键拆解</button>
@@ -54,37 +59,10 @@
       <div class="grid2">
         <label class="field">
           <span class="label">手法</span>
-          <select id="rewrite-type">
-            <option value="auto">AI 推荐（按语境自动选）</option>
-            <optgroup label="强调与倒装">
-              <option value="强调句（It is ... that ...）">强调句 It is ... that ...</option>
-              <option value="倒装（否定词 Not only / Never / Hardly 提前）">倒装：否定词提前</option>
-              <option value="倒装（Only + 状语提前）">倒装：Only + 状语提前</option>
-              <option value="让步倒装（Hardly ... when / No sooner ... than）">让步倒装</option>
-            </optgroup>
-            <optgroup label="从句与非谓语">
-              <option value="非限制性定语从句（..., which ...）">非限制性定语从句</option>
-              <option value="限制性定语从句">限制性定语从句</option>
-              <option value="主语从句 / 形式主语（It is ... to ...）">主语从句 / 形式主语</option>
-              <option value="同位语（用名词短语解释前文）">同位语</option>
-              <option value="分词短语作状语（Faced with ..., ...）">分词短语作状语</option>
-              <option value="独立主格">独立主格</option>
-              <option value="with 复合结构">with 复合结构</option>
-            </optgroup>
-            <optgroup label="名词化与抽象表达">
-              <option value="名词化（动词或形容词转抽象名词）">名词化</option>
-              <option value="抽象名词作主语">抽象名词作主语</option>
-              <option value="被动语态（强调受事）">被动语态</option>
-              <option value="虚拟语气（If it were not for ...）">虚拟语气</option>
-            </optgroup>
-            <optgroup label="比较与衔接">
-              <option value="比较结构（the more ..., the more ...）">比较结构 the more…, the more…</option>
-              <option value="平行结构（not only ..., but also ...）">平行结构</option>
-              <option value="因果递进衔接（Consequently / What's more）">因果递进衔接</option>
-            </optgroup>
-          </select>
+          <select id="rewrite-type"></select>
         </label>
       </div>
+      <div class="examples" id="rewrite-examples" hidden></div>
       <div class="row">
         <button id="btn-rewrite" class="btn primary">生成高级句型</button>
         <span class="tip">AI 推荐会先判断这句适合哪种手法；指定的手法不适用会直说</span>
@@ -120,6 +98,20 @@
         <p class="hint">先定档、再在档内给分；只批改单段时，分数是基于该段的估算。</p>
       </details>
 
+      <div class="grid2">
+        <label class="field">
+          <span class="label">批改模式</span>
+          <select id="essay-focus">
+            <option value="full">完整批改（五节报告 + 错题归类）</option>
+            <option value="target">目标分数（只列 3 条必改）</option>
+          </select>
+        </label>
+        <label class="field">
+          <span class="label">真题库（选填，自动填到题目里）</span>
+          <select id="topic-pick"></select>
+        </label>
+      </div>
+
       <label class="field">
         <span class="label">题目 / 图画描述（选填，但填了分数才靠谱）</span>
         <textarea id="essay-topic" rows="2" placeholder="例如：2023 英语一，图画中乡村龙舟赛，两位老人感叹村子越来越热闹"></textarea>
@@ -136,9 +128,13 @@
           <input type="file" id="file-camera" accept="image/*" capture="environment" hidden>
           <input type="file" id="file-gallery" accept="image/*" hidden>
           <div class="preview" id="preview" hidden>
-            <img id="preview-img" alt="作文照片预览">
+            <div class="crop-wrap" id="crop-wrap">
+              <img id="preview-img" alt="作文照片预览">
+              <div class="crop-box" id="crop-box" hidden></div>
+            </div>
             <div class="preview-meta">
               <span id="preview-info" class="tip"></span>
+              <button type="button" class="btn ghost small" id="btn-crop">框选裁剪</button>
               <button type="button" class="btn ghost small" id="btn-reset-image">重新选择</button>
             </div>
           </div>
@@ -155,6 +151,7 @@
           <span class="label">识别结果（可直接修改，改完再批改）</span>
           <textarea id="ocr-text" rows="8"></textarea>
         </label>
+        <div id="ocr-unknowns" class="unknowns" hidden></div>
         <p class="hint" id="ocr-hint"></p>
         <div class="row">
           <button id="btn-grade" class="btn primary">确认无误，开始批改</button>
@@ -163,6 +160,22 @@
       </div>
 
       <article id="essay-result" class="result" hidden></article>
+      <div class="row" id="essay-actions" hidden>
+        <button id="btn-export-md" class="btn ghost small">导出 Markdown</button>
+        <button id="btn-print" class="btn ghost small">打印报告</button>
+        <span class="tip">报告只在你本机生成，不上传</span>
+      </div>
+    </section>
+
+    <!-- Tab 4 -->
+    <section id="panel-review" class="panel" role="tabpanel" aria-labelledby="tab-review" hidden>
+      <div class="review-head">
+        <h2>弱点画像</h2>
+        <button id="btn-clear-journal" class="btn ghost small">清空记录</button>
+      </div>
+      <p class="hint" id="review-summary"></p>
+      <div class="chips" id="review-chips"></div>
+      <div id="review-list" class="review-list"></div>
     </section>
   </main>
 
@@ -200,6 +213,32 @@
         <span>流式输出（边生成边显示，推荐开启）</span>
       </label>
 
+      <details class="details" id="alt-box">
+        <summary>交叉打分：第二个模型（可选）</summary>
+        <label class="check">
+          <input type="checkbox" id="set-alt-on">
+          <span>批改时再用另一个模型打一次分</span>
+        </label>
+        <p class="hint">两个模型给出的档位相差 2 档以上时，报告会提示「评分有争议」，并列出第二模型的判分。两次请求都会消耗额度。</p>
+        <label class="field">
+          <span class="label">备用服务商</span>
+          <select id="set-alt-provider"></select>
+        </label>
+        <p class="hint" id="set-alt-note"></p>
+        <label class="field">
+          <span class="label">备用 Base URL</span>
+          <input id="set-alt-baseurl" type="url" spellcheck="false" placeholder="https://api.siliconflow.cn/v1">
+        </label>
+        <label class="field">
+          <span class="label">备用模型名</span>
+          <input id="set-alt-model" type="text" spellcheck="false" placeholder="Qwen/Qwen2.5-72B-Instruct">
+        </label>
+        <label class="field">
+          <span class="label">备用 API Key</span>
+          <input id="set-alt-key" type="password" autocomplete="off" spellcheck="false" placeholder="sk-...">
+        </label>
+      </details>
+
       <p class="hint">Key 只保存在本机浏览器（localStorage），不会上传到任何服务器。本页直接请求你选择的服务商，没有中间服务器。</p>
 
       <div class="row">
@@ -226,10 +265,13 @@
   <script src="assets/vendor/purify.min.js"></script>
   <script src="assets/config.js"></script>
   <script src="assets/calibration.js"></script>
+  <script src="assets/techniques.js"></script>
+  <script src="assets/topics.js"></script>
   <script src="assets/storage.js"></script>
   <script src="assets/image.js"></script>
   <script src="assets/api.js"></script>
   <script src="assets/markdown.js"></script>
+  <script src="assets/journal.js"></script>
   <script src="assets/ui.js"></script>
 </body>
 </html>

@@ -70,5 +70,55 @@ window.App = window.App || {};
     };
   }
 
-  App.image = { prepare: prepare };
+  /* 按归一化矩形（0–1）裁出作文区域，再走同一套压缩参数 */
+  function loadImage(dataURL) {
+    return new Promise(function (resolve, reject) {
+      const img = new Image();
+      img.onload = function () { resolve(img); };
+      img.onerror = function () { reject(new Error('裁剪失败，重新选一张图片试试。')); };
+      img.src = dataURL;
+    });
+  }
+
+  function drawRegion(img, rect, quality) {
+    const nw = img.naturalWidth || img.width;
+    const nh = img.naturalHeight || img.height;
+    let sx = Math.round(rect.x * nw);
+    let sy = Math.round(rect.y * nh);
+    let sw = Math.round(rect.w * nw);
+    let sh = Math.round(rect.h * nh);
+    sx = Math.max(0, Math.min(nw - 2, sx));
+    sy = Math.max(0, Math.min(nh - 2, sy));
+    sw = Math.max(2, Math.min(nw - sx, sw));
+    sh = Math.max(2, Math.min(nh - sy, sh));
+    const scale = Math.min(1, MAX_EDGE / Math.max(sw, sh));
+    const cw = Math.max(1, Math.round(sw * scale));
+    const ch = Math.max(1, Math.round(sh * scale));
+    const canvas = document.createElement('canvas');
+    canvas.width = cw;
+    canvas.height = ch;
+    const ctx = canvas.getContext('2d');
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(0, 0, cw, ch);
+    ctx.drawImage(img, sx, sy, sw, sh, 0, 0, cw, ch);
+    return { dataURL: canvas.toDataURL('image/jpeg', quality), width: cw, height: ch };
+  }
+
+  async function crop(dataURL, rect) {
+    const img = await loadImage(dataURL);
+    let quality = 0.85;
+    let out = drawRegion(img, rect, quality);
+    while (out.dataURL.length * 0.75 > TARGET_BYTES && quality > 0.4) {
+      quality -= 0.1;
+      out = drawRegion(img, rect, quality);
+    }
+    return {
+      dataURL: out.dataURL,
+      width: out.width,
+      height: out.height,
+      kb: Math.round((out.dataURL.length * 0.75) / 1024)
+    };
+  }
+
+  App.image = { prepare: prepare, crop: crop };
 })(window.App);

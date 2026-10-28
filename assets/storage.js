@@ -15,7 +15,14 @@ window.App = window.App || {};
       apiKey: '',
       stream: true,
       essayType: 'e1_big',
-      essayPara: 'all'
+      essayPara: 'all',
+      essayFocus: 'full',
+      rewriteType: 'auto',
+      altEnabled: false,
+      altProvider: 'siliconflow',
+      altBaseURL: App.config.PROVIDERS.siliconflow.baseURL,
+      altModel: 'Qwen/Qwen2.5-72B-Instruct',
+      altKey: ''
     };
   }
 

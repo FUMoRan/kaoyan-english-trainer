@@ -400,9 +400,141 @@ select { appearance: none; background-image: linear-gradient(45deg, transparent 
   vertical-align: middle;
 }
 
+/* ---------- 框选裁剪 ---------- */
+
+.crop-wrap {
+  position: relative;
+  display: inline-block;
+  max-width: 100%;
+  line-height: 0;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.crop-wrap.is-cropping { cursor: crosshair; touch-action: none; }
+
+.crop-box {
+  position: absolute;
+  z-index: 2;
+  border: 2px dashed var(--brand);
+  background: color-mix(in srgb, var(--brand) 14%, transparent);
+  pointer-events: none;
+}
+
+.btn.is-on {
+  border-color: var(--brand);
+  background: var(--brand-soft);
+  color: var(--brand-text);
+}
+
+/* ---------- 标签 ---------- */
+
+.chips { display: flex; flex-wrap: wrap; gap: 8px; margin: 4px 0 8px; }
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 10px;
+  border-radius: 999px;
+  background: var(--brand-soft);
+  color: var(--brand-text);
+  font-size: 13px;
+}
+
+.chip b { font-weight: 600; }
+
+/* ---------- 手法例句 ---------- */
+
+.examples {
+  margin: -4px 0 14px;
+  padding: 12px 14px;
+  background: var(--surface-muted);
+  border-radius: var(--radius);
+  font-size: 13px;
+}
+
+.example-tip { margin: 0 0 8px; color: var(--text-muted); font-size: 12.5px; }
+.example-tip b { color: var(--text); }
+.example-list { margin: 0; padding-left: 18px; }
+.example-list li { margin: 7px 0; }
+.ex-en { margin: 0; }
+.ex-cn { margin: 2px 0 0; font-size: 12.5px; color: var(--text-muted); }
+
+/* ---------- OCR 补词 ---------- */
+
+.unknowns { margin-bottom: 12px; }
+.unknown-row { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+.unknown-no { flex: 0 0 20px; text-align: right; font-size: 12px; color: var(--text-muted); }
+.unknown-row input { flex: 1; }
+
+/* ---------- 改写 diff ---------- */
+
+.diff-line { margin: 0 0 8px; line-height: 2; word-break: break-word; }
+.diff-add {
+  padding: 0 2px;
+  border-radius: 3px;
+  background: color-mix(in srgb, var(--success) 16%, transparent);
+  color: var(--success);
+}
+.diff-del {
+  padding: 0 2px;
+  border-radius: 3px;
+  background: color-mix(in srgb, var(--danger) 14%, transparent);
+  color: var(--danger);
+  text-decoration: line-through;
+}
+
+/* ---------- 主干对照 ---------- */
+
+.spine-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+@media (max-width: 560px) { .spine-grid { grid-template-columns: 1fr; } }
+.spine-mine, .spine-ref {
+  margin: 0;
+  padding: 8px 10px;
+  background: var(--surface-muted);
+  border-radius: var(--radius);
+  font-size: 14px;
+  line-height: 1.6;
+}
+.spine-ref > *:first-child { margin-top: 0; }
+.spine-ref > *:last-child { margin-bottom: 0; }
+
+/* ---------- 复盘 ---------- */
+
+.review-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 6px;
+}
+.review-head h2 { font-size: 16px; }
+.review-list { display: flex; flex-direction: column; gap: 12px; margin-top: 10px; }
+.journal-head { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; font-size: 13px; }
+.journal-score { color: var(--brand); font-size: 12.5px; white-space: nowrap; }
+.journal-item .hint { margin: 6px 0 0; }
+.journal-item .chips { margin: 8px 0 0; }
+
+.card.dispute {
+  border-color: color-mix(in srgb, var(--danger) 40%, var(--border));
+  background: var(--danger-soft);
+}
+
 @media (prefers-reduced-motion: reduce) {
   .spinner { animation-duration: 0s; }
   * { transition: none !important; }
+}
+
+/* 打印：只留批改报告 */
+@media print {
+  .topbar, .tabs, .uploader, .stage, .details, .field, .examples, .row,
+  .statusbar, .modal, .review-head, #essay-nokey { display: none !important; }
+  body { background: #fff; color: #000; }
+  .page { max-width: none; padding: 0; }
+  .card { box-shadow: none; border: 1px solid #ddd; break-inside: avoid; page-break-inside: avoid; }
+  .chips { display: none; }
+  #panel-essay > *:not(#essay-result) { display: none !important; }
 }
 
 @media (max-width: 480px) {

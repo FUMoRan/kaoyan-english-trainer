@@ -222,7 +222,8 @@ window.App = window.App || {};
     }];
   }
 
-  function gradingMessages(essay, paragraphText) {
+  function gradingMessages(essay, paragraphText, opts) {
+    const focus = (opts && opts.focus) || 'full';
     const type = ESSAY_TYPES[essay.typeKey];
     const bandText = type.bands.map(function (b) { return BULLET + b[0] + '：' + b[1]; }).join('\n');
     const samples = App.calibration.select(type.kind, essay.typeKey);
@@ -251,24 +252,60 @@ window.App = window.App || {};
       '4. 学生原文里已经正确、且符合档位要求的表达不要改写。',
       '5. 不评判字迹与卷面美观，只评判语言与任务完成度。',
       '',
-      '【输出格式】严格使用以下小标题，顺序不变，不增删：',
-      '## 一、档位与分数',
-      '## 二、硬伤清单',
-      '## 三、中式英语与表达',
-      '## 四、可升级句',
-      '## 五、下一步练习',
+      focus === 'target'
+        ? [
+          '【本模式：目标分数模式】',
+          '学生只想知道「离达标还差哪几处」，不要面面俱到。只保留最卡分的改动，其余问题略过。',
+          '',
+          '【输出格式】严格使用以下小标题，顺序不变，不增删：',
+          '## 一、档位与分数',
+          '## 二、达标必改（3 条）',
+          '## 三、错误归类',
+          '',
+          '「一、档位与分数」：先写「当前第X档，给 X/满分」，再写「再改 2–3 处可进第Y档」，三句以内。',
+          '「二、达标必改（3 条）」：只列 3 条，按对提档的影响从大到小排序；每条一行，格式为「原文 → 改为（提档原因）」。只给 3 条，不足 3 条就写实际条数。',
+          '「三、错误归类」：见文末格式要求。'
+        ].join('\n')
+        : [
+          '【输出格式】严格使用以下小标题，顺序不变，不增删：',
+          '## 一、档位与分数',
+          '## 二、硬伤清单',
+          '## 三、中式英语与表达',
+          '## 四、可升级句',
+          '## 五、下一步练习',
+          '## 六、错误归类',
+          '',
+          '「一、档位与分数」：档位 + 具体分/满分 + 三句以内的判分依据。',
+          '「二、硬伤清单」：Markdown 表格，列为 原文 | 改为 | 类型 | 说明；没有明显硬伤就写「未发现明显硬伤」。',
+          '「三、中式英语与表达」：最多 3 条，给出原文与更地道的说法。',
+          '「四、可升级句」：表格，列为 原句 | 升级句 | 手法；最多 3 条，必须贴合该段在整篇中的功能。',
+          '「五、下一步练习」：2 条今天就能做的动作，针对本次暴露的问题。',
+          '「六、错误归类」：见文末格式要求。'
+        ].join('\n'),
       '',
-      '「一、档位与分数」：档位 + 具体分/满分 + 三句以内的判分依据。',
-      '「二、硬伤清单」：Markdown 表格，列为 原文 | 改为 | 类型 | 说明；没有明显硬伤就写「未发现明显硬伤」。',
-      '「三、中式英语与表达」：最多 3 条，给出原文与更地道的说法。',
-      '「四、可升级句」：表格，列为 原句 | 升级句 | 手法；最多 3 条，必须贴合该段在整篇中的功能。',
-      '「五、下一步练习」：2 条今天就能做的动作，针对本次暴露的问题。'
+      '【错误归类格式（供本地错题本统计，必须一字不差）】',
+      '只输出一行：类别 数量，多个类别用 | 分隔，例如「冠词 2 | 时态 1 | 搭配 3」。',
+      '类别只能从这几个里选：冠词、时态、搭配、中式表达、拼写、单复数、标点、其他。',
+      '数量只统计' + (focus === 'target' ? '「二、达标必改」' : '「二、硬伤清单」与「三、中式英语与表达」') +
+        '里真正指出的错误；没有错误的类别不要写；一处都没有就写「无」。'
     ].join('\n');
 
     return [
       { role: 'system', content: head },
       { role: 'user', content: '以下是我要批改的内容（已由我确认识别无误）：\n\n' + paragraphText }
     ];
+  }
+
+  /* 批改后的追问：把原报告当上文，只回答新问题 */
+  function followUpMessages(baseMessages, report, question) {
+    return baseMessages.concat([
+      { role: 'assistant', content: report },
+      {
+        role: 'user',
+        content: question + '\n\n（只回答这个问题，可以引用我原文里的句子；不要重写整份批改报告，不要重复已经说过的内容；'
+          + '如果问的是与这篇作文无关的话题，直接说明。控制在 200 字以内。）'
+      }
+    ]);
   }
 
   const BULLET = '· ';
@@ -279,6 +316,7 @@ window.App = window.App || {};
     sentenceMessages: sentenceMessages,
     rewriteMessages: rewriteMessages,
     ocrMessages: ocrMessages,
-    gradingMessages: gradingMessages
+    gradingMessages: gradingMessages,
+    followUpMessages: followUpMessages
   };
 })(window.App);

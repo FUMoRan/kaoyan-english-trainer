@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="color-scheme" content="light dark">
   <title>考研英语高阶训练器</title>
-  <meta name="description" content="长难句拆解、高级句型改写与作文拍照批改，按考研英语大纲评分档位批改。">
+  <meta name="description" content="长难句拆解、高级句型改写、作文拍照批改与离线语法手册，按考研英语大纲评分档位批改。">
   <link rel="manifest" href="manifest.webmanifest">
   <meta name="theme-color" content="#4b3fe3">
   <meta name="mobile-web-app-capable" content="yes">
@@ -20,7 +20,7 @@
   <header class="topbar">
     <div class="brand">
       <h1>考研英语高阶训练器</h1>
-      <p class="sub">长难句 · 句型升级 · 作文批改</p>
+      <p class="sub">长难句 · 句型升级 · 作文批改 · 语法库</p>
     </div>
     <button id="btn-settings" class="btn ghost small" aria-haspopup="dialog">设置<span class="dot" id="key-dot" hidden></span></button>
   </header>
@@ -31,6 +31,7 @@
       <button class="tab" id="tab-rewrite" role="tab" data-tab="rewrite" aria-selected="false" aria-controls="panel-rewrite">句型魔改</button>
       <button class="tab" id="tab-essay" role="tab" data-tab="essay" aria-selected="false" aria-controls="panel-essay">作文批改</button>
       <button class="tab" id="tab-review" role="tab" data-tab="review" aria-selected="false" aria-controls="panel-review">复盘</button>
+      <button class="tab" id="tab-grammar" role="tab" data-tab="grammar" aria-selected="false" aria-controls="panel-grammar">语法库</button>
     </nav>
 
     <!-- Tab 1 -->
@@ -177,6 +178,17 @@
       <div class="chips" id="review-chips"></div>
       <div id="review-list" class="review-list"></div>
     </section>
+
+    <!-- Tab 5 -->
+    <section id="panel-grammar" class="panel" role="tabpanel" aria-labelledby="tab-grammar" hidden>
+      <label class="field">
+        <span class="label">搜语法点、例句或易错提醒</span>
+        <input id="grammar-q" type="search" spellcheck="false" placeholder="例如：虚拟、倒装、result in、冠词">
+      </label>
+      <div class="chips filter-chips" id="grammar-cats"></div>
+      <p class="hint" id="grammar-count"></p>
+      <div id="grammar-list" class="grammar-list"></div>
+    </section>
   </main>
 
   <!-- 设置 -->
@@ -267,6 +279,7 @@
   <script src="assets/calibration.js"></script>
   <script src="assets/techniques.js"></script>
   <script src="assets/topics.js"></script>
+  <script src="assets/grammar.js"></script>
   <script src="assets/storage.js"></script>
   <script src="assets/image.js"></script>
   <script src="assets/api.js"></script>

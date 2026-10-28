@@ -137,7 +137,7 @@ button, input, select, textarea { font: inherit; color: inherit; }
   color: var(--text-muted);
 }
 
-textarea, input[type="text"], input[type="url"], input[type="password"], select {
+textarea, input[type="text"], input[type="url"], input[type="password"], input[type="search"], select {
   width: 100%;
   padding: 10px 12px;
   background: var(--surface);
@@ -521,6 +521,91 @@ select { appearance: none; background-image: linear-gradient(45deg, transparent 
   background: var(--danger-soft);
 }
 
+/* ---------- 语法库 ---------- */
+
+.filter-chips { margin: 0 0 10px; }
+
+.chip.filter-chip {
+  border: 0;
+  cursor: pointer;
+  background: var(--surface-muted);
+  color: var(--text-muted);
+  font-size: 12.5px;
+  line-height: 1.5;
+}
+
+.chip.filter-chip:hover { color: var(--text); }
+
+.chip.filter-chip.is-active {
+  background: var(--brand);
+  color: #fff;
+  font-weight: 500;
+}
+
+.grammar-list { display: flex; flex-direction: column; gap: 10px; }
+
+.grammar-item {
+  padding: 0 16px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow);
+}
+
+.grammar-item summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 13px 0;
+  cursor: pointer;
+  list-style: none;
+}
+
+.grammar-item summary::-webkit-details-marker { display: none; }
+
+.grammar-title { font-size: 14px; font-weight: 500; }
+.grammar-title::before { content: '▸ '; color: var(--text-muted); }
+.grammar-item[open] .grammar-title::before { content: '▾ '; }
+.grammar-item[open] .grammar-title { color: var(--brand); }
+
+.grammar-cat {
+  flex: 0 0 auto;
+  padding: 1px 8px;
+  border-radius: 999px;
+  background: var(--brand-soft);
+  color: var(--brand-text);
+  font-size: 11.5px;
+}
+
+.grammar-body { padding: 0 0 14px; border-top: 1px solid var(--border); }
+.grammar-body > *:first-child { margin-top: 12px; }
+
+.grammar-formula {
+  margin: 0 0 10px;
+  padding: 9px 12px;
+  background: var(--surface-muted);
+  border-radius: var(--radius);
+  font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  font-size: 12.5px;
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+}
+
+.grammar-note { margin: 0 0 10px; font-size: 13.5px; }
+.grammar-body .example-list { margin: 0 0 12px; }
+
+.grammar-pitfall {
+  margin: 0;
+  padding: 9px 12px;
+  background: var(--danger-soft);
+  border-radius: var(--radius);
+  font-size: 12.5px;
+  line-height: 1.6;
+}
+
+.grammar-pitfall b { margin-right: 6px; color: var(--danger); }
+
 @media (prefers-reduced-motion: reduce) {
   .spinner { animation-duration: 0s; }
   * { transition: none !important; }
@@ -541,6 +626,6 @@ select { appearance: none; background-image: linear-gradient(45deg, transparent 
   .topbar { padding: 10px 14px; }
   .page { padding: 14px 12px 92px; }
   .card { padding: 14px; }
-  .tab { font-size: 13px; }
+  .tab { padding: 8px 3px; font-size: 12.5px; }
   .md table { font-size: 13px; }
 }

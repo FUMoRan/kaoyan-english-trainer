@@ -883,6 +883,62 @@ window.App = window.App || {};
     });
   }
 
+  /* ---------------- 语法库 ---------------- */
+
+  function initGrammar() {
+    const catBox = $('#grammar-cats');
+    const input = $('#grammar-q');
+    const listBox = $('#grammar-list');
+    const countBox = $('#grammar-count');
+    let cat = '全部';
+
+    catBox.innerHTML = ['全部'].concat(App.grammar.CATS).map(function (name) {
+      return '<button type="button" class="chip filter-chip' +
+        (name === '全部' ? ' is-active' : '') + '" data-cat="' + escapeAttr(name) + '">' +
+        escapeAttr(name) + '</button>';
+    }).join('');
+
+    function itemHtml(item) {
+      const examples = item.examples.map(function (pair) {
+        return '<li><p class="ex-en">' + escapeAttr(pair[0]) + '</p>' +
+          '<p class="ex-cn">' + escapeAttr(pair[1]) + '</p></li>';
+      }).join('');
+      return '<details class="grammar-item">' +
+        '<summary><span class="grammar-title">' + escapeAttr(item.title) + '</span>' +
+        '<span class="grammar-cat">' + escapeAttr(item.cat) + '</span></summary>' +
+        '<div class="grammar-body">' +
+        '<p class="grammar-formula">' + escapeAttr(item.formula) + '</p>' +
+        '<p class="grammar-note">' + escapeAttr(item.note) + '</p>' +
+        '<ul class="example-list">' + examples + '</ul>' +
+        '<p class="grammar-pitfall"><b>易错</b>' + escapeAttr(item.pitfall) + '</p>' +
+        '</div></details>';
+    }
+
+    function render() {
+      const items = App.grammar.search(input.value, cat);
+      const filtered = String(input.value).trim() !== '' || cat !== '全部';
+      countBox.textContent = filtered
+        ? '匹配到 ' + items.length + ' 个语法点'
+        : '共 ' + items.length + ' 个语法点，点开任意一条看结构、例句和易错提醒';
+      listBox.innerHTML = items.length
+        ? items.map(itemHtml).join('')
+        : '<p class="hint">没找到，换个关键词试试，比如「虚拟」「倒装」「冠词」或「result in」。</p>';
+    }
+
+    catBox.addEventListener('click', function (e) {
+      const btn = e.target.closest('[data-cat]');
+      if (!btn) return;
+      cat = btn.dataset.cat;
+      Array.prototype.forEach.call(catBox.children, function (chip) {
+        chip.classList.toggle('is-active', chip === btn);
+      });
+      render();
+    });
+
+    input.addEventListener('input', render);
+    render();
+  }
+
   /* ---------------- 启动 ---------------- */
 
   function init() {
@@ -948,6 +1004,7 @@ window.App = window.App || {};
     initRewrite();
     initEssay();
     initReview();
+    initGrammar();
     refreshKeyHint();
   }
 

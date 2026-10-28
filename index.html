@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="color-scheme" content="light dark">
+  <title>考研英语高阶训练器</title>
+  <meta name="description" content="长难句拆解、高级句型改写与作文拍照批改，按考研英语大纲评分档位批改。">
+  <link rel="stylesheet" href="assets/styles.css">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%234B3FE3'/%3E%3Ctext x='16' y='22' font-size='16' text-anchor='middle' fill='white' font-family='sans-serif'%3EE%3C/text%3E%3C/svg%3E">
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <h1>考研英语高阶训练器</h1>
+      <p class="sub">长难句 · 句型升级 · 作文批改</p>
+    </div>
+    <button id="btn-settings" class="btn ghost small" aria-haspopup="dialog">设置<span class="dot" id="key-dot" hidden></span></button>
+  </header>
+
+  <main class="page">
+    <nav class="tabs" role="tablist" aria-label="训练模块">
+      <button class="tab is-active" id="tab-sentence" role="tab" data-tab="sentence" aria-selected="true" aria-controls="panel-sentence">长难句拆解</button>
+      <button class="tab" id="tab-rewrite" role="tab" data-tab="rewrite" aria-selected="false" aria-controls="panel-rewrite">句型魔改</button>
+      <button class="tab" id="tab-essay" role="tab" data-tab="essay" aria-selected="false" aria-controls="panel-essay">作文批改</button>
+    </nav>
+
+    <!-- Tab 1 -->
+    <section id="panel-sentence" class="panel" role="tabpanel" aria-labelledby="tab-sentence">
+      <label class="field">
+        <span class="label">英文长难句</span>
+        <textarea id="sentence-input" rows="4" placeholder="粘贴一句真题阅读里的长句，例如：The idea that ..."></textarea>
+      </label>
+      <div class="row">
+        <button id="btn-sentence" class="btn primary">一键拆解</button>
+        <span class="tip">先自己划主干，再对答案，效果最好</span>
+      </div>
+      <article id="sentence-result" class="result" hidden></article>
+    </section>
+
+    <!-- Tab 2 -->
+    <section id="panel-rewrite" class="panel" role="tabpanel" aria-labelledby="tab-rewrite" hidden>
+      <label class="field">
+        <span class="label">你想表达的意思（中文、简单英文都行）</span>
+        <textarea id="rewrite-input" rows="4" placeholder="例如：越来越多的人开始重视传统文化"></textarea>
+      </label>
+      <div class="grid2">
+        <label class="field">
+          <span class="label">指定手法</span>
+          <select id="rewrite-type">
+            <option value="强调句（It is ... that ...）">强调句 It is ... that ...</option>
+            <option value="倒装句（否定词提前）">倒装句（否定词提前）</option>
+            <option value="独立主格">独立主格</option>
+            <option value="虚拟语气">虚拟语气</option>
+            <option value="让步倒装（Hardly ... when / No matter how）">让步倒装</option>
+          </select>
+        </label>
+      </div>
+      <div class="row">
+        <button id="btn-rewrite" class="btn primary">生成高级句型</button>
+        <span class="tip">不适合该语境时，会直接告诉你，不会硬凑</span>
+      </div>
+      <article id="rewrite-result" class="result" hidden></article>
+    </section>
+
+    <!-- Tab 3 -->
+    <section id="panel-essay" class="panel" role="tabpanel" aria-labelledby="tab-essay" hidden>
+      <div class="notice" id="essay-nokey" hidden>
+        还没配置 API Key，点右上角「设置」选一个服务商并填入 Key，就能开始批改。
+      </div>
+
+      <div class="grid2">
+        <label class="field">
+          <span class="label">试卷类型</span>
+          <select id="essay-type">
+            <option value="e1_big">英语一 · 大作文（20 分）</option>
+            <option value="e1_small">英语一 · 小作文（10 分）</option>
+            <option value="e2_big">英语二 · 大作文（15 分）</option>
+            <option value="e2_small">英语二 · 小作文（10 分）</option>
+          </select>
+        </label>
+        <label class="field">
+          <span class="label">批改哪一部分</span>
+          <select id="essay-para"></select>
+        </label>
+      </div>
+
+      <details class="details" id="score-guide">
+        <summary>评分档位说明（按考研大纲）</summary>
+        <ul id="band-list" class="band-list"></ul>
+        <p class="hint">先定档、再在档内给分；只批改单段时，分数是基于该段的估算。</p>
+      </details>
+
+      <label class="field">
+        <span class="label">题目 / 图画描述（选填，但填了分数才靠谱）</span>
+        <textarea id="essay-topic" rows="2" placeholder="例如：2023 英语一，图画中乡村龙舟赛，两位老人感叹村子越来越热闹"></textarea>
+      </label>
+
+      <div class="field">
+        <span class="label">作文照片</span>
+        <div class="uploader" id="uploader">
+          <div class="upload-actions" id="upload-actions">
+            <button type="button" class="btn" id="btn-camera">拍照</button>
+            <button type="button" class="btn ghost" id="btn-gallery">从相册选择</button>
+            <span class="tip">字迹清晰、光线均匀，识别率最高</span>
+          </div>
+          <input type="file" id="file-camera" accept="image/*" capture="environment" hidden>
+          <input type="file" id="file-gallery" accept="image/*" hidden>
+          <div class="preview" id="preview" hidden>
+            <img id="preview-img" alt="作文照片预览">
+            <div class="preview-meta">
+              <span id="preview-info" class="tip"></span>
+              <button type="button" class="btn ghost small" id="btn-reset-image">重新选择</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="row">
+        <button id="btn-ocr" class="btn primary">识别原文</button>
+        <span class="tip">第 1 步：只做转录，不改你的错误</span>
+      </div>
+
+      <div id="ocr-stage" class="stage" hidden>
+        <label class="field">
+          <span class="label">识别结果（可直接修改，改完再批改）</span>
+          <textarea id="ocr-text" rows="8"></textarea>
+        </label>
+        <p class="hint" id="ocr-hint"></p>
+        <div class="row">
+          <button id="btn-grade" class="btn primary">确认无误，开始批改</button>
+          <button id="btn-reocr" class="btn ghost">重新识别</button>
+        </div>
+      </div>
+
+      <article id="essay-result" class="result" hidden></article>
+    </section>
+  </main>
+
+  <!-- 设置 -->
+  <div id="settings" class="modal" hidden>
+    <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="settings-title">
+      <div class="modal-head">
+        <h2 id="settings-title">API 设置</h2>
+        <button class="btn ghost small" id="btn-close-settings" aria-label="关闭">关闭</button>
+      </div>
+
+      <label class="field">
+        <span class="label">服务商</span>
+        <select id="set-provider"></select>
+      </label>
+      <p class="hint" id="set-provider-note"></p>
+
+      <label class="field">
+        <span class="label">Base URL</span>
+        <input id="set-baseurl" type="url" spellcheck="false" placeholder="https://api.moonshot.cn/v1">
+      </label>
+
+      <label class="field">
+        <span class="label">模型名</span>
+        <input id="set-model" type="text" spellcheck="false" placeholder="moonshot-v1-8k-vision-preview">
+      </label>
+
+      <label class="field">
+        <span class="label">API Key</span>
+        <input id="set-key" type="password" autocomplete="off" spellcheck="false" placeholder="sk-...">
+      </label>
+
+      <label class="check">
+        <input type="checkbox" id="set-stream" checked>
+        <span>流式输出（边生成边显示，推荐开启）</span>
+      </label>
+
+      <p class="hint">Key 只保存在本机浏览器（localStorage），不会上传到任何服务器。本页直接请求你选择的服务商，没有中间服务器。</p>
+
+      <div class="row">
+        <button id="btn-test" class="btn">测试连接</button>
+        <button id="btn-save" class="btn primary">保存</button>
+      </div>
+      <p class="status" id="test-result" hidden></p>
+
+      <details class="details">
+        <summary>服务商跨域限制说明</summary>
+        <p>Moonshot、阿里百炼、硅基流动、OpenRouter 已验证允许网页直连；智谱的接口未开放跨域，需要自建代理（仓库里附了 20 行的 Cloudflare Worker）。</p>
+      </details>
+    </div>
+  </div>
+
+  <!-- 全局状态条 -->
+  <div id="statusbar" class="statusbar" hidden>
+    <span class="spinner" aria-hidden="true"></span>
+    <span id="status-text">正在生成…</span>
+    <button id="btn-stop" class="link-btn">停止</button>
+  </div>
+
+  <script src="assets/vendor/marked.min.js"></script>
+  <script src="assets/vendor/purify.min.js"></script>
+  <script src="assets/config.js"></script>
+  <script src="assets/calibration.js"></script>
+  <script src="assets/storage.js"></script>
+  <script src="assets/image.js"></script>
+  <script src="assets/api.js"></script>
+  <script src="assets/markdown.js"></script>
+  <script src="assets/ui.js"></script>
+</body>
+</html>

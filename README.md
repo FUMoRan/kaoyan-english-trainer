@@ -6,6 +6,9 @@
 
 ```
 index.html              页面骨架
+manifest.webmanifest    PWA 清单（名称、图标、独立窗口）
+sw.js                   离线缓存（网络优先，断网回落缓存）
+assets/icons/           桌面图标 192 / 512 / maskable
 assets/styles.css       样式（含深色模式）
 assets/config.js        服务商预设、题型与评分档位、提示词
 assets/calibration.js   评分标尺样本（近几年真题题目 + 档位构造）
@@ -27,6 +30,18 @@ proxy/worker.js         可选：Cloudflare Worker 代理（仅智谱等不开�
 不需要构建、不需要 Node 环境。`.nojekyll` 已经放好，避免 Jekyll 处理静态资源。
 
 如果 GitHub Pages 打开慢，多半是 `assets/vendor/` 没上传成功（marked/Purify 是本地文件，不走 CDN）。
+
+## 装成本地 App（PWA）
+
+线上地址：<https://fumoran.github.io/kaoyan-english-trainer/>
+
+- **桌面 Chrome / Edge**：打开上面的地址，点地址栏右侧的「安装」图标（或在菜单里找「安装 考研英语高阶训练器」）。装好后开始菜单/桌面会出现独立图标，点开是无地址栏的独立窗口。
+- **Android Chrome**：菜单 →「安装应用」或「添加到主屏幕」。
+- **iOS Safari**：分享菜单 →「添加到主屏幕」。
+
+装好之后页面本身断网也能打开（`sw.js` 缓存了全部静态资源），但批改仍要联网——模型接口是跨域的，Service Worker 不接管。
+
+改版后不用手动清缓存：`sw.js` 用「网络优先、断网回缓存」的策略，联网打开一次就会自动更新。Key 存在浏览器 localStorage，桌面 App 和普通标签页是同一份。
 
 ## 配置 API Key
 

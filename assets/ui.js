@@ -448,4 +448,11 @@ window.App = window.App || {};
   } else {
     init();
   }
+
+  /* PWA：注册 Service Worker，装到桌面后断网也能打开（接口调用仍需联网） */
+  if ('serviceWorker' in navigator && window.isSecureContext) {
+    window.addEventListener('load', function () {
+      navigator.serviceWorker.register('sw.js').catch(function () {});
+    });
+  }
 })(window.App);

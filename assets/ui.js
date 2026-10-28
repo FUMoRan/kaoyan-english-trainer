@@ -898,12 +898,12 @@ window.App = window.App || {};
         escapeAttr(name) + '</button>';
     }).join('');
 
-    function itemHtml(item) {
+    function itemHtml(item, index) {
       const examples = item.examples.map(function (pair) {
         return '<li><p class="ex-en">' + escapeAttr(pair[0]) + '</p>' +
           '<p class="ex-cn">' + escapeAttr(pair[1]) + '</p></li>';
       }).join('');
-      return '<details class="grammar-item">' +
+      return '<details class="grammar-item"' + (index === 0 ? ' open' : '') + '>' +
         '<summary><span class="grammar-title">' + escapeAttr(item.title) + '</span>' +
         '<span class="grammar-cat">' + escapeAttr(item.cat) + '</span></summary>' +
         '<div class="grammar-body">' +

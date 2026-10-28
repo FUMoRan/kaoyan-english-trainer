@@ -5,9 +5,139 @@ window.App = window.App || {};
 (function (App) {
   'use strict';
 
-  const CATS = ['从句', '非谓语', '虚拟语气', '倒装与强调', '时态与语态', '一致与比较', '冠词与搭配', '写作升级'];
+  const CATS = ['高分句式', '从句', '非谓语', '虚拟语气', '倒装与强调', '时态与语态', '一致与比较', '冠词与搭配', '写作升级'];
 
   const ITEMS = [
+    {
+      id: 'appositive',
+      cat: '高分句式',
+      title: '同位语与同位语从句：给观点贴标签',
+      formula: '抽象名词 + that 从句（the belief that ...）；名词/名词短语直接后置（..., a shift that ...）',
+      note: '同位语从句解释前面抽象名词的具体内容（belief / fact / idea / evidence），that 不作成分；同位语短语则是对前文的概括复述，适合一句话收束前文。',
+      examples: [
+        ['The belief that talent alone guarantees success ignores the role of deliberate practice.', '「仅靠天赋就能成功」这一信念忽视了刻意练习的作用。'],
+        ['The fact that many graduates postpone marriage has fueled a demographic shift.', '许多毕业生推迟结婚，这一事实推动了人口结构的转变。'],
+        ['Cities are pouring money into public transport, a shift that could reshape commuting habits.', '城市正大举投资公共交通，这一转变可能重塑通勤习惯。']
+      ],
+      pitfall: '同位语从句用 that，不用 which；抽象名词后若 that 在从句里作主语或宾语，那就是定语从句，不是同位语从句。'
+    },
+    {
+      id: 'parallelism',
+      cat: '高分句式',
+      title: '平行结构：三项并列撑起句子',
+      formula: 'A, B, and C 同词性同形式；not only ... but also ...；rather than / instead of 前后对称',
+      note: '阅卷人看句式变化，平行结构最稳：把三个同类成分用同一语法形式排开，句子立刻有节奏。常用于列举原因、影响或措施。',
+      examples: [
+        ['The policy aims to cut costs, improve access, and restore public trust.', '该政策旨在降低成本、改善可及性并重建公众信任。'],
+        ['Reading sharpens judgment, widens perspective, and strengthens empathy.', '阅读磨砺判断、拓宽视野、增强共情。'],
+        ['Success depends less on talent than on discipline, patience, and the willingness to fail.', '成功更依赖自律、耐心和接受失败的意愿，而非天赋。']
+      ],
+      pitfall: '平行项必须同词性同形式：× to cut costs, improving access, and restore trust；not only 后接的成分要与 but also 后一致。'
+    },
+    {
+      id: 'double-negative',
+      cat: '高分句式',
+      title: '双重否定与弱化肯定：把话说得有余地',
+      formula: 'not uncommon / it is not unusual for ... to ...；few would deny that ...；hardly a ... that ...',
+      note: '双重否定等于委婉肯定，语气比直说更稳，适合评论和结论段。注意别叠成三重否定，读起来会绕。',
+      examples: [
+        ['It is not uncommon for fresh graduates to change jobs within a year.', '应届生一年内换工作并不罕见。'],
+        ['Few would deny that digital tools have reshaped the way we read.', '很少有人会否认数字工具重塑了我们的阅读方式。'],
+        ['Hardly a week passes without a new report on youth unemployment.', '几乎每周都有关于青年失业的新报告。']
+      ],
+      pitfall: 'not uncommon 比 common 更保守，别当完全同义词；hardly / scarcely 本身含否定，后面不要再加 not。'
+    },
+    {
+      id: 'concession-contrast',
+      cat: '高分句式',
+      title: '让步—转折：While it is true that ...',
+      formula: 'While it is true that A, it does not follow that B；Admittedly A; however, B；Granted that A, B',
+      note: '先承认对方一半，再转折给出自己的判断，是议论文里最像「成年人说话」的句式。第二段分析原因、第三段给建议都好用。',
+      examples: [
+        ['While it is true that online courses save time, it does not follow that they replace face-to-face teaching.', '网课确实省时间，但这并不意味着它能取代面授。'],
+        ['Admittedly, technology has made life more convenient; however, it has also made attention harder to hold.', '诚然，科技让生活更便利；但它也让注意力更难集中。'],
+        ['Granted that the reform is costly, the long-term benefits outweigh the short-term pain.', '就算改革代价高昂，长期收益也大于短期阵痛。']
+      ],
+      pitfall: 'while 在这里是「虽然」，不是「当…时」；it does not follow that 后接完整从句，别写成 it does not follow to。'
+    },
+    {
+      id: 'causal-chain',
+      cat: '高分句式',
+      title: '因果链：Given ..., it follows that ...',
+      formula: 'Given + 名词/从句, it follows that ...；A breeds B, which in turn fuels C；This, in turn, ...',
+      note: '把「因为—所以—进一步」写成一条链，比堆 because 更书面。图表作文解释原因时尤其好用。',
+      examples: [
+        ['Given the rising cost of housing, it follows that young people delay marriage.', '鉴于房价上涨，年轻人推迟结婚也就不足为奇。'],
+        ['Long working hours breed exhaustion, which in turn fuels mistakes.', '长时间工作导致疲惫，而疲惫又进一步引发失误。'],
+        ['Automation cuts routine jobs; this, in turn, raises demand for retraining.', '自动化削减常规岗位，这反过来又提高了再培训的需求。']
+      ],
+      pitfall: 'given 后接名词或从句，不要写成 given that 再加完整句子；in turn 表「反过来、依次」，别与 in return（作为回报）混用。'
+    },
+    {
+      id: 'as-clause',
+      cat: '高分句式',
+      title: 'as 引导的非限制性定语从句：As is often the case',
+      formula: 'As is often the case, ...；As the data show, ...；..., as has been noted',
+      note: 'as 可以指代整句话，位置灵活（句首、句中、句尾），比 which 更常用于「正如…」的评注。作文里用来引数据或承接常识。',
+      examples: [
+        ['As is often the case with new technology, the benefits arrive before the rules do.', '新技术的常见情形是：好处先到，规则后到。'],
+        ['As the figures show, rural consumption has grown faster than urban consumption.', '正如数据所示，农村消费增速快于城镇。'],
+        ['The reform, as was expected, met resistance from local officials.', '正如预料的那样，改革遭到了地方官员的抵制。']
+      ],
+      pitfall: 'as 从句可以放句首，which 从句不行；as 常含「正如」义，which 只是补充事实。'
+    },
+    {
+      id: 'formal-subject',
+      cat: '高分句式',
+      title: '形式主语：It is worth noting that ...',
+      formula: 'It is + 形容词/过去分词 + that 从句；It would be + 名词 + to do',
+      note: '用 it 占位，把长从句放到句尾，句子更平衡。适合引出数据、提出评价或委婉建议。',
+      examples: [
+        ['It is worth noting that the gap between urban and rural incomes has narrowed.', '值得注意的是，城乡收入差距已经缩小。'],
+        ['It would be a mistake to assume that longer study hours always raise scores.', '认为学习时间越长分数就越高，是个错误。'],
+        ['It is no exaggeration to say that public libraries anchor community life.', '说公共图书馆支撑着社区生活，并不夸张。']
+      ],
+      pitfall: '评价形容词后用 that 从句，不用 what；It is no exaggeration to say 后面接完整从句。'
+    },
+    {
+      id: 'data-focus',
+      cat: '高分句式',
+      title: '数据焦点：What stands out is ...',
+      formula: 'What stands out is that ...；A closer look at the figures reveals ...；X accounts for + 比例',
+      note: '图表作文第一段最忌逐条念数字。先用一句话点出最突出的变化，再补关键数据，读起来像分析而不是流水账。',
+      examples: [
+        ['What stands out is that air-conditioner ownership nearly doubled in a decade.', '最突出的是，空调拥有量在十年间几乎翻倍。'],
+        ['A closer look at the figures reveals a steady rise in rural car ownership.', '细看数据会发现，农村汽车保有量在稳步上升。'],
+        ['Private cars account for nearly half of the growth in energy consumption.', '私家车占能源消费增长的近一半。']
+      ],
+      pitfall: 'What 从句作主语时谓语用单数（What stands out is）；reveal 的主语是「数据、图表」，不要重复写 the figures reveal that ... reveals。'
+    },
+    {
+      id: 'contrast-frame',
+      cat: '高分句式',
+      title: '对比句式：In contrast / whereas',
+      formula: 'In contrast to / with + 名词, ...；A ..., whereas B ...；By comparison, ...',
+      note: '对比让观点有参照系。图表作文比两组数据、议论文比两种态度时，一句话就能立住。',
+      examples: [
+        ['In contrast to urban residents, rural families spend a larger share on food.', '与城镇居民相比，农村家庭的食品支出占比更高。'],
+        ['Young workers value flexibility, whereas older workers prioritize stability.', '年轻员工看重灵活，年长员工更看重稳定。'],
+        ['By comparison, spending on education grew far more slowly than spending on travel.', '相比之下，教育支出的增速远低于旅行支出。']
+      ],
+      pitfall: 'whereas 连接两个完整分句，不能像 in contrast 那样单独起句；in contrast to 后接名词，不接句子。'
+    },
+    {
+      id: 'parenthesis',
+      cat: '高分句式',
+      title: '插入语与破折号：给句子加一层解释',
+      formula: '..., a trend that ...；— often at the cost of ... —；名词 + , 同位语, + 继续',
+      note: '插入语补充背景或态度，不打断主句骨架，是长句「高级感」的来源。破折号比逗号更醒目，一段最多用一次。',
+      examples: [
+        ['Cities are gentrifying fast — often at the cost of long-time residents.', '城市正在快速绅士化——代价往往由老居民承担。'],
+        ['The proposal, widely praised at first, soon ran into funding problems.', '这项提议起初广受好评，很快却陷入资金问题。'],
+        ['Remote work has reshaped hiring, a change that favors workers with scarce skills.', '远程办公重塑了招聘，这一变化有利于技能稀缺的劳动者。']
+      ],
+      pitfall: '插入语去掉后主句必须仍然完整；破折号要成对使用，一段里不要连用两个以上插入语。'
+    },
     {
       id: 'attr-clause',
       cat: '从句',

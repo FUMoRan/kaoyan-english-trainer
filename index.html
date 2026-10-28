@@ -53,19 +53,41 @@
       </label>
       <div class="grid2">
         <label class="field">
-          <span class="label">指定手法</span>
+          <span class="label">手法</span>
           <select id="rewrite-type">
-            <option value="强调句（It is ... that ...）">强调句 It is ... that ...</option>
-            <option value="倒装句（否定词提前）">倒装句（否定词提前）</option>
-            <option value="独立主格">独立主格</option>
-            <option value="虚拟语气">虚拟语气</option>
-            <option value="让步倒装（Hardly ... when / No matter how）">让步倒装</option>
+            <option value="auto">AI 推荐（按语境自动选）</option>
+            <optgroup label="强调与倒装">
+              <option value="强调句（It is ... that ...）">强调句 It is ... that ...</option>
+              <option value="倒装（否定词 Not only / Never / Hardly 提前）">倒装：否定词提前</option>
+              <option value="倒装（Only + 状语提前）">倒装：Only + 状语提前</option>
+              <option value="让步倒装（Hardly ... when / No sooner ... than）">让步倒装</option>
+            </optgroup>
+            <optgroup label="从句与非谓语">
+              <option value="非限制性定语从句（..., which ...）">非限制性定语从句</option>
+              <option value="限制性定语从句">限制性定语从句</option>
+              <option value="主语从句 / 形式主语（It is ... to ...）">主语从句 / 形式主语</option>
+              <option value="同位语（用名词短语解释前文）">同位语</option>
+              <option value="分词短语作状语（Faced with ..., ...）">分词短语作状语</option>
+              <option value="独立主格">独立主格</option>
+              <option value="with 复合结构">with 复合结构</option>
+            </optgroup>
+            <optgroup label="名词化与抽象表达">
+              <option value="名词化（动词或形容词转抽象名词）">名词化</option>
+              <option value="抽象名词作主语">抽象名词作主语</option>
+              <option value="被动语态（强调受事）">被动语态</option>
+              <option value="虚拟语气（If it were not for ...）">虚拟语气</option>
+            </optgroup>
+            <optgroup label="比较与衔接">
+              <option value="比较结构（the more ..., the more ...）">比较结构 the more…, the more…</option>
+              <option value="平行结构（not only ..., but also ...）">平行结构</option>
+              <option value="因果递进衔接（Consequently / What's more）">因果递进衔接</option>
+            </optgroup>
           </select>
         </label>
       </div>
       <div class="row">
         <button id="btn-rewrite" class="btn primary">生成高级句型</button>
-        <span class="tip">不适合该语境时，会直接告诉你，不会硬凑</span>
+        <span class="tip">AI 推荐会先判断这句适合哪种手法；指定的手法不适用会直说</span>
       </div>
       <article id="rewrite-result" class="result" hidden></article>
     </section>

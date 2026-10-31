@@ -1,0 +1,1191 @@
+{
+  "version": 1,
+  "exportedAt": "2026-10-31T04:00:00.000Z",
+  "cats": [
+    "图表总述·动态",
+    "图表总述·静态",
+    "图表总述·双图",
+    "图表总述·万能",
+    "图表细节·公式",
+    "图表词汇·搭配",
+    "图表过渡·社会现象",
+    "图画描述·单双图",
+    "图画主题·阐述",
+    "文字作文·改写",
+    "第二段·过渡句",
+    "第二段·举例论证",
+    "第二段·群众路线",
+    "第二段·从句与六方面",
+    "第二段·not倒装",
+    "第二段·虚拟语气",
+    "第二段·对比论证",
+    "第二段·比喻句",
+    "第二段·正反论证",
+    "第三段·总结全文",
+    "第三段·具体措施",
+    "第三段·畅想与预测",
+    "真题整段范例"
+  ],
+  "items": [
+    {
+      "id": "tpl-001",
+      "en": "The chart above illustrates the changes in 主题词 from 年份 to 年份, during which it rose steadily.",
+      "cn": "上表展示了年份至年份间主题词的变化，其在这一时期稳步上升。",
+      "note": "待选 1（Which 从句）。适合动态单方向；rose steadily 可按数据换成 climbed sharply / declined gradually。",
+      "cat": "图表总述·动态",
+      "at": 1793400000000
+    },
+    {
+      "id": "tpl-002",
+      "en": "主题词 saw a steady rise from 年份 to 年份, as illustrated in the chart.",
+      "cn": "如该图表所示，主题词在年份至年份间稳步上升。",
+      "note": "待选 2（趋势作宾语）。主题词须是实体（行业/城市/国家）；若主题词是水平、率、比例，改用 The period from 年份 to 年份 saw a steady rise in 主题词。",
+      "cat": "图表总述·动态",
+      "at": 1793399999000
+    },
+    {
+      "id": "tpl-003",
+      "en": "According to the data given in the chart, the number of 主题词 climbed steadily from 年份 to 年份.",
+      "cn": "根据图中数据，主题词的数量在年份至年份间稳步攀升。",
+      "note": "待选 3（状语式）。the number of 视情况换成 the level / rate / proportion of。",
+      "cat": "图表总述·动态",
+      "at": 1793399998000
+    },
+    {
+      "id": "tpl-004",
+      "en": "The chart above illustrates the changes in 主题词 from 年份 to 年份, among which the rise in 单项 was the most striking.",
+      "cn": "上方图表展示了年份至年份间主题词的变化，其中单项的上升最为显著。",
+      "note": "待选 1（Among which 从句）。用于多个变量走向不一的动态图。",
+      "cat": "图表总述·动态",
+      "at": 1793399997000
+    },
+    {
+      "id": "tpl-005",
+      "en": "主题词 experienced divergent trends from 年份 to 年份, with 单项 rising most sharply.",
+      "cn": "主题词在年份至年份间经历了分化性的趋势，其中单项上升最为剧烈。",
+      "note": "待选 2（Divergent + with）。",
+      "cat": "图表总述·动态",
+      "at": 1793399996000
+    },
+    {
+      "id": "tpl-006",
+      "en": "As reflected in the chart, 主题词 moved in opposite directions from 年份 to 年份, 单项 rising while 另一单项 falling.",
+      "cn": "如图中数据所示，主题词在年份至年份间朝不同方向变化，单项上升而另一单项下降。",
+      "note": "待选 3（状语式 + 对比）。moved in opposite directions 可换 diverged；三个变量只写对比最鲜明的两个。",
+      "cat": "图表总述·动态",
+      "at": 1793399995000
+    },
+    {
+      "id": "tpl-007",
+      "en": "The bar chart above presents the distribution of 主题词 in 年份, with 单项 accounting for the largest share.",
+      "cn": "上方柱状图呈现了年份主题词的分布，其中单项占比最高。",
+      "note": "待选 1（3D 之 Distribution + with）。静态图没有年份趋势，用 in 年份。",
+      "cat": "图表总述·静态",
+      "at": 1793399994000
+    },
+    {
+      "id": "tpl-008",
+      "en": "The pie chart above highlights the dominance of 单项 in 主题词, with it overshadowing all other components.",
+      "cn": "上方图表突出了单项在主题词中的主导地位，其远超其他各项。",
+      "note": "待选 2（3D 之 Dominance）。仅当第一项断崖式领先时使用。",
+      "cat": "图表总述·静态",
+      "at": 1793399993000
+    },
+    {
+      "id": "tpl-009",
+      "en": "The chart above reveals a striking disparity in 主题词, with the proportions ranging from 最低值 to 最高值.",
+      "cn": "上方图表揭示了主题词中显著的差距，各项占比从最低值到最高值不等。",
+      "note": "待选 3（3D 之 Disparity）。结构为 with + 宾语 + 现在分词。",
+      "cat": "图表总述·静态",
+      "at": 1793399992000
+    },
+    {
+      "id": "tpl-010",
+      "en": "The chart on the left illustrates 左图主题, while the chart on the right presents 右图主题.",
+      "cn": "左侧的图展示了……，而右侧的图呈现了……。",
+      "note": "待选 1（While 并列）。静静、动静、动动结合都只换骨架里的主题词。",
+      "cat": "图表总述·双图",
+      "at": 1793399991000
+    },
+    {
+      "id": "tpl-011",
+      "en": "The pie chart above presents 左图主题. As for the chart on the right, it shows 右图主题.",
+      "cn": "上面的饼图呈现了……。至于右侧的图，它展示了……。",
+      "note": "待选 2（As for 另起一句）。",
+      "cat": "图表总述·双图",
+      "at": 1793399990000
+    },
+    {
+      "id": "tpl-012",
+      "en": "The two charts present 总主题: the pie chart shows 图1内容, while the bar chart on the right lists 图2内容.",
+      "cn": "两幅图呈现了……：饼图显示了……，而右侧的柱状图列出了……。",
+      "note": "待选 3（总分结构）。能抽象就抽象：attitudes / concerns / choices / preferences。",
+      "cat": "图表总述·双图",
+      "at": 1793399989000
+    },
+    {
+      "id": "tpl-013",
+      "en": "Some remarkable changes in 主题词 have taken place in the past few years.",
+      "cn": "在过去的几年中，主题词发生了一些显著的变化。",
+      "note": "万能待选 1。用于没把握、看不懂或时间紧的情况。",
+      "cat": "图表总述·万能",
+      "at": 1793399988000
+    },
+    {
+      "id": "tpl-014",
+      "en": "The chart above shows the variation in 主题词 from 年份 to 年份.",
+      "cn": "上述图表展示了年份至年份间主题词的变化。",
+      "note": "万能待选 2。",
+      "cat": "图表总述·万能",
+      "at": 1793399987000
+    },
+    {
+      "id": "tpl-015",
+      "en": "The proportions of 主题词 had visible changes during the period from 年份 to 年份.",
+      "cn": "主题词的占比在年份至年份间发生明显变化。",
+      "note": "万能待选 3。有变化类图表。",
+      "cat": "图表总述·万能",
+      "at": 1793399986000
+    },
+    {
+      "id": "tpl-016",
+      "en": "The chart shows the distribution of 主题词 at a glance, revealing a striking disparity among the options.",
+      "cn": "该图一目了然地展示了主题词的分布，揭示了各项之间的巨大差异。",
+      "note": "万能待选 4。有占比类图表。",
+      "cat": "图表总述·万能",
+      "at": 1793399985000
+    },
+    {
+      "id": "tpl-017",
+      "en": "The chart above presents 主题词, offering a clear picture of the overall situation.",
+      "cn": "上方图表呈现了主题词，清晰地展示了整体情况。",
+      "note": "万能待选 5。",
+      "cat": "图表总述·万能",
+      "at": 1793399984000
+    },
+    {
+      "id": "tpl-018",
+      "en": "The chart above provides information about 主题词 from 年份 to 年份.",
+      "cn": "上述图表提供了年份至年份间关于主题词的信息。",
+      "note": "万能待选 6。也可写 provides information about the situation of。",
+      "cat": "图表总述·万能",
+      "at": 1793399983000
+    },
+    {
+      "id": "tpl-019",
+      "en": "The percentage of Sth1 decreased remarkably from 数量 to 数量. However, the percentage of Sth2 climbed significantly from 数量 to 数量. Meanwhile, the percentage of Sth3 rose slightly, from 数量 to 数量.",
+      "cn": "公式 1：某比例从……显著下降到……；然而另一比例从……显著攀升至……；与此同时，第三个比例从……小幅升至……。",
+      "note": "动态图公式 1。三个数据用三种动词和副词（decreased remarkably / climbed significantly / rose slightly），避免句式单调；during the same period 视篇幅可省。",
+      "cat": "图表细节·公式",
+      "at": 1793399982000
+    },
+    {
+      "id": "tpl-020",
+      "en": "The percentage of graduates who pursued further study was 34.0% in 2018, compared with 26.3% in 2013, showing an increase of 7.7 percentage points.",
+      "cn": "2018 年选择继续深造的毕业生比例为 34.0%，2013 年为 26.3%，增长了 7.7 个百分点。",
+      "note": "动态公式 2：The number/proportion of Sth was 数量 in 年份, compared with 数量 in 年份, showing an increase of 增量（记得带单位）。",
+      "cat": "图表细节·公式",
+      "at": 1793399981000
+    },
+    {
+      "id": "tpl-021",
+      "en": "The percentage of graduates who start a business in 2018 was twice that in 2013.",
+      "cn": "2018 年毕业生创业比例是 2013 年的 2 倍。",
+      "note": "动态公式 3（倍数）。三选一：twice that in / twice as high as that in / twice the 年份 figure；2 倍 twice，3 倍 triple，以上用 four times。",
+      "cat": "图表细节·公式",
+      "at": 1793399980000
+    },
+    {
+      "id": "tpl-022",
+      "en": "The percentages of 主题词1, 主题词2, 主题词3 and 主题词4 account for X%, X%, X% and X% respectively. Notably, 占比最多的主题词 tops the list, at X%, followed by 占比次多的主题词 at X%.",
+      "cn": "公式：四项占比分别为……；值得注意的是，占比最多者居首，占 X%，其次是占比次多者，占 X%。",
+      "note": "静态图公式 1。主语是 percentages/proportions 时谓语用复数 account；排名只写两项，否则头重脚轻。",
+      "cat": "图表细节·公式",
+      "at": 1793399979000
+    },
+    {
+      "id": "tpl-023",
+      "en": "The percentage of A was about 1.8 times that of B in 2018.",
+      "cn": "2018 年 A 的比例约为 B 的 1.8 倍。",
+      "note": "静态图倍数公式。同一年份不同变量的对比，沿用动态公式 3 的倍数句型。",
+      "cat": "图表细节·公式",
+      "at": 1793399978000
+    },
+    {
+      "id": "tpl-024",
+      "en": "increase / rise / grow / expand / climb / jump / surge / soar",
+      "cn": "增加：上升、增长、扩张、攀升、跃升、暴涨。",
+      "note": "图表描述必背动词。例：The health literacy level rose from 8.8% in 2012 to 25.4% in 2021.",
+      "cat": "图表词汇·搭配",
+      "at": 1793399977000
+    },
+    {
+      "id": "tpl-025",
+      "en": "decrease / decline / diminish / shrink / drop / fall",
+      "cn": "减少：下降、减少、萎缩、回落。",
+      "note": "例：The proportion of graduates entering the workforce fell from 68.1% to 60.7%.",
+      "cat": "图表词汇·搭配",
+      "at": 1793399976000
+    },
+    {
+      "id": "tpl-026",
+      "en": "remain flat / stay at / stand at / stabilize",
+      "cn": "持平：保持平稳、维持在、稳定于。",
+      "note": "例：The figure stood at roughly 30% throughout the period.",
+      "cat": "图表词汇·搭配",
+      "at": 1793399975000
+    },
+    {
+      "id": "tpl-027",
+      "en": "fluctuate / vary / rise and fall",
+      "cn": "波动：起伏、变化、有升有降。",
+      "note": "例：The share fluctuated between 10% and 15%.",
+      "cat": "图表词汇·搭配",
+      "at": 1793399974000
+    },
+    {
+      "id": "tpl-028",
+      "en": "sharply / markedly / notably / significantly / dramatically; slightly / gradually / steadily / modestly",
+      "cn": "迅速地：急剧地、显著地、明显地；缓慢地：轻微地、逐渐地、稳步地、适度地。",
+      "note": "动态图快慢两档 × 增/减/持/波四方向，可连写 8 句内化搭配。",
+      "cat": "图表词汇·搭配",
+      "at": 1793399973000
+    },
+    {
+      "id": "tpl-029",
+      "en": "account for / make up / constitute; proportion / percentage / share / ratio",
+      "cn": "占：account for / make up / constitute；比例：proportion / percentage / share / ratio。",
+      "note": "占比用 proportion / percentage / share，对比用 ratio。例：Watching TV accounts for the largest share, at 90.8%.",
+      "cat": "图表词汇·搭配",
+      "at": 1793399972000
+    },
+    {
+      "id": "tpl-030",
+      "en": "peak at / reach a peak of / hit a record high; bottom out at / hit a trough / fall to a low",
+      "cn": "峰值：达到……的峰值、创历史新高；谷值：触底于、跌至低点。",
+      "note": "例：The volume peaked at 83 billion parcels in 2019.",
+      "cat": "图表词汇·搭配",
+      "at": 1793399971000
+    },
+    {
+      "id": "tpl-031",
+      "en": "A doubled / tripled; A is X times as high as B; A increased by X; A increased to X",
+      "cn": "A 翻倍/翻三倍；A 是 B 的 X 倍；A 增加了 X；A 增加到 X。",
+      "note": "注意 by 与 to 的区别：by 是增量，to 是终值；outnumbered 表示远超。",
+      "cat": "图表词汇·搭配",
+      "at": 1793399970000
+    },
+    {
+      "id": "tpl-032",
+      "en": "between A and B / from A to B / during the period from A to B; rank first / top the list; approximately / roughly / nearly / just over",
+      "cn": "时间：在 A 与 B 之间、从 A 到 B、在 A 至 B 期间；排序：位居第一、居首；约数：大约、粗略、将近、略高于。",
+      "note": "静态图无年份可省略时间；just over 60% 表示略高于 60%。",
+      "cat": "图表词汇·搭配",
+      "at": 1793399969000
+    },
+    {
+      "id": "tpl-033",
+      "en": "These data lead us to the conclusion that ...",
+      "cn": "这些数据使我们得出这样的结论：……",
+      "note": "过渡句待选 1。that 后接社会现象，不是直接翻译图表。",
+      "cat": "图表过渡·社会现象",
+      "at": 1793399968000
+    },
+    {
+      "id": "tpl-034",
+      "en": "It is apparent from the statistics that ...",
+      "cn": "从统计数据可以明显看出：……",
+      "note": "过渡句待选 2。最通用，三套真题范例都用它。",
+      "cat": "图表过渡·社会现象",
+      "at": 1793399967000
+    },
+    {
+      "id": "tpl-035",
+      "en": "Despite its apparent simplicity, the chart highlights the core information that ...",
+      "cn": "尽管它看似简单，这幅图却突出了核心信息：……",
+      "note": "过渡句待选 3。",
+      "cat": "图表过渡·社会现象",
+      "at": 1793399966000
+    },
+    {
+      "id": "tpl-036",
+      "en": "The chart clearly communicates its intended meaning: ...",
+      "cn": "这幅图清楚地传达了它的意图：……",
+      "note": "过渡句待选 4。冒号后接社会现象。",
+      "cat": "图表过渡·社会现象",
+      "at": 1793399965000
+    },
+    {
+      "id": "tpl-037",
+      "en": "The chart appears to convey a message to the younger generation, reminding them that ...",
+      "cn": "这幅图似乎向年轻一代传达了一条信息，提醒他们……",
+      "note": "过渡句待选 5。对象可按题换成 the public / urban residents。",
+      "cat": "图表过渡·社会现象",
+      "at": 1793399964000
+    },
+    {
+      "id": "tpl-038",
+      "en": "主题词 has been developing rapidly in recent years. / Recent years have witnessed the rapid development of 主题词.",
+      "cn": "主题词近年来发展迅速。/ 近年来见证了主题词的快速发展。",
+      "note": "社会现象方案 1。实体主题词（industry/economy）配 develop；水平、率、数量配 improve/rise/climb。",
+      "cat": "图表过渡·社会现象",
+      "at": 1793399963000
+    },
+    {
+      "id": "tpl-039",
+      "en": "The majority of people would choose to do X when they ... / An increasing number of people tend to do X when they ...",
+      "cn": "大多数人会在……时选择做 X。/ 越来越多的人倾向于在……时做 X。",
+      "note": "社会现象方案 2。people 按题换成 residents / undergraduates / consumers，也可换 institution / brand / country。",
+      "cat": "图表过渡·社会现象",
+      "at": 1793399962000
+    },
+    {
+      "id": "tpl-040",
+      "en": "主题词 is becoming common among people nowadays.",
+      "cn": "主题词如今在人们中正变得普遍。",
+      "note": "社会现象方案 3。common 可换 popular / prevalent。",
+      "cat": "图表过渡·社会现象",
+      "at": 1793399961000
+    },
+    {
+      "id": "tpl-041",
+      "en": "主题词 has drawn growing attention from the public. / People attach importance to 主题词.",
+      "cn": "主题词日益受到公众关注。/ 人们重视主题词。",
+      "note": "社会现象方案 4。态度型图表（新技术、新观念、新生活方式）首选。",
+      "cat": "图表过渡·社会现象",
+      "at": 1793399960000
+    },
+    {
+      "id": "tpl-042",
+      "en": "This is a common phenomenon in modern society. / This phenomenon reflects a broader social trend.",
+      "cn": "在当今社会，这是一个很常见的现象。/ 这一现象反映了一个更广泛的社会趋势。",
+      "note": "社会现象方案 5。不需要补充任何成分的万能方案。",
+      "cat": "图表过渡·社会现象",
+      "at": 1793399959000
+    },
+    {
+      "id": "tpl-043",
+      "en": "As is symbolically depicted in the cartoon above, ...",
+      "cn": "如上图象征性地描绘的那样，……",
+      "note": "单图描述升级句。depicted 可换 illustrated / portrayed / conveyed；可加副词 vividly / clearly。",
+      "cat": "图画描述·单双图",
+      "at": 1793399958000
+    },
+    {
+      "id": "tpl-044",
+      "en": "The cartoon above presents us with a thought-provoking scene: ...",
+      "cn": "上面的漫画向我们呈现了一个发人深省的场景：……",
+      "note": "单图待选 1。",
+      "cat": "图画描述·单双图",
+      "at": 1793399957000
+    },
+    {
+      "id": "tpl-045",
+      "en": "Portrayed distinctively in the drawing above is a common scene: ...",
+      "cn": "画中清晰地描绘出一个常见的场景：……",
+      "note": "单图待选 2（倒装）。",
+      "cat": "图画描述·单双图",
+      "at": 1793399956000
+    },
+    {
+      "id": "tpl-046",
+      "en": "What is clearly conveyed in the picture is that ...",
+      "cn": "图片明确传达出的是……",
+      "note": "单图待选 3。",
+      "cat": "图画描述·单双图",
+      "at": 1793399955000
+    },
+    {
+      "id": "tpl-047",
+      "en": "Depicted in the picture above is a scene that strikes us as both familiar and thought-provoking: ...",
+      "cn": "图中描绘的是一个既熟悉又发人深省的场景：……",
+      "note": "单图待选 4。",
+      "cat": "图画描述·单双图",
+      "at": 1793399954000
+    },
+    {
+      "id": "tpl-048",
+      "en": "As is symbolically depicted in the picture above, on the playground runs a young man, rushing to the finishing line, with a sweet smile on his face.",
+      "cn": "如上图象征性描绘的那样，操场上一位年轻人正冲向终点，脸上带着甜蜜的微笑。",
+      "note": "非对话单图公式：环境 + 基本动作 + 主体，主要动作（doing），with 细节。细节可换 with determination in his eyes。",
+      "cat": "图画描述·单双图",
+      "at": 1793399953000
+    },
+    {
+      "id": "tpl-049",
+      "en": "Below the drawing, there is a caption which reads: ...",
+      "cn": "图画下方有一句说明文字，写着：……",
+      "note": "图画有标题或文字时用。也可写 The caption beneath the drawing reads: ...。",
+      "cat": "图画描述·单双图",
+      "at": 1793399952000
+    },
+    {
+      "id": "tpl-050",
+      "en": "The cartoons provide us with a thought-provoking scene: the girl in the left picture is fully focused on her homework, thinking that she will feel relieved when she finishes her work. However, the boy is lying on the sofa in the right picture, telling himself that he will not start until the deadline.",
+      "cn": "漫画为我们呈现了一个发人深省的场景：左边女孩全神贯注做作业，心想完成任务就会轻松；而右边男孩躺在沙发上，告诉自己要等到最后期限才开始。",
+      "note": "两幅图公式：左图主体 + 主要动作. 关联词，右图主体 + 主要动作。推荐转述，直述会显得低级。",
+      "cat": "图画描述·单双图",
+      "at": 1793399951000
+    },
+    {
+      "id": "tpl-051",
+      "en": "As is symbolically depicted in the picture above, in front of us stand two girls, talking about campus lectures. One argues that ..., By contrast, the other maintains that ...",
+      "cn": "如上图所示，两位女孩站在我们面前，正在谈论校园讲座。一人认为……，而另一人坚持认为……。",
+      "note": "对话型单图公式：环境 + 基本动作 + 主体，主要动作 + 引语。对比用 By contrast / However，相似用 Similarly / Likewise。",
+      "cat": "图画描述·单双图",
+      "at": 1793399950000
+    },
+    {
+      "id": "tpl-052",
+      "en": "As is vividly depicted in the cartoon and clearly shown in the chart above, 图画描述, and 图表总体描述.",
+      "cn": "如上图漫画生动描绘、上表清晰展示的那样，……，并且……。",
+      "note": "一图一表叠加写法。也可写 The cartoon above depicts ..., while the chart below illustrates ...。",
+      "cat": "图画描述·单双图",
+      "at": 1793399949000
+    },
+    {
+      "id": "tpl-053",
+      "en": "The primary intention of the drawing is to remind the whole society that ...",
+      "cn": "这幅图的首要意图是提醒整个社会……",
+      "note": "主题阐述升级句。the whole society 可换 the public / urban residents / undergraduates。",
+      "cat": "图画主题·阐述",
+      "at": 1793399948000
+    },
+    {
+      "id": "tpl-054",
+      "en": "Simple as the drawing is, it conveys a truth that ...",
+      "cn": "图画虽然简单，但蕴含一个真理：……",
+      "note": "主题阐述待选 1。",
+      "cat": "图画主题·阐述",
+      "at": 1793399947000
+    },
+    {
+      "id": "tpl-055",
+      "en": "The drawing, undoubtedly, emphasizes the core idea that ...",
+      "cn": "这幅图毫无疑问突出了这样的核心观点：……",
+      "note": "主题阐述待选 2。",
+      "cat": "图画主题·阐述",
+      "at": 1793399946000
+    },
+    {
+      "id": "tpl-056",
+      "en": "What the cartoon above mirrors is a thought-provoking phenomenon that ...",
+      "cn": "上图反映的是一个发人深省的现象：……",
+      "note": "主题阐述待选 3。",
+      "cat": "图画主题·阐述",
+      "at": 1793399945000
+    },
+    {
+      "id": "tpl-057",
+      "en": "主题词 is so indispensable that the subject deserves the highest level of attention and consideration.",
+      "cn": "主题词如此不可或缺，值得最高程度的关注与考虑。",
+      "note": "中心思想方案 1（如此重要以至于）。indispensable 可换 vital / critical / significant；subject 可换 phenomenon / issue。",
+      "cat": "图画主题·阐述",
+      "at": 1793399944000
+    },
+    {
+      "id": "tpl-058",
+      "en": "The utmost importance ought to be attached to 主题词 by 某人.",
+      "cn": "某人应当给予主题词最高程度的重视。",
+      "note": "中心思想方案 2（给予高度重视）。某人换 government / institutions / the public。",
+      "cat": "图画主题·阐述",
+      "at": 1793399943000
+    },
+    {
+      "id": "tpl-059",
+      "en": "Great accomplishments have been made in 主题词 by 某人.",
+      "cn": "某人在主题词方面取得了巨大成就。",
+      "note": "中心思想方案 3（取得重大成就）。适合已见成效的话题，如公园建设。",
+      "cat": "图画主题·阐述",
+      "at": 1793399942000
+    },
+    {
+      "id": "tpl-060",
+      "en": "At no time should we underestimate the significance of 主题词.",
+      "cn": "我们任何时候都不应低估主题词的重要性。",
+      "note": "中心思想方案 4（双重否定）。也可用 The importance of 主题词 cannot be overstated。",
+      "cat": "图画主题·阐述",
+      "at": 1793399941000
+    },
+    {
+      "id": "tpl-061",
+      "en": "It is 主题词 that deserves greater attention.",
+      "cn": "值得更多关注的是主题词。",
+      "note": "中心思想方案 5（强调句型）。主题词抽象（创新/坚持/选择）时好用。",
+      "cat": "图画主题·阐述",
+      "at": 1793399940000
+    },
+    {
+      "id": "tpl-062",
+      "en": "Nowadays, gaining trust from others is vital in the workplace. Many people are afraid of damaging their image by appearing unsure.",
+      "cn": "如今，在职场中获得他人的信任至关重要。许多人害怕表现得不自信会损害自己的形象。",
+      "note": "改写现象示范。手段：同义词替换、主动变被动、高度概括、变换修饰语位置。",
+      "cat": "文字作文·改写",
+      "at": 1793399939000
+    },
+    {
+      "id": "tpl-063",
+      "en": "The author believes that we are perceived as less biased and willing to tell the truth when we show uncertainty in a transparent way.",
+      "cn": "作者认为，当我们以透明的方式表达不确定性时，我们会被认为更少偏见、更愿意说出真相。",
+      "note": "改写观点示范。The author believes that + 原文观点。",
+      "cat": "文字作文·改写",
+      "at": 1793399938000
+    },
+    {
+      "id": "tpl-064",
+      "en": "It cannot be denied that 主题词 plays a key role in people's work and life.",
+      "cn": "不可否认的是，主题词在人们的工作和生活中扮演了重要角色。",
+      "note": "引出主题待选 1。改写不出来时用。",
+      "cat": "文字作文·改写",
+      "at": 1793399937000
+    },
+    {
+      "id": "tpl-065",
+      "en": "It is widely accepted that 主题词 is the key element for individuals to achieve success.",
+      "cn": "人们普遍认为，主题词是个人取得成功的关键因素。",
+      "note": "引出主题待选 2。",
+      "cat": "文字作文·改写",
+      "at": 1793399936000
+    },
+    {
+      "id": "tpl-066",
+      "en": "Nowadays, it is well-known that the problem of 主题词 has caused wide concern.",
+      "cn": "如今，众所周知，主题词的问题已经引起了广泛关注。",
+      "note": "引出主题待选 3。",
+      "cat": "文字作文·改写",
+      "at": 1793399935000
+    },
+    {
+      "id": "tpl-067",
+      "en": "With the rapid advancement of society and technology, 主题词 has become a common phenomenon in our daily lives.",
+      "cn": "随着社会和技术的快速进步，主题词已经成为我们日常生活中一个普遍的现象。",
+      "note": "引出主题待选 4。争取用改写，实在不会再用待选句。",
+      "cat": "文字作文·改写",
+      "at": 1793399934000
+    },
+    {
+      "id": "tpl-068",
+      "en": "Currently, whether to 选择1 or 选择2 has become a hot topic among people, especially among the young.",
+      "cn": "目前，选择 1 还是选择 2 已经成为人们的热门话题，尤其是在年轻人中。",
+      "note": "引出主题待选 5（争议型）。",
+      "cat": "文字作文·改写",
+      "at": 1793399933000
+    },
+    {
+      "id": "tpl-069",
+      "en": "According to the author, ...",
+      "cn": "根据作者的观点，……",
+      "note": "改写观点待选 3。另有 Therefore, the author holds that / In the opinion of the author。",
+      "cat": "文字作文·改写",
+      "at": 1793399932000
+    },
+    {
+      "id": "tpl-070",
+      "en": "I fully agree with the author's viewpoint.",
+      "cn": "我完全同意作者的观点。",
+      "note": "表明态度（强烈同意）。题干明确要求表明态度，这句必须有。",
+      "cat": "文字作文·改写",
+      "at": 1793399931000
+    },
+    {
+      "id": "tpl-071",
+      "en": "I strongly disagree with the author's opinion.",
+      "cn": "我强烈反对作者的观点。",
+      "note": "表明态度（强烈反对）。",
+      "cat": "文字作文·改写",
+      "at": 1793399930000
+    },
+    {
+      "id": "tpl-072",
+      "en": "I share the author's view to a large extent, but I also believe that ...",
+      "cn": "我在很大程度上同意作者的观点，但我也认为……",
+      "note": "表明态度（部分同意）。",
+      "cat": "文字作文·改写",
+      "at": 1793399929000
+    },
+    {
+      "id": "tpl-073",
+      "en": "It cannot be denied that integrity and benevolence play a key role in people's work and life. The author believes that we are perceived as less biased and willing to tell the truth when we show uncertainty in a transparent way. I fully agree with the author's viewpoint.",
+      "cn": "不可否认，诚信和仁慈在人们的工作和生活中起着关键作用。作者认为，当我们以透明的方式展示不确定性时，我们会被认为偏见更少、更愿意说实话。我完全同意作者的观点。",
+      "note": "文字作文第一段完整范例（大纲样题 1）：引出主题 + 改写观点 + 表明态度。",
+      "cat": "文字作文·改写",
+      "at": 1793399928000
+    },
+    {
+      "id": "tpl-074",
+      "en": "Three key reasons, from my perspective, account for this phenomenon.",
+      "cn": "在我看来，三个关键原因可以解释这一现象。",
+      "note": "第二段过渡待选 1。英语一写 3 点原因，英语二写 2~3 点。",
+      "cat": "第二段·过渡句",
+      "at": 1793399927000
+    },
+    {
+      "id": "tpl-075",
+      "en": "From my perspective, the causes of X can be summarized as three main aspects.",
+      "cn": "在我看来，X 的成因可以归结为三个主要方面。",
+      "note": "第二段过渡待选 2。",
+      "cat": "第二段·过渡句",
+      "at": 1793399926000
+    },
+    {
+      "id": "tpl-076",
+      "en": "Several factors contribute to this phenomenon.",
+      "cn": "几个因素促成了这一现象。",
+      "note": "第二段过渡待选 3。",
+      "cat": "第二段·过渡句",
+      "at": 1793399925000
+    },
+    {
+      "id": "tpl-077",
+      "en": "A variety of reasons can be cited to account for this phenomenon.",
+      "cn": "有很多原因可以用来解释这一现象。",
+      "note": "第二段过渡待选 4。",
+      "cat": "第二段·过渡句",
+      "at": 1793399924000
+    },
+    {
+      "id": "tpl-078",
+      "en": "A combination of factors has contributed to the tendency reflected in this chart.",
+      "cn": "多种因素共同促成了这张图表所反映的趋势。",
+      "note": "第二段过渡待选 5。phenomenon 与 opinion 可互换。",
+      "cat": "第二段·过渡句",
+      "at": 1793399923000
+    },
+    {
+      "id": "tpl-079",
+      "en": "For instance, my hometown, a livable city, places a high priority on infrastructure construction, which enables residents to relax and unwind at nearby parks. During this period, citizen satisfaction has improved.",
+      "cn": "例如，我的家乡是一座宜居城市，高度重视基础设施建设，这让居民能在附近公园放松身心。在此期间，市民满意度有所提高。",
+      "note": "举例论证四步组装：引出例子 + 短语写现状 + which 写结果 + 换角度写心态或结果。",
+      "cat": "第二段·举例论证",
+      "at": 1793399922000
+    },
+    {
+      "id": "tpl-080",
+      "en": "This point can be confirmed by the example of ...",
+      "cn": "这一点可以通过……的例子来证实。",
+      "note": "引出例子替换。另有 To give a common example / For example / For instance。",
+      "cat": "第二段·举例论证",
+      "at": 1793399921000
+    },
+    {
+      "id": "tpl-081",
+      "en": "For instance, my roommate, Kevin, was addicted to the Internet, which made him fail the final exam. During that period, he regretted everything he had done.",
+      "cn": "例如，我的室友凯文沉溺于互联网，这让他没能通过期末考试。在那段时间，他后悔自己做的一切。",
+      "note": "2015 英一范例。负面话题可用；结尾可换 Consequently / As a result。",
+      "cat": "第二段·举例论证",
+      "at": 1793399920000
+    },
+    {
+      "id": "tpl-082",
+      "en": "The majority of people believe that 主题词 will provide them with a broader platform to 主题词带来的好处, which may put them in a beneficial position in the future.",
+      "cn": "大多数人认为，主题词将为他们提供一个更广阔的平台去……，这可能让他们在未来处于有利位置。",
+      "note": "方案二公式。believe 可换 maintain / hold the view / are convinced；platform 可换 present a unique chance / create more opportunities。",
+      "cat": "第二段·群众路线",
+      "at": 1793399919000
+    },
+    {
+      "id": "tpl-083",
+      "en": "The majority of individuals maintain that team spirit will create more opportunities for them to develop themselves, which is likely to secure a competitive edge in the future.",
+      "cn": "大多数人认为团队精神会为他们创造更多发展自己的机会，这有望在未来获得竞争优势。",
+      "note": "2008 英一范例。which 从句逻辑要与主题匹配：个人发展用 competitive edge，健康用 quality of life。",
+      "cat": "第二段·群众路线",
+      "at": 1793399918000
+    },
+    {
+      "id": "tpl-084",
+      "en": "It is widely believed that ... / It is generally agreed that ... / It is universally known that ...",
+      "cn": "人们普遍相信……/ 人们普遍认同……/ 众所周知……",
+      "note": "主语从句三选一。作用只是拉长句子，背三句即可，不必研究语法。",
+      "cat": "第二段·从句与六方面",
+      "at": 1793399917000
+    },
+    {
+      "id": "tpl-085",
+      "en": "There is no doubt that ... / Nobody can deny that ... / We cannot ignore the fact that ...",
+      "cn": "毫无疑问……/ 没有人能否认……/ 我们不能忽视……的事实。",
+      "note": "宾语从句三选一。",
+      "cat": "第二段·从句与六方面",
+      "at": 1793399916000
+    },
+    {
+      "id": "tpl-086",
+      "en": "Definitely no one can deny the fact that ... / There is a growing recognition that ...",
+      "cn": "当然没有人能否认这个事实……/ 人们越来越认识到……",
+      "note": "同位语从句三选一。",
+      "cat": "第二段·从句与六方面",
+      "at": 1793399915000
+    },
+    {
+      "id": "tpl-087",
+      "en": "主题词 plays a crucial role in 某方面. / 主题词 lays the foundation of 某方面.",
+      "cn": "主题词在某方面起关键作用。/ 主题词为某方面奠定基础。",
+      "note": "常用短语·角色类。另有 is a driving force behind / is the cornerstone of / acts as a catalyst for。",
+      "cat": "第二段·从句与六方面",
+      "at": 1793399914000
+    },
+    {
+      "id": "tpl-088",
+      "en": "主题词 has a beneficial influence on 某方面. / 主题词 contributes significantly to 某方面.",
+      "cn": "主题词对某方面有积极影响。/ 主题词对某方面贡献显著。",
+      "note": "常用短语·积极类。主语复数时 have，注意主谓一致。",
+      "cat": "第二段·从句与六方面",
+      "at": 1793399913000
+    },
+    {
+      "id": "tpl-089",
+      "en": "主题词 may undermine 某方面. / 主题词 poses a tremendous threat to 某方面.",
+      "cn": "主题词可能削弱某方面。/ 主题词对某方面构成巨大威胁。",
+      "note": "常用短语·消极类。另有 is seriously destructive to / is a double-edged sword for。",
+      "cat": "第二段·从句与六方面",
+      "at": 1793399912000
+    },
+    {
+      "id": "tpl-090",
+      "en": "某方面 is strongly dependent on 主题词. / 某方面 is inextricably linked to 主题词.",
+      "cn": "某方面高度依赖主题词。/ 某方面与主题词密不可分。",
+      "note": "常用短语·相关类。主语是并列名词时注意谓语单复数。",
+      "cat": "第二段·从句与六方面",
+      "at": 1793399911000
+    },
+    {
+      "id": "tpl-091",
+      "en": "social progress, economic prosperity, people's livelihood, public services, social harmony",
+      "cn": "社会进步、经济繁荣、民生、公共服务、社会和谐。",
+      "note": "六大方面·社会。核心是发展，方式是经济，特征是服务，目标是和谐。",
+      "cat": "第二段·从句与六方面",
+      "at": 1793399910000
+    },
+    {
+      "id": "tpl-092",
+      "en": "sustainable development, green transformation, environmental awareness, carbon emissions reduction, harmony between humanity and nature",
+      "cn": "可持续发展、绿色转型、环保意识、碳减排、人与自然和谐共生。",
+      "note": "六大方面·自然。核心是持续，方式是保护，目标是和谐。",
+      "cat": "第二段·从句与六方面",
+      "at": 1793399909000
+    },
+    {
+      "id": "tpl-093",
+      "en": "cultural protection, digital preservation, cultural exchange, cultural confidence, cultural soft power",
+      "cn": "文化保护、数字化保护、文化交流、文化自信、文化软实力。",
+      "note": "六大方面·文化。核心是传承，方式是交流，态度是包容，目标是繁荣。",
+      "cat": "第二段·从句与六方面",
+      "at": 1793399908000
+    },
+    {
+      "id": "tpl-094",
+      "en": "personal growth, physical and mental health, lifelong learning, expand our horizons, boost self-confidence",
+      "cn": "个人成长、身心健康、终身学习、开拓眼界、提升自信。",
+      "note": "六大方面·个人。核心是成长，基础是健康，方式是学习，目标是实现。",
+      "cat": "第二段·从句与六方面",
+      "at": 1793399907000
+    },
+    {
+      "id": "tpl-095",
+      "en": "effective communication, facilitate information sharing, enhance mutual understanding, bridge communication gaps",
+      "cn": "有效沟通、促进信息共享、增进相互理解、弥合沟通鸿沟。",
+      "note": "六大方面·交流。核心是沟通，方式是连接，目标是和谐。",
+      "cat": "第二段·从句与六方面",
+      "at": 1793399906000
+    },
+    {
+      "id": "tpl-096",
+      "en": "technological innovation, digital transformation, artificial intelligence, smart devices, smart city construction",
+      "cn": "科技创新、数字化转型、人工智能、智能设备、智慧城市建设。",
+      "note": "六大方面·科技。核心是创新，方式是转型，目标是赋能。",
+      "cat": "第二段·从句与六方面",
+      "at": 1793399905000
+    },
+    {
+      "id": "tpl-097",
+      "en": "Not only does 主题词 increase 某方面, but it also enables them to 某方面.",
+      "cn": "主题词不仅提升某方面，还使他们能够……",
+      "note": "方案四公式。increase 可换 improve / enhance / promote / boost；enable 可换 help / allow / encourage。",
+      "cat": "第二段·not倒装",
+      "at": 1793399904000
+    },
+    {
+      "id": "tpl-098",
+      "en": "Not only does attending dragon boat races improve our physical and mental health, but it also enables us to inherit and develop traditional culture.",
+      "cn": "参加龙舟比赛不仅有助于身心健康，还有助于传承和发展传统文化。",
+      "note": "2023 英一范例。主语复数时用 do 不用 does，but also 后用 their。",
+      "cat": "第二段·not倒装",
+      "at": 1793399903000
+    },
+    {
+      "id": "tpl-099",
+      "en": "If we ignored the importance of 主题词, we would never become a better version of ourselves.",
+      "cn": "如果我们忽视主题词的重要性，我们就永远不会成为更好的自己。",
+      "note": "方案五·个人层面。主将从现改虚拟：fails→failed，will→would，其余不变。",
+      "cat": "第二段·虚拟语气",
+      "at": 1793399902000
+    },
+    {
+      "id": "tpl-100",
+      "en": "If everyone failed to 主题词, our society would be confronted with an unpromising and fruitless future.",
+      "cn": "如果每个人都没能做到……，我们的社会将面临一个没有希望的未来。",
+      "note": "方案五·社会层面。建议放在原因三，段尾给人警醒。",
+      "cat": "第二段·虚拟语气",
+      "at": 1793399901000
+    },
+    {
+      "id": "tpl-101",
+      "en": "If we underestimated the importance of 主题词, our nation would permanently lag behind in the new era of rapid development.",
+      "cn": "如果我们低估主题词的重要性，我们的国家将在快速发展的新时代永远落后。",
+      "note": "方案五·国家层面。别扣太狠；2025 英一家电不适合本方案。",
+      "cat": "第二段·虚拟语气",
+      "at": 1793399900000
+    },
+    {
+      "id": "tpl-102",
+      "en": "Compared with B, A can 小方面, so as to 大方面.",
+      "cn": "与 B 相比，A 能够……，从而……。",
+      "note": "方案六公式 1。A 是主要内容，B 是次要内容；so as to 可换 thereby doing。",
+      "cat": "第二段·对比论证",
+      "at": 1793399899000
+    },
+    {
+      "id": "tpl-103",
+      "en": "In contrast to B, the advantage of A lies in 某方面.",
+      "cn": "与 B 相比，A 的优势在于……",
+      "note": "方案六公式 2。没有对比就创造对比：商业项目 vs 公园。",
+      "cat": "第二段·对比论证",
+      "at": 1793399898000
+    },
+    {
+      "id": "tpl-104",
+      "en": "Compared with indoor activities, outdoor activities can better cultivate children's curiosity and observational skills, thereby promoting their all-round development.",
+      "cn": "与室内活动相比，户外活动能更好地培养儿童的好奇心和观察力，从而促进他们的全面发展。",
+      "note": "2026 英二范例。",
+      "cat": "第二段·对比论证",
+      "at": 1793399897000
+    },
+    {
+      "id": "tpl-105",
+      "en": "主题词 is as important as a lighthouse, providing guidance in difficult times.",
+      "cn": "主题词就像灯塔一样重要，在困难时为我们提供指引。",
+      "note": "方案七·明喻。心态态度类（自信/乐观/好奇心）适配灯塔。",
+      "cat": "第二段·比喻句",
+      "at": 1793399896000
+    },
+    {
+      "id": "tpl-106",
+      "en": "主题词 is as essential as a compass, helping us navigate through life's challenges.",
+      "cn": "主题词像指南针一样不可或缺，帮助我们应对生活中的挑战。",
+      "note": "明喻。思维认知类（批判性思维/反思/知识）适配指南针。",
+      "cat": "第二段·比喻句",
+      "at": 1793399895000
+    },
+    {
+      "id": "tpl-107",
+      "en": "主题词 is the key that unlocks the door to success.",
+      "cn": "主题词是开启成功之门的钥匙。",
+      "note": "暗喻。养老机器人等“关键手段”类话题。",
+      "cat": "第二段·比喻句",
+      "at": 1793399894000
+    },
+    {
+      "id": "tpl-108",
+      "en": "主题词 is the engine that propels personal growth and social progress.",
+      "cn": "主题词是推动个人成长与社会进步的引擎。",
+      "note": "暗喻。意志品质类（坚持/自律/勇气/努力）适配引擎。",
+      "cat": "第二段·比喻句",
+      "at": 1793399893000
+    },
+    {
+      "id": "tpl-109",
+      "en": "主题词 is the bridge between goals and accomplishments.",
+      "cn": "主题词是连接目标与成就的桥梁。",
+      "note": "暗喻。人际与社会类（合作/沟通/创新）适配桥梁；可加插入语 needless to say 拉长句子。",
+      "cat": "第二段·比喻句",
+      "at": 1793399892000
+    },
+    {
+      "id": "tpl-110",
+      "en": "Every situation has its pros and cons, and this issue is not exempt.",
+      "cn": "每种情况都有其利弊，这个问题也不例外。",
+      "note": "争议话题过渡句 1。用于网络、兼职等正反论证。",
+      "cat": "第二段·正反论证",
+      "at": 1793399891000
+    },
+    {
+      "id": "tpl-111",
+      "en": "In fact, this issue remains controversial.",
+      "cn": "事实上，这个问题仍有争议。",
+      "note": "争议话题过渡句 2。",
+      "cat": "第二段·正反论证",
+      "at": 1793399890000
+    },
+    {
+      "id": "tpl-112",
+      "en": "When it comes to ..., opinions vary widely.",
+      "cn": "涉及……时，意见分歧很大。",
+      "note": "争议话题过渡句 3。",
+      "cat": "第二段·正反论证",
+      "at": 1793399889000
+    },
+    {
+      "id": "tpl-113",
+      "en": "On the one hand, some people hold the view that ... On the other hand, the rest insist that ... Nevertheless, when we are confronted with 主题词, we should be sensible enough to discard the dross and select the essence.",
+      "cn": "一方面，一些人认为……另一方面，其余人坚持认为……然而，面对主题词，我们应明智地取其精华、去其糟粕。",
+      "note": "正反论证公式 1。省略号处填七大方案的原句或部分原句。",
+      "cat": "第二段·正反论证",
+      "at": 1793399888000
+    },
+    {
+      "id": "tpl-114",
+      "en": "Proponents of this trend argue that ... However, critics are quick to point out its adverse consequences, such as ... It is, therefore, imperative for us to adopt a discerning attitude, carefully weighing its merits against its demerits.",
+      "cn": "该趋势的支持者认为……然而批评者迅速指出其不利后果，例如……因此，我们必须采取有辨识力的态度，仔细权衡其利弊。",
+      "note": "正反论证公式 2。",
+      "cat": "第二段·正反论证",
+      "at": 1793399887000
+    },
+    {
+      "id": "tpl-115",
+      "en": "It is not difficult to draw the conclusion that enough attention must be paid to 主题词 by ourselves and our community.",
+      "cn": "不难得出结论，我们个人和社会都必须对主题词给予足够重视。",
+      "note": "总结方案一·公式 1。时态按情况变：has been paid to。",
+      "cat": "第三段·总结全文",
+      "at": 1793399886000
+    },
+    {
+      "id": "tpl-116",
+      "en": "We should bear in mind that 主题词 is of great importance to 某方面.",
+      "cn": "我们应牢记，主题词对某方面非常重要。",
+      "note": "公式 2。意志品质类作文首选：the spirit of perseverance / cooperation。",
+      "cat": "第三段·总结全文",
+      "at": 1793399885000
+    },
+    {
+      "id": "tpl-117",
+      "en": "The discussion leads us to the realization that 主题词 is not an option, but a necessity.",
+      "cn": "讨论使我们认识到，主题词不是一种选择，而是一种必要。",
+      "note": "公式 3。文化传承用 inheritance，文化交流换 exchange。",
+      "cat": "第三段·总结全文",
+      "at": 1793399884000
+    },
+    {
+      "id": "tpl-118",
+      "en": "We are faced with the undeniable fact that 主题词 has become an integral part of our lives.",
+      "cn": "我们面临一个不可否认的事实：主题词已成为我们生活中不可或缺的一部分。",
+      "note": "公式 4。变体：has become increasingly accessible to the general public。",
+      "cat": "第三段·总结全文",
+      "at": 1793399883000
+    },
+    {
+      "id": "tpl-119",
+      "en": "Never can we give up our efforts to 主题词. / On no account should we underestimate the profound impact of 主题词.",
+      "cn": "我们决不能放弃为……而努力。/ 我们绝不应当低估主题词的深远影响。",
+      "note": "总结方案二·否定词倒装。三组否定词（Never/On no account/Under no circumstances）与动词短语自由组合。",
+      "cat": "第三段·总结全文",
+      "at": 1793399882000
+    },
+    {
+      "id": "tpl-120",
+      "en": "It is evident that the trend reflected in the chart deserves our careful consideration.",
+      "cn": "很明显，图表反映的趋势值得我们认真考虑。",
+      "note": "总结方案三·万能。不需改任何内容，应急使用。",
+      "cat": "第三段·总结全文",
+      "at": 1793399881000
+    },
+    {
+      "id": "tpl-121",
+      "en": "It is imperative for the authorities to make strict laws to protect the environment.",
+      "cn": "当局必须制定严格的法律来保护环境。",
+      "note": "措施角度·政府作为。make strict laws 可换 formulate policies / allocate more funds / launch public initiatives。",
+      "cat": "第三段·具体措施",
+      "at": 1793399880000
+    },
+    {
+      "id": "tpl-122",
+      "en": "We should also raise environmental awareness among children and adults.",
+      "cn": "我们还应该增强孩子和大人的环保意识。",
+      "note": "措施角度·公民意识。也可用 It is high time that we raised public consciousness of ...。",
+      "cat": "第三段·具体措施",
+      "at": 1793399879000
+    },
+    {
+      "id": "tpl-123",
+      "en": "We should spare no pains to protect the environment and make the \"global village\" better.",
+      "cn": "我们应该不遗余力地保护环境，让“地球村”变得更好。",
+      "note": "措施角度·个人行为。We should 可换 It is our duty to / We are obliged to；spare no pains 可换 make concerted efforts to。",
+      "cat": "第三段·具体措施",
+      "at": 1793399878000
+    },
+    {
+      "id": "tpl-124",
+      "en": "New media platforms, ranging from short video apps to social media, should appeal to users to adopt a sustainable lifestyle.",
+      "cn": "新媒体平台，从短视频应用到社交媒体，应该呼吁用户采取可持续的生活方式。",
+      "note": "措施角度·媒体呼吁。也可用 play a pivotal role in raising public awareness of ...。",
+      "cat": "第三段·具体措施",
+      "at": 1793399877000
+    },
+    {
+      "id": "tpl-125",
+      "en": "Parents and teachers should set a good example for children in resource conservation through their own behavior.",
+      "cn": "家长和老师应当通过自身行为为孩子树立节约资源的榜样。",
+      "note": "措施角度·家庭教育。也可用 Parents can serve as role models for children by ...。",
+      "cat": "第三段·具体措施",
+      "at": 1793399876000
+    },
+    {
+      "id": "tpl-126",
+      "en": "For one thing, it is imperative for the authorities to formulate strict regulations to ensure the safety of elderly-care robots. For another, enterprises ought to spare no pains to improve product quality.",
+      "cn": "一方面，当局必须制定严格法规确保养老机器人的安全；另一方面，企业应不遗余力提高产品质量。",
+      "note": "一句一个角度，两句并列（2026 英一范例）。",
+      "cat": "第三段·具体措施",
+      "at": 1793399875000
+    },
+    {
+      "id": "tpl-127",
+      "en": "When it comes to concrete solutions, some people hold that the government must take responsibility for 主题词. In fact, it is cultivating citizens' consciousness that plays a crucial role in 主题词.",
+      "cn": "谈到具体解决方案，一些人认为政府必须承担……的责任；事实上，培养公民意识在……中起关键作用。",
+      "note": "措施方案二·待选 1（强调句型）。适用于主题词、实施方、措施都较短的题。",
+      "cat": "第三段·具体措施",
+      "at": 1793399874000
+    },
+    {
+      "id": "tpl-128",
+      "en": "On the surface, 措施A seems to be a sound solution, but on careful consideration, we find that 措施B is a more reasonable and effective approach.",
+      "cn": "表面上，措施 A 似乎是一个合理的解决方案，但仔细考虑后，我们发现措施 B 才是更合理有效的方法。",
+      "note": "措施方案二·待选 2。字数偏多，26 英一英二都不太适合。",
+      "cat": "第三段·具体措施",
+      "at": 1793399873000
+    },
+    {
+      "id": "tpl-129",
+      "en": "If these proposed measures are implemented, a harmonious balance between A and B will be within our reach.",
+      "cn": "如果这些提议的措施得以实施，A 与 B 之间的和谐平衡触手可及。",
+      "note": "畅想未来待选 1。A、B 按主题词改。",
+      "cat": "第三段·畅想与预测",
+      "at": 1793399872000
+    },
+    {
+      "id": "tpl-130",
+      "en": "Only through the joint efforts of all people can we effectively solve the problem and advance social progress.",
+      "cn": "只有通过所有人的共同努力，我们才能有效解决问题并推动社会进步。",
+      "note": "畅想未来待选 2。需按题目小改。",
+      "cat": "第三段·畅想与预测",
+      "at": 1793399871000
+    },
+    {
+      "id": "tpl-131",
+      "en": "In this way, hopefully, we may embrace a brighter and more promising future.",
+      "cn": "这样，我们才有希望拥抱一个更光明、更有希望的未来。",
+      "note": "畅想未来待选 3。万能套话，不用改。",
+      "cat": "第三段·畅想与预测",
+      "at": 1793399870000
+    },
+    {
+      "id": "tpl-132",
+      "en": "There is no better time than now for us to take collective and decisive action to address this pressing issue.",
+      "cn": "现在是我们采取集体果断行动解决这一紧迫问题的最佳时机。",
+      "note": "畅想未来待选 4。万能套话，时间紧或字数不够时用。",
+      "cat": "第三段·畅想与预测",
+      "at": 1793399869000
+    },
+    {
+      "id": "tpl-133",
+      "en": "Only through the joint efforts of the government, enterprises and the public can we effectively promote the healthy development of elderly-care robots.",
+      "cn": "只有通过政府、企业和公众的共同努力，我们才能有效促进养老机器人的健康发展。",
+      "note": "2026 英一范例（待选 2 的套用）。",
+      "cat": "第三段·畅想与预测",
+      "at": 1793399868000
+    },
+    {
+      "id": "tpl-134",
+      "en": "Taking into account all the factors discussed above, we may reasonably conclude that, with the passage of time and the advancement of society, the number of people who choose to do Sth will continue to increase in the coming years.",
+      "cn": "综合考虑上述所有因素，可以合理得出结论：随着时代变迁和社会进步，未来几年选择做某事的人数将持续增加。",
+      "note": "趋势预测待选 1。图表作文第三段的简单写法：总结 + 趋势预测。",
+      "cat": "第三段·畅想与预测",
+      "at": 1793399867000
+    },
+    {
+      "id": "tpl-135",
+      "en": "For the reasons given above, we can predict that an increasing number of people will focus on 主题词, and this trend is likely to continue in the near future.",
+      "cn": "基于上述原因，可以预测将有越来越多的人关注主题词，这一趋势在不久的将来很可能持续。",
+      "note": "趋势预测待选 2。",
+      "cat": "第三段·畅想与预测",
+      "at": 1793399866000
+    },
+    {
+      "id": "tpl-136",
+      "en": "Given the arguments above, the next few years will also witness larger-scale, faster-paced and higher-quality development in 主题词.",
+      "cn": "鉴于上述论点，未来几年主题词也将迎来更大规模、更快速度和更高水平的发展。",
+      "note": "趋势预测待选 3。",
+      "cat": "第三段·畅想与预测",
+      "at": 1793399865000
+    },
+    {
+      "id": "tpl-137",
+      "en": "In conclusion, the phenomenon reflected in the chart is bound to continue, and it will keep exerting a positive influence on our lives.",
+      "cn": "总之，图表所反映的现象必将持续，并将继续对我们的生活产生积极影响。",
+      "note": "趋势预测待选 4。静态图常用。",
+      "cat": "第三段·畅想与预测",
+      "at": 1793399864000
+    },
+    {
+      "id": "tpl-138",
+      "en": "In a word, as society keeps moving forward, 主题词 is likely to gain even greater significance in the days to come.",
+      "cn": "总之，随着社会不断前进，主题词在未来很可能变得更加重要。",
+      "note": "趋势预测待选 5。",
+      "cat": "第三段·畅想与预测",
+      "at": 1793399863000
+    },
+    {
+      "id": "tpl-139",
+      "en": "Given the arguments above, we can predict that outdoor activities will win growing recognition among parents as they increasingly value children's all-round development.",
+      "cn": "鉴于上述论点，随着家长愈发重视孩子的全面发展，可以预测户外活动将赢得越来越多家长的认可。",
+      "note": "趋势预测待选 6（愈发重视、获得认可）。2026 英二范例。",
+      "cat": "第三段·畅想与预测",
+      "at": 1793399862000
+    },
+    {
+      "id": "tpl-140",
+      "en": "The line chart above illustrates the changes in Chinese residents' health literacy level from 2012 to 2021, during which it rose steadily. To be specific, the health literacy level increased gradually from 8.8% in 2012 to 11.58% in 2016. In the next five years, it climbed remarkably, from 11.58% to 25.40%. It is apparent from the statistics that the health literacy level has been improving rapidly in recent years.",
+      "cn": "上方折线图展示了 2012 至 2021 年间中国居民健康素养水平的变化，其在这一时期稳步上升。具体而言，健康素养水平从 2012 年的 8.8% 逐步升至 2016 年的 11.58%。在接下来的五年里，它显著攀升，从 11.58% 升至 25.40%。从统计数据可以明显看出，居民健康素养水平近年来在迅速提高。",
+      "note": "2023 英二首段（动态单方向）。套用：总体描述·待选 1 + 动态公式 1 + 过渡句 2 + 社会现象方案 1。",
+      "cat": "真题整段范例",
+      "at": 1793399861000
+    },
+    {
+      "id": "tpl-141",
+      "en": "The chart on the left shows consumers' attitudes towards elderly-care robots, while the chart on the right lists their major concerns about such robots. To be specific, the proportions of respondents who fully accept, partially accept and reject these robots account for 39.3%, 32.8% and 27.9% respectively. Notably, safety tops the list of consumers' major concerns, at 46.3%, followed by price at 24.9%. It is apparent from the statistics that elderly-care robots have drawn growing attention from the public, with safety as their top concern.",
+      "cn": "左侧的图显示了消费者对养老机器人的态度，而右侧的图列出了他们对这类机器人的主要担忧。具体而言，完全接受、部分接受和不接受这类机器人的受访者比例分别为 39.3%、32.8% 和 27.9%。值得注意的是，安全在消费者的主要担忧中居首位，占 46.3%；其次是价格，占 24.9%。从统计数据可以明显看出，养老机器人日益受到公众关注，安全是他们的首要关切。",
+      "note": "2026 英一首段（双图表·静静）。套用：双图表待选 1 + 静态公式 1 + 排名 + 过渡句 2 + 社会现象方案 4。",
+      "cat": "真题整段范例",
+      "at": 1793399860000
+    },
+    {
+      "id": "tpl-142",
+      "en": "The bar chart above presents the distribution of respondents' views on children's outdoor activities, with satisfying curiosity accounting for the largest share. To be specific, the percentages of respondents who believe that outdoor activities could satisfy children's curiosity, develop observational skills, strengthen physical fitness and enhance parent-child interaction account for 54.6%, 54.5%, 37.2% and 33.2% respectively. Despite its apparent simplicity, the chart highlights the core information that parents attach importance to outdoor activities for children's development.",
+      "cn": "上方柱状图呈现了受访者对儿童户外活动看法的分布，其中满足好奇心占比最高。具体而言，认为户外活动能满足孩子好奇心、促进观察力、强身健体和增强亲子互动的受访者比例分别为 54.6%、54.5%、37.2% 和 33.2%。尽管它看似简单，这幅图却突出了核心信息：家长重视户外活动对儿童发展的价值。",
+      "note": "2026 英二首段（静态）。套用：静态待选 1 + 静态公式 1（篇幅重复，删后半句）+ 过渡句 3 + 社会现象方案 4。",
+      "cat": "真题整段范例",
+      "at": 1793399859000
+    },
+    {
+      "id": "tpl-143",
+      "en": "There are plenty of causes accounting for the phenomenon in various aspects. For instance, my hometown, a beautiful city, is committed to infrastructure construction. Thanks to these efforts, citizen satisfaction has improved. Furthermore, a rising number of individuals are coming to the realization that a healthy lifestyle is strongly dependent on infrastructure development. In the end, if the government ignored the importance of infrastructure construction, our cities would be confronted with an unpromising and fruitless future.",
+      "cn": "造成这一现象的原因是多方面的。例如，我的家乡，一个美丽的城市，致力于基础设施建设。得益于这些努力，公民满意度有所提高。此外，越来越多的人开始认识到健康的生活方式在很大程度上取决于基础设施的发展。最后，如果政府忽视基础设施建设的重要性，我们的城市将没有未来。",
+      "note": "2024 英一二段完整范例。三点原因：举例论证 + 从句与六大方面 + 虚拟语气；连接词 Furthermore / In the end。",
+      "cat": "真题整段范例",
+      "at": 1793399858000
+    },
+    {
+      "id": "tpl-144",
+      "en": "It is not difficult to draw the conclusion that enough attention has been paid to the infrastructure by the departments concerned. For one thing, it is imperative for the authorities to increase investment continuously. For another, new media platforms, ranging from short video apps to social media, should appeal to people to live a healthy life. In this way, hopefully, we may embrace a brighter and more promising future.",
+      "cn": "不难得出结论，有关部门已对基础设施给予足够重视。一方面，当局必须不断增加投资。另一方面，新媒体平台，从短视频应用到社交媒体，应该呼吁人们过健康的生活。通过这种方式，希望我们能拥抱一个更光明、更有希望的未来。",
+      "note": "2024 英一三段完整范例。总结全文 + 两个具体措施（政府 / 媒体）+ 畅想未来。",
+      "cat": "真题整段范例",
+      "at": 1793399857000
+    },
+    {
+      "id": "tpl-145",
+      "en": "The drawing on the left side provides us with a lively scene: several urban residents are exercising in a park and a youngster says that the new park is fantastic. Referring to the statistics provided in the right chart, the number of parks in a certain city increased remarkably from 406 in 2020 to 670 in 2022. The drawing and the chart aim to remind us that great accomplishments have been made in the construction of public facilities by the government.",
+      "cn": "左侧图画为我们呈现了一个生动的场景：几位城市居民正在公园锻炼，一位年轻人说新公园很棒。再看右侧图表提供的数据，某城市公园数量从 2020 年的 406 个显著增加到 2022 年的 670 个。图画和图表意在提醒我们，政府在公共设施建设方面取得了巨大成就。",
+      "note": "2024 英一首段（图画 + 图表）。图画描述 + 图表总体描述 + 图画主题阐述（中心思想方案 3）。",
+      "cat": "真题整段范例",
+      "at": 1793399856000
+    }
+  ]
+}

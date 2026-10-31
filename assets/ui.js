@@ -9,6 +9,8 @@ window.App = window.App || {};
 
   let running = null;
   let renderReview = function () {};
+  let renderGrammarList = function () {};
+  let renderNotes = function () {};
   const essayState = { image: null, report: '', messages: null, meta: null };
 
   /* ---------------- 通用状态 ---------------- */
@@ -150,6 +152,8 @@ window.App = window.App || {};
       p.hidden = p.id !== 'panel-' + name;
     });
     if (name === 'review') renderReview();
+    if (name === 'grammar') renderGrammarList();
+    if (name === 'notes') renderNotes();
   }
 
   /* ---------------- 设置 ---------------- */
@@ -261,7 +265,11 @@ window.App = window.App || {};
       return '<p class="hint">AI 推荐会从强调句、倒装、从句、非谓语、名词化、比较与衔接里挑一个最贴语境的；选定某个手法后这里会显示例句。</p>';
     }
     const list = item.examples.map(function (pair) {
-      return '<li><p class="ex-en">' + escapeAttr(pair[0]) + '</p><p class="ex-cn">' + escapeAttr(pair[1]) + '</p></li>';
+      const saved = App.examples.has(pair[0]);
+      return '<li><p class="ex-en">' + escapeAttr(pair[0]) + '</p><p class="ex-cn">' + escapeAttr(pair[1]) + '</p>' +
+        '<button type="button" class="ex-save' + (saved ? ' is-saved' : '') +
+        '" data-en="' + escapeAttr(pair[0]) + '" data-cn="' + escapeAttr(pair[1]) + '">' +
+        (saved ? '已收藏' : '收藏到例句本') + '</button></li>';
     }).join('');
     return '<p class="example-tip"><b>' + escapeAttr(item.label) + '</b>　' + escapeAttr(item.tip) + '</p>' +
       '<ul class="example-list">' + list + '</ul>';
@@ -293,6 +301,18 @@ window.App = window.App || {};
       renderExamples();
     });
     renderExamples();
+
+    $('#rewrite-examples').addEventListener('click', function (e) {
+      const btn = e.target.closest('.ex-save');
+      if (!btn) return;
+      const result = App.examples.add({ en: btn.dataset.en, cn: btn.dataset.cn });
+      if (result.error) {
+        btn.textContent = '保存失败';
+        return;
+      }
+      btn.classList.add('is-saved');
+      btn.textContent = '已收藏';
+    });
 
     $('#btn-rewrite').addEventListener('click', function () {
       const text = $('#rewrite-input').value.trim();
@@ -898,10 +918,14 @@ window.App = window.App || {};
         escapeAttr(name) + '</button>';
     }).join('');
 
-    function itemHtml(item, index) {
+    function itemHtml(item, index, savedSet) {
       const examples = item.examples.map(function (pair) {
+        const saved = savedSet[pair[0].trim().toLowerCase()];
         return '<li><p class="ex-en">' + escapeAttr(pair[0]) + '</p>' +
-          '<p class="ex-cn">' + escapeAttr(pair[1]) + '</p></li>';
+          '<p class="ex-cn">' + escapeAttr(pair[1]) + '</p>' +
+          '<button type="button" class="ex-save' + (saved ? ' is-saved' : '') +
+          '" data-en="' + escapeAttr(pair[0]) + '" data-cn="' + escapeAttr(pair[1]) + '">' +
+          (saved ? '已收藏' : '收藏到例句本') + '</button></li>';
       }).join('');
       return '<details class="grammar-item"' + (index === 0 ? ' open' : '') + '>' +
         '<summary><span class="grammar-title">' + escapeAttr(item.title) + '</span>' +
@@ -916,12 +940,16 @@ window.App = window.App || {};
 
     function render() {
       const items = App.grammar.search(input.value, cat);
+      const savedSet = {};
+      App.examples.list('全部', '').forEach(function (item) {
+        savedSet[item.en.trim().toLowerCase()] = true;
+      });
       const filtered = String(input.value).trim() !== '' || cat !== '全部';
       countBox.textContent = filtered
         ? '匹配到 ' + items.length + ' 个语法点'
         : '共 ' + items.length + ' 个语法点，点开任意一条看结构、例句和易错提醒';
       listBox.innerHTML = items.length
-        ? items.map(itemHtml).join('')
+        ? items.map(function (item, index) { return itemHtml(item, index, savedSet); }).join('')
         : '<p class="hint">没找到，换个关键词试试，比如「虚拟」「倒装」「冠词」或「result in」。</p>';
     }
 
@@ -935,7 +963,316 @@ window.App = window.App || {};
       render();
     });
 
+    listBox.addEventListener('click', function (e) {
+      const btn = e.target.closest('.ex-save');
+      if (!btn) return;
+      const result = App.examples.add({ en: btn.dataset.en, cn: btn.dataset.cn });
+      if (result.error) {
+        btn.textContent = '保存失败';
+        return;
+      }
+      btn.classList.add('is-saved');
+      btn.textContent = '已收藏';
+    });
+
     input.addEventListener('input', render);
+    renderGrammarList = render;
+    render();
+  }
+
+  /* ---------------- 例句本 ---------------- */
+
+  function initNotes() {
+    const box = $('#note-box');
+    const enInput = $('#note-en');
+    const cnInput = $('#note-cn');
+    const noteInput = $('#note-note');
+    const catSel = $('#note-cat');
+    const formTip = $('#note-form-tip');
+    const catBox = $('#notes-cats');
+    const listBox = $('#notes-list');
+    const countBox = $('#notes-count');
+    const search = $('#notes-q');
+    const catList = $('#cat-list');
+    const catName = $('#cat-name');
+    const catHint = $('#cat-hint');
+    const tip = $('#notes-tip');
+    let filterCat = '全部';
+    let editingId = null;
+
+    function dateText(at) {
+      if (!at) return '';
+      const d = new Date(at);
+      const pad = function (n) { return n < 10 ? '0' + n : String(n); };
+      return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate());
+    }
+
+    function optionsHtml(selected) {
+      return App.examples.cats().map(function (name) {
+        return '<option value="' + escapeAttr(name) + '"' +
+          (name === selected ? ' selected' : '') + '>' + escapeAttr(name) + '</option>';
+      }).join('');
+    }
+
+    function renderCatSelect(preferred) {
+      const cats = App.examples.cats();
+      const current = preferred || catSel.value;
+      catSel.innerHTML = optionsHtml(current);
+      if (cats.indexOf(current) === -1) catSel.value = App.examples.DEFAULT_CAT;
+    }
+
+    function renderCatChips() {
+      const counts = App.examples.counts();
+      const total = App.examples.list('全部', '').length;
+      catBox.innerHTML = ['全部'].concat(App.examples.cats()).map(function (name) {
+        const n = name === '全部' ? total : (counts[name] || 0);
+        return '<button type="button" class="chip filter-chip' +
+          (name === filterCat ? ' is-active' : '') + '" data-cat="' + escapeAttr(name) + '">' +
+          escapeAttr(name) + ' <b>' + n + '</b></button>';
+      }).join('');
+    }
+
+    function renderCatList() {
+      const counts = App.examples.counts();
+      catList.innerHTML = App.examples.cats().map(function (name) {
+        const del = name === App.examples.DEFAULT_CAT ? '' :
+          '<button type="button" class="link-btn cat-del" data-cat="' + escapeAttr(name) + '">删除</button>';
+        return '<div class="cat-row"><span class="cat-name">' + escapeAttr(name) + '</span>' +
+          '<span class="cat-count">' + (counts[name] || 0) + ' 句</span>' + del + '</div>';
+      }).join('');
+    }
+
+    function itemHtml(item) {
+      return '<article class="note-item" data-id="' + escapeAttr(item.id) + '">' +
+        '<div class="note-head">' +
+        '<span class="note-cat">' + escapeAttr(item.cat) + '</span>' +
+        '<span class="note-date">' + escapeAttr(dateText(item.at)) + '</span>' +
+        '</div>' +
+        '<p class="note-en">' + escapeAttr(item.en) + '</p>' +
+        (item.cn ? '<p class="note-cn">' + escapeAttr(item.cn) + '</p>' : '') +
+        (item.note ? '<p class="note-extra">备注：' + escapeAttr(item.note) + '</p>' : '') +
+        '<div class="note-foot">' +
+        '<label class="note-move-label">分类 <select class="note-move">' + optionsHtml(item.cat) + '</select></label>' +
+        '<button type="button" class="btn ghost small" data-act="edit">编辑</button>' +
+        '<button type="button" class="btn ghost small" data-act="del">删除</button>' +
+        '</div></article>';
+    }
+
+    function renderList() {
+      const keyword = search.value;
+      const items = App.examples.list(filterCat, keyword);
+      const total = App.examples.list('全部', '').length;
+      const filtered = String(keyword).trim() !== '' || filterCat !== '全部';
+
+      if (!total) {
+        listBox.innerHTML = '<p class="hint">例句本还是空的。上面写一句，或在语法库里点例句旁的「收藏到例句本」。</p>';
+        countBox.textContent = '共 0 句';
+      } else if (!items.length) {
+        listBox.innerHTML = '<p class="hint">这个条件下没有例句，换个分类或关键词试试。</p>';
+        countBox.textContent = '匹配到 0 句（共 ' + total + ' 句）';
+      } else {
+        listBox.innerHTML = items.map(itemHtml).join('');
+        countBox.textContent = filtered
+          ? '匹配到 ' + items.length + ' 句（共 ' + total + ' 句）'
+          : '共 ' + total + ' 句，' + App.examples.cats().length + ' 个分类';
+      }
+    }
+
+    function render() {
+      renderCatSelect();
+      renderCatChips();
+      renderCatList();
+      renderList();
+    }
+
+    function exitEdit() {
+      editingId = null;
+      enInput.value = '';
+      cnInput.value = '';
+      noteInput.value = '';
+      $('#btn-note-save').textContent = '保存例句';
+      $('#btn-note-cancel').hidden = true;
+      formTip.textContent = '';
+    }
+
+    function enterEdit(id) {
+      const item = App.examples.list('全部', '').filter(function (i) { return i.id === id; })[0];
+      if (!item) return;
+      editingId = id;
+      enInput.value = item.en;
+      cnInput.value = item.cn;
+      noteInput.value = item.note;
+      renderCatSelect(item.cat);
+      $('#btn-note-save').textContent = '更新例句';
+      $('#btn-note-cancel').hidden = false;
+      formTip.textContent = '正在编辑，改完点「更新例句」。';
+      box.open = true;
+      if (box.scrollIntoView) box.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    $('#btn-note-save').addEventListener('click', function () {
+      const en = enInput.value.trim();
+      if (!en) {
+        formTip.textContent = '先写一句英文。';
+        enInput.focus();
+        return;
+      }
+      const payload = { en: en, cn: cnInput.value, note: noteInput.value, cat: catSel.value };
+
+      if (editingId) {
+        const result = App.examples.update(editingId, payload);
+        if (result.error) {
+          formTip.textContent = result.error;
+          return;
+        }
+        exitEdit();
+        render();
+        formTip.textContent = '已更新。';
+        return;
+      }
+
+      const result = App.examples.add(payload);
+      if (result.error) {
+        formTip.textContent = result.error;
+        return;
+      }
+      if (result.existing) {
+        formTip.textContent = '这句已经在例句本里（分类：' + result.existing.cat + '）。';
+        return;
+      }
+      enInput.value = '';
+      cnInput.value = '';
+      noteInput.value = '';
+      formTip.textContent = '已保存到「' + result.item.cat + '」。';
+      render();
+    });
+
+    $('#btn-note-cancel').addEventListener('click', function () {
+      exitEdit();
+      renderCatSelect();
+    });
+
+    catBox.addEventListener('click', function (e) {
+      const btn = e.target.closest('[data-cat]');
+      if (!btn) return;
+      filterCat = btn.dataset.cat;
+      renderCatChips();
+      renderList();
+    });
+
+    search.addEventListener('input', renderList);
+
+    listBox.addEventListener('click', function (e) {
+      const btn = e.target.closest('[data-act]');
+      const card = e.target.closest('.note-item');
+      if (!btn || !card) return;
+      if (btn.dataset.act === 'edit') {
+        enterEdit(card.dataset.id);
+        return;
+      }
+      if (btn.dataset.act === 'del') {
+        if (!window.confirm('删除这条例句？')) return;
+        const result = App.examples.remove(card.dataset.id);
+        if (result.error) {
+          tip.textContent = result.error;
+          return;
+        }
+        if (editingId === card.dataset.id) exitEdit();
+        tip.textContent = '已删除一例句。';
+        render();
+      }
+    });
+
+    listBox.addEventListener('change', function (e) {
+      const sel = e.target.closest('.note-move');
+      const card = e.target.closest('.note-item');
+      if (!sel || !card) return;
+      const result = App.examples.move(card.dataset.id, sel.value);
+      if (result.error) {
+        tip.textContent = result.error;
+        return;
+      }
+      tip.textContent = '已移到「' + sel.value + '」。';
+      render();
+    });
+
+    $('#btn-cat-add').addEventListener('click', function () {
+      const result = App.examples.addCat(catName.value);
+      if (result.error) {
+        catHint.textContent = result.error;
+        return;
+      }
+      catName.value = '';
+      catHint.textContent = '已新建分类「' + result.name + '」。';
+      render();
+      renderCatSelect(result.name);
+    });
+
+    catName.addEventListener('keydown', function (e) {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        $('#btn-cat-add').click();
+      }
+    });
+
+    catList.addEventListener('click', function (e) {
+      const btn = e.target.closest('.cat-del');
+      if (!btn) return;
+      const name = btn.dataset.cat;
+      if (!window.confirm('删除分类「' + name + '」？里面的例句会移到「未分类」。')) return;
+      const result = App.examples.removeCat(name);
+      if (result.error) {
+        catHint.textContent = result.error;
+        return;
+      }
+      if (filterCat === name) filterCat = '全部';
+      catHint.textContent = '已删除「' + name + '」，例句已移到未分类。';
+      render();
+    });
+
+    $('#btn-notes-export').addEventListener('click', function () {
+      const data = App.examples.exportData();
+      if (!data.items.length) {
+        tip.textContent = '还没有例句可以导出。';
+        return;
+      }
+      const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      const d = new Date();
+      const pad = function (n) { return n < 10 ? '0' + n : String(n); };
+      link.href = url;
+      link.download = '例句本-' + d.getFullYear() + pad(d.getMonth() + 1) + pad(d.getDate()) + '.json';
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      setTimeout(function () { URL.revokeObjectURL(url); }, 1000);
+      tip.textContent = '已导出 ' + data.items.length + ' 句。';
+    });
+
+    $('#btn-notes-import').addEventListener('click', function () {
+      $('#file-notes-import').click();
+    });
+
+    $('#file-notes-import').addEventListener('change', function () {
+      const file = this.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = function () {
+        const result = App.examples.importData(String(reader.result || ''));
+        if (result.error) {
+          tip.textContent = result.error;
+          return;
+        }
+        tip.textContent = '导入完成：新增 ' + result.added + ' 句，跳过 ' + result.skipped + ' 句重复。';
+        render();
+      };
+      reader.onerror = function () { tip.textContent = '读取文件失败。'; };
+      reader.readAsText(file);
+      this.value = '';
+    });
+
+    renderNotes = render;
     render();
   }
 
@@ -1005,6 +1342,7 @@ window.App = window.App || {};
     initEssay();
     initReview();
     initGrammar();
+    initNotes();
     refreshKeyHint();
   }
 

@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="color-scheme" content="light dark">
   <title>考研英语高阶训练器</title>
-  <meta name="description" content="长难句拆解、高级句型改写、作文拍照批改与离线语法手册，按考研英语大纲评分档位批改。">
+  <meta name="description" content="长难句拆解、高级句型改写、作文拍照批改、离线语法手册与可自定义分类的例句本，按考研英语大纲评分档位批改。">
   <link rel="manifest" href="manifest.webmanifest">
   <meta name="theme-color" content="#4b3fe3">
   <meta name="mobile-web-app-capable" content="yes">
@@ -20,7 +20,7 @@
   <header class="topbar">
     <div class="brand">
       <h1>考研英语高阶训练器</h1>
-      <p class="sub">长难句 · 句型升级 · 作文批改 · 语法库</p>
+      <p class="sub">长难句 · 句型升级 · 作文批改 · 语法库 · 例句本</p>
     </div>
     <button id="btn-settings" class="btn ghost small" aria-haspopup="dialog">设置<span class="dot" id="key-dot" hidden></span></button>
   </header>
@@ -32,6 +32,7 @@
       <button class="tab" id="tab-essay" role="tab" data-tab="essay" aria-selected="false" aria-controls="panel-essay">作文批改</button>
       <button class="tab" id="tab-review" role="tab" data-tab="review" aria-selected="false" aria-controls="panel-review">复盘</button>
       <button class="tab" id="tab-grammar" role="tab" data-tab="grammar" aria-selected="false" aria-controls="panel-grammar">语法库</button>
+      <button class="tab" id="tab-notes" role="tab" data-tab="notes" aria-selected="false" aria-controls="panel-notes">例句本</button>
     </nav>
 
     <!-- Tab 1 -->
@@ -189,6 +190,61 @@
       <p class="hint" id="grammar-count"></p>
       <div id="grammar-list" class="grammar-list"></div>
     </section>
+
+    <!-- Tab 6 -->
+    <section id="panel-notes" class="panel" role="tabpanel" aria-labelledby="tab-notes" hidden>
+      <details class="details note-box" id="note-box" open>
+        <summary>添加例句</summary>
+        <label class="field">
+          <span class="label">英文句子</span>
+          <textarea id="note-en" rows="2" spellcheck="false" placeholder="把想记住的句子原样贴进来"></textarea>
+        </label>
+        <label class="field">
+          <span class="label">中文翻译（选填）</span>
+          <input id="note-cn" type="text" placeholder="自己的翻译或参考译文">
+        </label>
+        <div class="grid2">
+          <label class="field">
+            <span class="label">分类</span>
+            <select id="note-cat"></select>
+          </label>
+          <label class="field">
+            <span class="label">备注（选填）</span>
+            <input id="note-note" type="text" placeholder="来源、用法、易错点">
+          </label>
+        </div>
+        <div class="row">
+          <button id="btn-note-save" class="btn primary">保存例句</button>
+          <button id="btn-note-cancel" class="btn ghost" hidden>取消编辑</button>
+          <span class="tip" id="note-form-tip"></span>
+        </div>
+      </details>
+
+      <details class="details" id="cat-box">
+        <summary>分类管理（自己定主题）</summary>
+        <div class="row cat-add-row">
+          <input id="cat-name" type="text" maxlength="12" spellcheck="false" placeholder="例如：图表作文、环保、长难句">
+          <button id="btn-cat-add" class="btn">新建分类</button>
+        </div>
+        <p class="hint" id="cat-hint">分类只存在本机；删除分类时，里面的例句会移到「未分类」。</p>
+        <div id="cat-list" class="cat-list"></div>
+      </details>
+
+      <label class="field">
+        <span class="label">我的例句里搜索</span>
+        <input id="notes-q" type="search" spellcheck="false" placeholder="搜英文、中文、分类或备注">
+      </label>
+      <div class="chips filter-chips" id="notes-cats"></div>
+      <p class="hint" id="notes-count"></p>
+      <div id="notes-list" class="notes-list"></div>
+
+      <div class="row notes-actions">
+        <button id="btn-notes-export" class="btn ghost small">导出备份</button>
+        <button id="btn-notes-import" class="btn ghost small">导入备份</button>
+        <input type="file" id="file-notes-import" accept="application/json,.json" hidden>
+        <span class="tip" id="notes-tip">备份是 JSON 文件，换设备或清缓存前先导出一份</span>
+      </div>
+    </section>
   </main>
 
   <!-- 设置 -->
@@ -285,6 +341,7 @@
   <script src="assets/api.js"></script>
   <script src="assets/markdown.js"></script>
   <script src="assets/journal.js"></script>
+  <script src="assets/examples.js"></script>
   <script src="assets/ui.js"></script>
 </body>
 </html>

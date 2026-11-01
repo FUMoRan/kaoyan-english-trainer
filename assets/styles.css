@@ -984,21 +984,66 @@ body.is-exam-mode .topbar { position: static; }
 
 /* ---------- 答题栏 ---------- */
 
-.exam-bar {
+.exam-sticky {
   position: sticky;
   top: 0;
   z-index: 30;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
   margin: -18px -16px 14px;
-  padding: 10px 16px;
   background: color-mix(in srgb, var(--bg) 92%, transparent);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
   border-bottom: 1px solid var(--border);
 }
+
+.exam-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 10px 16px 6px;
+}
+
+.exam-nav {
+  display: flex;
+  gap: 6px;
+  padding: 0 16px 9px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.exam-nav::-webkit-scrollbar { display: none; }
+
+.exam-nav-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  flex: 0 0 auto;
+  padding: 4px 10px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  font-size: 12px;
+  color: var(--text-muted);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background .15s, border-color .15s, color .15s;
+}
+
+.exam-nav-chip.is-active {
+  background: var(--brand);
+  border-color: var(--brand);
+  color: #fff;
+}
+
+.exam-nav-label { font-weight: 500; }
+
+.exam-nav-count {
+  font-size: 10.5px;
+  font-variant-numeric: tabular-nums;
+  opacity: .78;
+}
+.exam-nav-chip.is-active .exam-nav-count { opacity: .92; }
+.exam-nav-chip .exam-nav-count.is-done { color: var(--success); }
+.exam-nav-chip.is-active .exam-nav-count.is-done { color: #fff; }
 
 .exam-bar-left { display: flex; align-items: center; gap: 10px; min-width: 0; }
 .exam-bar-title { display: flex; flex-direction: column; min-width: 0; }
@@ -1075,6 +1120,40 @@ body.is-exam-mode .topbar { position: static; }
   border: 1px solid var(--border);
   border-radius: var(--radius-card);
   box-shadow: var(--shadow);
+  scroll-margin-top: 112px;
+}
+
+.group-split {
+  display: grid;
+  grid-template-columns: minmax(0, 1.05fr) minmax(0, .95fr);
+  gap: 24px;
+  align-items: start;
+}
+
+.split-passage {
+  position: sticky;
+  top: 112px;
+  max-height: calc(100vh - 132px);
+  overflow-y: auto;
+  padding-right: 6px;
+  scrollbar-width: thin;
+}
+
+.split-passage .passage { margin-bottom: 0; }
+
+.part-foot {
+  display: flex;
+  justify-content: flex-end;
+  margin: -6px 0 18px;
+}
+
+.part-foot .btn {
+  border-style: dashed;
+  color: var(--text-muted);
+}
+.part-foot .btn:hover {
+  border-style: solid;
+  color: var(--text);
 }
 
 .group-head {
@@ -1368,6 +1447,9 @@ body.is-exam-mode .topbar { position: static; }
 .sheet-card { max-width: 560px; }
 .sheet-grid { display: flex; flex-direction: column; gap: 14px; margin: 10px 0 16px; }
 .sheet-part-head { margin-bottom: 6px; font-size: 12px; color: var(--text-muted); }
+.sheet-group { margin-bottom: 10px; }
+.sheet-group:last-child { margin-bottom: 0; }
+.sheet-group-head { margin: 0 0 5px 1px; font-size: 11.5px; color: var(--text-muted); }
 .sheet-nums { display: grid; grid-template-columns: repeat(8, minmax(0, 1fr)); gap: 6px; }
 .sheet-num {
   height: 32px;
@@ -1571,20 +1653,32 @@ body.is-exam-mode .topbar { position: static; }
 
 /* ---------- 真题模式 · 移动端 ---------- */
 
+@media (max-width: 900px) {
+  .group-split { grid-template-columns: 1fr; gap: 0; }
+  .split-passage {
+    position: static;
+    max-height: none;
+    overflow: visible;
+    padding-right: 0;
+  }
+}
+
 @media (max-width: 560px) {
   .exam-hero { flex-direction: column; align-items: stretch; gap: 12px; padding: 16px; }
   .exam-wrong-btn { align-self: flex-start; }
   .year-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .start-card { flex-direction: column; align-items: stretch; gap: 12px; }
+  .exam-sticky { margin: -18px -16px 12px; }
   .exam-bar {
     flex-wrap: wrap;
     gap: 8px;
-    margin: -18px -16px 12px;
-    padding: 9px 16px;
+    padding: 9px 16px 6px;
   }
+  .exam-nav { padding: 0 16px 8px; }
   .exam-bar-right { flex-wrap: wrap; }
   .exam-timer { order: -1; }
   .paper-block { padding: 13px 14px; }
+  .paper-block { scroll-margin-top: 96px; }
   .q-card { padding: 12px 13px; }
   .sheet-nums { grid-template-columns: repeat(6, minmax(0, 1fr)); }
   .score-hero { padding: 18px; }
@@ -1599,7 +1693,9 @@ body.is-exam-mode .topbar { position: static; }
 }
 
 @media (max-width: 480px) {
-  .exam-bar { margin: -14px -12px 12px; padding: 9px 12px; }
+  .exam-sticky { margin: -14px -12px 12px; }
+  .exam-bar { padding: 9px 12px 6px; }
+  .exam-nav { padding: 0 12px 8px; }
   .exam-hero { padding: 15px 14px; }
   .year-card { padding: 11px 12px; }
   .year-num { font-size: 18px; }

@@ -477,7 +477,22 @@ window.App = window.App || {};
     const answered = answeredCount(paper, s);
     const isFull = s.mode === 'full';
 
+    const chips = [];
+    parts.forEach(function (item) {
+      item.groups.forEach(function (group) {
+        chips.push(sectionInfo(item.part, group, s));
+      });
+    });
+    const nav = '<div class="exam-nav" role="tablist" aria-label="题组导航">' +
+      chips.map(function (sec) {
+        return '<button type="button" class="exam-nav-chip" role="tab" data-nav-group="' + escapeHtml(sec.id) + '">' +
+          '<span class="exam-nav-label">' + escapeHtml(sec.label) + '</span>' +
+          '<span class="exam-nav-count" data-count-group="' + escapeHtml(sec.id) + '">' + sec.answered + '/' + sec.total + '</span>' +
+          '</button>';
+      }).join('') + '</div>';
+
     const bar =
+      '<div class="exam-sticky" id="exam-sticky">' +
       '<div class="exam-bar" id="exam-bar">' +
       '<div class="exam-bar-left">' +
       '<button type="button" class="icon-btn" id="btn-exit-exam" aria-label="退出并保存">←</button>' +
@@ -490,18 +505,45 @@ window.App = window.App || {};
       (isFull
         ? '<button type="button" class="btn primary small" id="btn-submit-exam">交卷</button>'
         : '<button type="button" class="btn ghost small" id="btn-exit-exam-2">退出</button>') +
-      '</div></div>';
+      '</div></div>' + nav + '</div>';
 
     const intro = isFull
       ? '<p class="exam-run-hint">本卷共 ' + paper.totalQuestions + ' 题，满分 ' + paper.totalScore + ' 分。答案会自动保存；中途离开可以回来继续。</p>'
       : '<p class="exam-run-hint">' + escapeHtml(s.label) + ' · 做完一篇点「对答案」，客观题立刻判分并给解析。</p>';
 
-    const body = parts.map(function (item) {
-      return renderPart(paper, item.part, item.groups, s);
+    const body = parts.map(function (item, index) {
+      return renderPart(paper, item.part, item.groups, s, parts[index + 1]);
     }).join('');
 
     $('#exam-run').innerHTML = bar + '<div class="exam-run-body">' + intro + body + '</div>';
     updateBar();
+    updateNavCounts(paper, s);
+
+    const target = isFull && s.scrollGroup ? $('#group-' + s.scrollGroup) : null;
+    if (target) {
+      setTimeout(function () {
+        target.scrollIntoView({ block: 'start' });
+        updateNavActive();
+      }, 60);
+    }
+  }
+
+  function sectionInfo(part, group, s) {
+    let label = part.short || part.title;
+    if (group.kind === 'reading') {
+      label = group.title;
+    } else if (part.groups.length > 1 && group.kind === 'writing') {
+      label = group.title.indexOf('Part A') === 0 ? '小作文' : '大作文';
+    }
+    const answered = group.questions.filter(function (q) {
+      return q.subjective ? !!String(s.texts[q.number] || '').trim() : !!s.answers[q.number];
+    }).length;
+    return {
+      id: group.id,
+      label: label,
+      answered: answered,
+      total: group.questions.length
+    };
   }
 
   function timerText(s) {
@@ -509,9 +551,22 @@ window.App = window.App || {};
     return fmtClock(s.elapsedMs || 0);
   }
 
-  function renderPart(paper, part, groups, s) {
-    const groupHtml = groups.map(function (group) {
-      return renderGroup(paper, part, group, s);
+  function renderPart(paper, part, groups, s, next) {
+    const lastNext = next
+      ? (next.groups.length > 1 ? next.part.title : next.groups[0].title)
+      : '';
+    const groupHtml = groups.map(function (group, index) {
+      const following = groups[index + 1];
+      let target = '';
+      let label = '交卷并查看成绩';
+      if (following) {
+        target = following.id;
+        label = '下一篇 · ' + following.title;
+      } else if (next) {
+        target = next.groups[0].id;
+        label = '下一篇 · ' + lastNext;
+      }
+      return renderGroup(paper, part, group, s) + partFoot(target, label, s);
     }).join('');
     const count = groups.reduce(function (n, g) { return n + g.questions.length; }, 0);
     const score = groups.reduce(function (n, g) { return n + g.score; }, 0);
@@ -522,6 +577,12 @@ window.App = window.App || {};
       '<div class="part-band"><span class="part-band-name">' + escapeHtml(part.title) + '</span>' +
       '<span class="part-band-meta">' + count + ' 题 · ' + round1(score) + ' 分</span></div>' +
       instr + groupHtml + '</section>';
+  }
+
+  function partFoot(target, label, s) {
+    if (s.mode !== 'full') return '';
+    return '<div class="part-foot"><button type="button" class="btn ghost small" data-part-next="' +
+      escapeHtml(target) + '">' + escapeHtml(label) + ' →</button></div>';
   }
 
   function renderGroup(paper, part, group, s) {
@@ -576,8 +637,17 @@ window.App = window.App || {};
       }
     }
 
-    return '<article class="paper-block" id="group-' + escapeHtml(group.id) + '">' +
-      head + passage + optionList + '<div class="questions">' + questions + '</div>' + actions + '</article>';
+    const split = (group.kind === 'reading' || group.kind === 'translation_sentences') &&
+      !!passage && !optionList;
+    const inner = split
+      ? '<div class="group-split">' +
+        '<div class="split-col split-passage">' + passage + '</div>' +
+        '<div class="split-col split-questions"><div class="questions">' + questions + '</div>' + actions + '</div>' +
+        '</div>'
+      : passage + optionList + '<div class="questions">' + questions + '</div>' + actions;
+
+    return '<article class="paper-block" id="group-' + escapeHtml(group.id) + '" data-section="' +
+      escapeHtml(group.id) + '">' + head + inner + '</article>';
   }
 
   function passageText(text, group, s, checked) {
@@ -752,6 +822,46 @@ window.App = window.App || {};
     if (sub) sub.textContent = '已答 ' + answeredCount(paper, s) + ' / ' + collectQuestions(paper, s).length + ' 题';
     const timer = $('#exam-timer');
     if (timer) timer.textContent = timerText(s);
+    updateNavCounts(paper, s);
+  }
+
+  function updateNavCounts(paper, s) {
+    sessionParts(paper, s).forEach(function (item) {
+      item.groups.forEach(function (group) {
+        const el = $('[data-count-group="' + group.id + '"]');
+        if (!el) return;
+        const info = sectionInfo(item.part, group, s);
+        el.textContent = info.answered + '/' + info.total;
+        el.classList.toggle('is-done', info.answered === info.total);
+      });
+    });
+  }
+
+  function updateNavActive() {
+    const s = state.session;
+    const run = $('#exam-run');
+    if (!s || !run || run.hidden) return;
+    const chips = $$('.exam-nav-chip');
+    if (!chips.length) return;
+    const sticky = $('#exam-sticky');
+    const threshold = (sticky ? sticky.getBoundingClientRect().bottom : 100) + 8;
+    let current = chips[0].dataset.navGroup;
+    $$('[data-section]').forEach(function (section) {
+      if (section.getBoundingClientRect().top <= threshold) current = section.dataset.section;
+    });
+    chips.forEach(function (chip) {
+      const active = chip.dataset.navGroup === current;
+      chip.classList.toggle('is-active', active);
+      chip.setAttribute('aria-selected', active ? 'true' : 'false');
+    });
+    s.scrollGroup = current;
+  }
+
+  function scrollToSection(id) {
+    const node = $('#group-' + id);
+    if (!node) return;
+    node.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    updateNavActive();
   }
 
   function checkGroup(groupId) {
@@ -825,16 +935,20 @@ window.App = window.App || {};
     const parts = sessionParts(paper, s);
     $('#sheet-grid').innerHTML = parts.map(function (item) {
       return '<div class="sheet-part"><div class="sheet-part-head">' + escapeHtml(item.part.title) + '</div>' +
-        '<div class="sheet-nums">' + item.groups.map(function (group) {
-          return group.questions.map(function (q) {
-            const answered = q.subjective ? !!String(s.texts[q.number] || '').trim() : !!s.answers[q.number];
-            const checked = isChecked(s, group);
-            const wrong = checked && !q.subjective && s.answers[q.number] !== q.answer;
-            return '<button type="button" class="sheet-num' + (answered ? ' is-answered' : '') +
-              (wrong ? ' is-wrong' : '') + (checked && !q.subjective && s.answers[q.number] === q.answer ? ' is-correct' : '') +
-              '" data-sheet-jump="' + q.number + '">' + q.number + '</button>';
-          }).join('');
-        }).join('') + '</div></div>';
+        item.groups.map(function (group) {
+          const groupHead = (item.groups.length > 1 || group.title !== item.part.title)
+            ? '<div class="sheet-group-head">' + escapeHtml(group.title) + '</div>'
+            : '';
+          return '<div class="sheet-group">' + groupHead + '<div class="sheet-nums">' +
+            group.questions.map(function (q) {
+              const answered = q.subjective ? !!String(s.texts[q.number] || '').trim() : !!s.answers[q.number];
+              const checked = isChecked(s, group);
+              const wrong = checked && !q.subjective && s.answers[q.number] !== q.answer;
+              return '<button type="button" class="sheet-num' + (answered ? ' is-answered' : '') +
+                (wrong ? ' is-wrong' : '') + (checked && !q.subjective && s.answers[q.number] === q.answer ? ' is-correct' : '') +
+                '" data-sheet-jump="' + q.number + '">' + q.number + '</button>';
+            }).join('') + '</div></div>';
+        }).join('') + '</div>';
     }).join('');
   }
 
@@ -1276,6 +1390,15 @@ window.App = window.App || {};
   function init() {
     load();
 
+    let navFrame = 0;
+    window.addEventListener('scroll', function () {
+      if (navFrame) return;
+      navFrame = window.requestAnimationFrame(function () {
+        navFrame = 0;
+        updateNavActive();
+      });
+    }, { passive: true });
+
     $('#btn-open-wrong') && $('#btn-open-wrong').addEventListener('click', openWrong);
     $('#exam-year-grid') && $('#exam-year-grid').addEventListener('click', function (e) {
       const card = e.target.closest('.year-card');
@@ -1349,6 +1472,17 @@ window.App = window.App || {};
       }
       if (e.target.closest('#btn-answer-card')) {
         openSheet();
+        return;
+      }
+      const nav = e.target.closest('[data-nav-group]');
+      if (nav) {
+        scrollToSection(nav.dataset.navGroup);
+        return;
+      }
+      const partNext = e.target.closest('[data-part-next]');
+      if (partNext) {
+        if (partNext.dataset.partNext) scrollToSection(partNext.dataset.partNext);
+        else submitSession(false);
         return;
       }
       if (e.target.closest('#btn-submit-exam')) {
@@ -1452,6 +1586,7 @@ window.App = window.App || {};
     const s = state.session;
     if (!s) { renderHome(); showView('home'); return; }
     if (!window.confirm('退出会保留这次进度，下次可以继续。要退出吗？')) return;
+    updateNavActive();
     pauseSessionClock();
     stopTimer();
     save();

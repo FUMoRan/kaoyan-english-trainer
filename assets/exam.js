@@ -468,6 +468,7 @@ window.App = window.App || {};
   /* ---------------- 答题页 ---------------- */
 
   function renderRun() {
+    closeBlankPicker();
     const s = state.session;
     if (!s) return;
     const paper = currentPaper();
@@ -601,6 +602,9 @@ window.App = window.App || {};
       passage = '<div class="passage">' + group.passage.map(function (p) {
         return '<p>' + passageText(p, group, s, checked) + '</p>';
       }).join('') + '</div>';
+      if (group.kind === 'cloze') {
+        passage += '<p class="hint cloze-hint">点文中空位可直接选词；下方逐题区可复查和看解析。</p>';
+      }
     }
 
     let optionList = '';
@@ -787,6 +791,80 @@ window.App = window.App || {};
     });
     refreshBlanks();
     updateBar();
+  }
+
+  function openBlankPicker(number, anchor) {
+    const s = state.session;
+    const paper = currentPaper();
+    if (!s || !paper || s.submitted) return;
+    const q = findQuestion(number);
+    if (!q || !q.options) return;
+    closeBlankPicker();
+
+    const keys = Object.keys(q.options).sort();
+    const node = document.createElement('div');
+    node.id = 'blank-pop';
+    node.className = 'blank-pop';
+    node.innerHTML = '<div class="blank-pop-head"><span>第 ' + number + ' 题</span>' +
+      '<button type="button" class="blank-pop-close" data-blank-close="1" aria-label="关闭">×</button></div>' +
+      '<div class="blank-pop-opts">' + keys.map(function (key) {
+        const chosen = s.answers[number] === key;
+        return '<button type="button" class="blank-pop-opt' + (chosen ? ' is-selected' : '') +
+          '" data-pick-q="' + number + '" data-pick-opt="' + key + '">' +
+          '<span class="opt-key">' + key + '</span>' +
+          '<span class="opt-text">' + textHtml(q.options[key]) + '</span></button>';
+      }).join('') + '</div>' +
+      '<p class="blank-pop-tip">选完自动保存，可随时改</p>';
+    document.body.appendChild(node);
+    positionBlankPicker(node, anchor);
+    state.blankPop = node;
+    state.blankPopOutside = function (event) {
+      if (node.contains(event.target)) return;
+      closeBlankPicker();
+    };
+    setTimeout(function () {
+      if (state.blankPop) document.addEventListener('pointerdown', state.blankPopOutside, true);
+    }, 0);
+  }
+
+  function positionBlankPicker(node, anchor) {
+    const rect = anchor.getBoundingClientRect();
+    const isSheet = window.innerWidth < 560;
+    node.classList.toggle('is-sheet', isSheet);
+    if (isSheet) {
+      node.style.left = '';
+      node.style.top = '';
+      node.style.width = '';
+      return;
+    }
+    const width = Math.min(340, window.innerWidth - 24);
+    node.style.width = width + 'px';
+    const height = node.offsetHeight;
+    const left = Math.min(Math.max(12, rect.left), window.innerWidth - width - 12);
+    let top = rect.bottom + 8;
+    if (top + height > window.innerHeight - 12) top = Math.max(12, rect.top - height - 8);
+    node.style.left = left + 'px';
+    node.style.top = top + 'px';
+  }
+
+  function closeBlankPicker() {
+    if (state.blankPop) {
+      if (state.blankPopOutside) document.removeEventListener('pointerdown', state.blankPopOutside, true);
+      state.blankPop.remove();
+      state.blankPop = null;
+      state.blankPopOutside = null;
+    }
+  }
+
+  function findQuestion(number) {
+    const s = state.session;
+    const paper = currentPaper();
+    if (!s || !paper) return null;
+    const items = collectQuestions(paper, s);
+    for (let i = 0; i < items.length; i++) {
+      if (items[i].q.number === number) return items[i].q;
+    }
+    return null;
   }
 
   function groupForQuestion(s, number) {
@@ -1395,9 +1473,24 @@ window.App = window.App || {};
       if (navFrame) return;
       navFrame = window.requestAnimationFrame(function () {
         navFrame = 0;
+        if (state.blankPop && !state.blankPop.classList.contains('is-sheet')) closeBlankPicker();
         updateNavActive();
       });
     }, { passive: true });
+
+    document.addEventListener('click', function (e) {
+      const pick = e.target.closest('[data-pick-opt]');
+      if (pick) {
+        chooseOption(Number(pick.dataset.pickQ), pick.dataset.pickOpt);
+        closeBlankPicker();
+        return;
+      }
+      if (e.target.closest('[data-blank-close]')) closeBlankPicker();
+    });
+
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape') closeBlankPicker();
+    });
 
     $('#btn-open-wrong') && $('#btn-open-wrong').addEventListener('click', openWrong);
     $('#exam-year-grid') && $('#exam-year-grid').addEventListener('click', function (e) {
@@ -1458,6 +1551,17 @@ window.App = window.App || {};
       const opt = e.target.closest('[data-opt][data-q]');
       if (opt) {
         chooseOption(Number(opt.dataset.q), opt.dataset.opt);
+        return;
+      }
+      const blank = e.target.closest('.passage-blank');
+      if (blank) {
+        const num = Number(blank.dataset.jump.split('-').pop());
+        const group = groupForQuestion(state.session, num);
+        if (group && isChecked(state.session, group)) {
+          scrollToQuestion(num);
+        } else {
+          openBlankPicker(num, blank);
+        }
         return;
       }
       const jump = e.target.closest('[data-jump]');

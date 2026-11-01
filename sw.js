@@ -1,7 +1,7 @@
 /* Service Worker：同一域名的静态资源走「网络优先、离线回落缓存」。
    模型接口是跨域的，这里不接管，断网时照常报网络错误。 */
 
-const CACHE = 'kaoyan-trainer-v7';
+const CACHE = 'kaoyan-trainer-v8';
 const SHELL = [
   './',
   './index.html',

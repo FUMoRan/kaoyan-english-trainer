@@ -18,14 +18,21 @@
 </head>
 <body>
   <header class="topbar">
-    <div class="brand">
-      <h1>考研英语高阶训练器</h1>
-      <p class="sub">长难句 · 句型升级 · 作文批改 · 语法库 · 例句本</p>
+    <div class="topbar-row">
+      <div class="brand">
+        <h1>考研英语高阶训练器</h1>
+        <p class="sub">长难句 · 句型升级 · 作文批改 · 语法库 · 例句本</p>
+      </div>
+      <button id="btn-settings" class="btn ghost small" aria-haspopup="dialog">设置<span class="dot" id="key-dot" hidden></span></button>
     </div>
-    <button id="btn-settings" class="btn ghost small" aria-haspopup="dialog">设置<span class="dot" id="key-dot" hidden></span></button>
+    <nav class="mode-switch" id="mode-switch" role="tablist" aria-label="学习模式">
+      <button class="mode-btn is-active" data-mode="train" role="tab" aria-selected="true">训练</button>
+      <button class="mode-btn" data-mode="exam" role="tab" aria-selected="false">历年真题</button>
+    </nav>
   </header>
 
   <main class="page">
+    <div id="train-mode">
     <nav class="tabs" role="tablist" aria-label="训练模块">
       <button class="tab is-active" id="tab-sentence" role="tab" data-tab="sentence" aria-selected="true" aria-controls="panel-sentence">长难句拆解</button>
       <button class="tab" id="tab-rewrite" role="tab" data-tab="rewrite" aria-selected="false" aria-controls="panel-rewrite">句型魔改</button>
@@ -246,7 +253,61 @@
         <span class="tip" id="notes-tip">模板包 145 句，下载后点「导入备份」即可合并；备份是 JSON 文件，换设备或清缓存前先导出一份</span>
       </div>
     </section>
+    </div>
+
+    <!-- 真题模式 -->
+    <div id="exam-mode" hidden>
+      <section id="exam-home" class="exam-view">
+        <div class="exam-hero">
+          <div>
+            <p class="eyebrow">历年真题 · 英语一</p>
+            <h2>2000–2025 · 26 套</h2>
+            <p class="exam-hero-sub">整卷 180 分钟模拟，也可以按题型单篇精练。客观题自动判分，翻译和写作给参考译文/范文。</p>
+          </div>
+          <button id="btn-open-wrong" class="btn ghost exam-wrong-btn">错题本 <span id="wrong-count">0</span></button>
+        </div>
+
+        <div id="exam-resume" class="exam-resume" hidden></div>
+
+        <div id="exam-home-loading" class="exam-loading">
+          <span class="spinner" aria-hidden="true"></span>
+          <span>正在加载题库…</span>
+        </div>
+
+        <div id="exam-home-body" hidden>
+          <div class="exam-filters" role="group" aria-label="筛选年份">
+            <button class="chip filter-chip is-active" data-filter="all">全部</button>
+            <button class="chip filter-chip" data-filter="recent">近五年</button>
+            <button class="chip filter-chip" data-filter="undone">未做</button>
+          </div>
+          <div id="exam-year-grid"></div>
+        </div>
+
+        <p class="hint exam-credit">题库整理自 structured-kaoyan-english，试题用于非商业学习；解析版权归原作者。2000–2004 原卷含听力 20 分，本应用只收录笔试部分。</p>
+      </section>
+
+      <section id="exam-detail" class="exam-view" hidden></section>
+      <section id="exam-run" class="exam-view" hidden></section>
+      <section id="exam-result" class="exam-view" hidden></section>
+      <section id="exam-wrong" class="exam-view" hidden></section>
+    </div>
   </main>
+
+  <!-- 答题卡 -->
+  <div id="exam-sheet" class="modal" hidden>
+    <div class="modal-card sheet-card" role="dialog" aria-modal="true" aria-labelledby="sheet-title">
+      <div class="modal-head">
+        <h2 id="sheet-title">答题卡</h2>
+        <button id="btn-close-sheet" class="btn ghost small">关闭</button>
+      </div>
+      <p class="hint" id="sheet-summary"></p>
+      <div id="sheet-grid" class="sheet-grid"></div>
+      <div class="row sheet-actions">
+        <button id="btn-sheet-submit" class="btn primary">交卷</button>
+        <button id="btn-sheet-exit" class="btn ghost">退出并保存</button>
+      </div>
+    </div>
+  </div>
 
   <!-- 设置 -->
   <div id="settings" class="modal" hidden>
@@ -343,6 +404,7 @@
   <script src="assets/markdown.js"></script>
   <script src="assets/journal.js"></script>
   <script src="assets/examples.js"></script>
+  <script src="assets/exam.js"></script>
   <script src="assets/ui.js"></script>
 </body>
 </html>

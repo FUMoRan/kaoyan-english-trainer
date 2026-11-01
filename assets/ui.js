@@ -156,6 +156,22 @@ window.App = window.App || {};
     if (name === 'notes') renderNotes();
   }
 
+  /* ---------------- 模式切换：训练 / 历年真题 ---------------- */
+
+  function switchMode(name) {
+    $$('.mode-btn').forEach(function (btn) {
+      const active = btn.dataset.mode === name;
+      btn.classList.toggle('is-active', active);
+      btn.setAttribute('aria-selected', active ? 'true' : 'false');
+    });
+    $('#train-mode').hidden = name !== 'train';
+    $('#exam-mode').hidden = name !== 'exam';
+    document.body.classList.toggle('is-exam-mode', name === 'exam');
+    if (name === 'exam' && App.exam) App.exam.enter();
+    if (name === 'train' && App.exam) App.exam.leave();
+    window.scrollTo(0, 0);
+  }
+
   /* ---------------- 设置 ---------------- */
 
   function fillProviders(sel) {
@@ -1282,6 +1298,11 @@ window.App = window.App || {};
     $$('.tab').forEach(function (tab) {
       tab.addEventListener('click', function () { switchTab(tab.dataset.tab); });
     });
+
+    $$('.mode-btn').forEach(function (btn) {
+      btn.addEventListener('click', function () { switchMode(btn.dataset.mode); });
+    });
+    if (App.exam) App.exam.init();
 
     $('#btn-settings').addEventListener('click', openSettings);
     $('#btn-close-settings').addEventListener('click', closeSettings);

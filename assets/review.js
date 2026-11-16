@@ -80,8 +80,6 @@ window.App = window.App || {};
     const wrong = listed === null
       ? rows.filter(function (r) { return !r.pass; }).map(function (r) { return r.no; })
       : listed;
-    const byNo = {};
-    rows.forEach(function (r) { byNo[r.no] = r; });
     return {
       rows: rows,
       wrong: wrong,

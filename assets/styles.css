@@ -650,6 +650,18 @@ select { appearance: none; background-image: linear-gradient(45deg, transparent 
 }
 .review-head h2 { font-size: 16px; }
 
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 10px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  font-size: 12.5px;
+  color: var(--text-muted);
+}
+
 .review-templates { margin: 10px 0 0; }
 .review-table { display: flex; flex-direction: column; gap: 6px; }
 .review-row {

@@ -1,4 +1,4 @@
-/* 界面逻辑：Tab 切换、设置、三段式批改流程、流式渲染 */
+/* 界面：模块切换、设置、长难句拆解、复盘 */
 window.App = window.App || {};
 
 (function (App) {
@@ -7,203 +7,58 @@ window.App = window.App || {};
   const $ = function (sel) { return document.querySelector(sel); };
   const $$ = function (sel) { return Array.prototype.slice.call(document.querySelectorAll(sel)); };
 
-  let running = null;
-  let renderReview = function () {};
-  let renderGrammarList = function () {};
-  let renderNotes = function () {};
-  const essayState = { image: null, report: '', messages: null, meta: null };
+  const TABS = ['sentence', 'tpl', 'review'];
 
-  /* ---------------- 通用状态 ---------------- */
-
-  function showStatus(text) {
-    $('#status-text').textContent = text;
-    $('#statusbar').hidden = false;
-  }
-
-  function hideStatus() {
-    $('#statusbar').hidden = true;
-  }
-
-  function showError(target, err) {
-    const isStop = err && err.message === '已停止生成。';
-    if (isStop) return;
-    const detail = err && err.detail ? '<p class="detail">' + escapeAttr(err.detail) + '</p>' : '';
-    target.hidden = false;
-    target.innerHTML = '<div class="error-card"><strong>' + escapeAttr(err && err.message ? err.message : '请求失败') +
-      '</strong><span>可以在「设置 → 测试连接」里先确认 Key 和接口是否正常。</span>' + detail + '</div>';
-  }
-
-  function escapeAttr(text) {
-    return String(text).replace(/[&<>"']/g, function (c) {
-      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
-    });
-  }
-
-  function chipsHtml(items) {
-    const names = Object.keys(items || {});
-    if (!names.length) return '';
-    return names.map(function (name) {
-      return '<span class="chip">' + escapeAttr(name) + ' <b>' + items[name] + '</b></span>';
-    }).join('');
-  }
-
-  /* ---------------- 结果渲染 ---------------- */
-
-  function renderSections(target, markdown) {
-    const parts = App.md.sections(markdown);
-    const hasTitles = parts.some(function (p) { return p.title; });
-    if (!hasTitles) {
-      target.innerHTML = '<article class="card"><div class="md">' + App.md.render(markdown) + '</div></article>';
-      return;
-    }
-    target.innerHTML = parts.map(function (p) {
-      const head = p.title ? '<h3>' + escapeAttr(p.title) + '</h3>' : '';
-      return '<article class="card">' + head + '<div class="md">' + App.md.render(p.body) + '</div></article>';
-    }).join('');
-  }
-
-  /* 从「高级英文」小节里取出那一句英文，交给本地 diff */
-  function englishLine(body) {
-    const lines = String(body || '').split(/\r?\n/);
-    for (let i = 0; i < lines.length; i++) {
-      let line = lines[i].replace(/^[\s>*\-–—\d.、]+/, '').replace(/[*_`"]/g, '').trim();
-      if (line.length < 12) continue;
-      const cn = line.search(/[\u4e00-\u9fa5]/);
-      if (cn > 8) line = line.slice(0, cn);
-      line = line.replace(/[\s（(【\[—–\-:：]+$/, '');
-      if (/[A-Za-z]{3}/.test(line) && line.split(/\s+/).length >= 4) return line;
-    }
-    return '';
-  }
-
-  /* ---------------- 统一的任务执行 ---------------- */
-
-  async function run(opts) {
-    if (running) return;
-    const ctrl = new AbortController();
-    running = ctrl;
-    const trigger = opts.trigger;
-    if (trigger) trigger.disabled = true;
-    showStatus(opts.statusText || '正在生成…');
-
-    try {
-      const text = await App.api.chat({
-        messages: opts.messages,
-        signal: ctrl.signal,
-        override: opts.override,
-        onDelta: function (delta, full) {
-          if (opts.onDelta) opts.onDelta(full);
-          else if (opts.buffer) { opts.buffer.text = full; opts.paint && opts.paint(full); }
-        }
-      });
-      if (opts.paint && opts.paint.cancel) opts.paint.cancel();
-      if (opts.onDone) await opts.onDone(text);
-      else if (opts.target) renderSections(opts.target, text);
-      return text;
-    } catch (err) {
-      if (opts.paint && opts.paint.cancel) opts.paint.cancel();
-      if (err && err.message === '已停止生成。') {
-        if (opts.buffer && opts.buffer.text && opts.target) renderSections(opts.target, opts.buffer.text);
-      } else if (opts.onError) {
-        opts.onError(err);
-      } else if (opts.target) {
-        showError(opts.target, err);
-      }
-      return null;
-    } finally {
-      running = null;
-      hideStatus();
-      if (trigger) trigger.disabled = false;
-    }
-  }
-
-  /* 节流渲染，避免每个 token 都重排 */
-  function throttlePainter(target) {
-    let last = 0;
-    let timer = null;
-    let latest = '';
-    function paint() {
-      last = Date.now();
-      target.innerHTML = '<article class="card"><div class="md">' + App.md.render(latest) + '</div></article>';
-    }
-    function paintThrottled(full) {
-      latest = full;
-      if (Date.now() - last > 90) {
-        paint();
-      } else if (!timer) {
-        timer = setTimeout(function () { timer = null; paint(); }, 90);
-      }
-    }
-    paintThrottled.cancel = function () {
-      if (timer) { clearTimeout(timer); timer = null; }
-    };
-    return paintThrottled;
-  }
-
-  /* ---------------- Tab ---------------- */
+  /* ---------------- 模块切换 ---------------- */
 
   function switchTab(name) {
-    $$('.tab').forEach(function (t) {
-      const active = t.dataset.tab === name;
-      t.classList.toggle('is-active', active);
-      t.setAttribute('aria-selected', active ? 'true' : 'false');
-    });
-    $$('.panel').forEach(function (p) {
-      p.hidden = p.id !== 'panel-' + name;
+    TABS.forEach(function (key) {
+      const btn = $('#tab-' + key);
+      const panel = $('#panel-' + key);
+      const on = key === name;
+      if (btn) {
+        btn.classList.toggle('is-active', on);
+        btn.setAttribute('aria-selected', on ? 'true' : 'false');
+      }
+      if (panel) panel.hidden = !on;
     });
     if (name === 'review') renderReview();
-    if (name === 'grammar') renderGrammarList();
-    if (name === 'notes') renderNotes();
-  }
-
-  /* ---------------- 模式切换：训练 / 历年真题 ---------------- */
-
-  function switchMode(name) {
-    $$('.mode-btn').forEach(function (btn) {
-      const active = btn.dataset.mode === name;
-      btn.classList.toggle('is-active', active);
-      btn.setAttribute('aria-selected', active ? 'true' : 'false');
-    });
-    $('#train-mode').hidden = name !== 'train';
-    $('#exam-mode').hidden = name !== 'exam';
-    document.body.classList.toggle('is-exam-mode', name === 'exam');
-    if (name === 'exam' && App.exam) App.exam.enter();
-    if (name === 'train' && App.exam) App.exam.leave();
+    if (name === 'sentence') {
+      const input = $('#sentence-input');
+      if (input && !input.value) {
+        try { input.focus({ preventScroll: true }); } catch (e) { /* 忽略 */ }
+      }
+    }
     window.scrollTo(0, 0);
   }
 
   /* ---------------- 设置 ---------------- */
 
-  function fillProviders(sel) {
-    sel.innerHTML = Object.keys(App.config.PROVIDERS).map(function (key) {
-      return '<option value="' + key + '">' + escapeAttr(App.config.PROVIDERS[key].label) + '</option>';
-    }).join('');
+  function providerNote(provider) {
+    const p = App.config.PROVIDERS[provider];
+    return p ? p.note : '';
   }
 
-  function providerNote(key) {
-    const preset = App.config.PROVIDERS[key];
-    if (!preset) return '';
-    return preset.note + (preset.keyURL ? ' 申请地址：' + preset.keyURL : '');
+  function fillProvider(provider) {
+    const p = App.config.PROVIDERS[provider];
+    if (!p) return;
+    $('#set-baseurl').value = p.baseURL || '';
+    $('#set-model').value = p.model || '';
+    $('#set-provider-note').textContent = providerNote(provider);
   }
 
   function openSettings() {
     const s = App.store.getSettings();
-    fillProviders($('#set-provider'));
-    fillProviders($('#set-alt-provider'));
-    $('#set-provider').value = s.provider;
+    const sel = $('#set-provider');
+    sel.innerHTML = Object.keys(App.config.PROVIDERS).map(function (key) {
+      return '<option value="' + key + '">' + App.config.PROVIDERS[key].label + '</option>';
+    }).join('');
+    sel.value = s.provider;
     $('#set-baseurl').value = s.baseURL;
     $('#set-model').value = s.model;
     $('#set-key').value = s.apiKey;
-    $('#set-stream').checked = !!s.stream;
+    $('#set-stream').checked = s.stream !== false;
     $('#set-provider-note').textContent = providerNote(s.provider);
-
-    $('#set-alt-on').checked = !!s.altEnabled;
-    $('#set-alt-provider').value = s.altProvider;
-    $('#set-alt-baseurl').value = s.altBaseURL;
-    $('#set-alt-model').value = s.altModel;
-    $('#set-alt-key').value = s.altKey;
-    $('#set-alt-note').textContent = providerNote(s.altProvider);
-
     $('#test-result').hidden = true;
     $('#settings').hidden = false;
   }
@@ -212,1171 +67,189 @@ window.App = window.App || {};
     $('#settings').hidden = true;
   }
 
-  function currentFormSettings() {
-    return {
-      provider: $('#set-provider').value,
+  function saveSettings() {
+    const provider = $('#set-provider').value;
+    App.store.saveSettings({
+      provider: provider,
       baseURL: $('#set-baseurl').value.trim(),
       model: $('#set-model').value.trim(),
       apiKey: $('#set-key').value.trim(),
-      stream: $('#set-stream').checked,
-      altEnabled: $('#set-alt-on').checked,
-      altProvider: $('#set-alt-provider').value,
-      altBaseURL: $('#set-alt-baseurl').value.trim(),
-      altModel: $('#set-alt-model').value.trim(),
-      altKey: $('#set-alt-key').value.trim()
-    };
+      stream: $('#set-stream').checked
+    });
+    refreshKeyDot();
+    closeSettings();
   }
 
-  function refreshKeyHint() {
-    const has = App.store.hasKey();
-    $('#key-dot').hidden = has;
-    $('#essay-nokey').hidden = has;
+  function refreshKeyDot() {
+    $('#key-dot').hidden = App.store.hasKey();
   }
 
-  /* ---------------- 三个训练模块 ---------------- */
+  async function testConnection() {
+    App.store.saveSettings({
+      provider: $('#set-provider').value,
+      baseURL: $('#set-baseurl').value.trim(),
+      model: $('#set-model').value.trim(),
+      apiKey: $('#set-key').value.trim()
+    });
+    const box = $('#test-result');
+    box.hidden = false;
+    box.className = 'status';
+    box.textContent = '正在测试…';
+    try {
+      const msg = await App.api.testConnection();
+      box.className = 'status ok';
+      box.textContent = msg;
+    } catch (err) {
+      box.className = 'status bad';
+      box.textContent = err.message + (err.detail ? '（' + err.detail.slice(0, 120) + '）' : '');
+    }
+  }
 
-  function initSentence() {
-    $('#btn-sentence').addEventListener('click', function () {
-      const text = $('#sentence-input').value.trim();
-      const spine = $('#sentence-spine').value.trim();
-      const target = $('#sentence-result');
-      if (text.length < 12) {
-        target.hidden = false;
-        target.innerHTML = '<div class="error-card"><strong>句子太短了。</strong><span>至少粘一句完整的长句（≥12 个字符）。</span></div>';
-        return;
-      }
+  /* ---------------- 长难句拆解 ---------------- */
+
+  function spineCard(yours, ai) {
+    if (!yours && !ai) return '';
+    return '<article class="card spine-card"><h3>主干对照</h3>' +
+      '<div class="spine-grid">' +
+      '<div class="spine-col"><span class="spine-label">你的版本</span><p class="spine-text">' +
+      (yours ? App.runner.escapeAttr(yours) : '<span class="hint">没填，下次先自己划</span>') + '</p></div>' +
+      '<div class="spine-col"><span class="spine-label">参考主干</span><p class="spine-text">' +
+      (ai ? App.runner.escapeAttr(ai) : '<span class="hint">未识别到这节</span>') + '</p></div>' +
+      '</div></article>';
+  }
+
+  async function runSentence() {
+    const input = $('#sentence-input');
+    const spine = $('#sentence-spine');
+    const target = $('#sentence-result');
+    const text = input.value.trim();
+
+    if (!text) {
       target.hidden = false;
-      target.innerHTML = '';
-      const paint = throttlePainter(target);
-      run({
-        trigger: this,
-        statusText: '正在拆句子…',
-        messages: App.config.sentenceMessages(text),
-        buffer: { text: '' },
-        paint: paint,
-        onDone: function (result) {
-          renderSections(target, result);
-          if (spine) {
-            const ref = englishLine(App.journal.sectionText(result, '主干'));
-            const head = App.journal.sectionText(result, '主干').trim().split(/\r?\n/).filter(Boolean)[0] || '';
-            target.insertAdjacentHTML('afterbegin',
-              '<article class="card"><h3>你的主干 vs 参考答案</h3>' +
-              '<div class="spine-grid">' +
-              '<div><span class="label">你划的</span><p class="spine-mine">' + escapeAttr(spine) + '</p></div>' +
-              '<div><span class="label">参考</span><div class="spine-ref">' +
-              App.md.render(ref || head || '（模型没按格式给出主干，直接看下面第一节）') +
-              '</div></div>' +
-              '</div>' +
-              '<p class="hint">对照三件事：主语找对了吗、谓语找对了吗、哪些修饰成分你漏掉了。</p></article>');
-          }
-          target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        }
-      });
-    });
-  }
-
-  function techniqueExamplesHtml(type) {
-    const item = App.techniques.get(type);
-    if (!item) {
-      return '<p class="hint">AI 推荐会从强调句、倒装、从句、非谓语、名词化、比较与衔接里挑一个最贴语境的；选定某个手法后这里会显示例句。</p>';
+      target.innerHTML = '<div class="error-card"><strong>先把句子粘进来。</strong><span>一句就够，太长的段落拆开练。</span></div>';
+      input.focus();
+      return;
     }
-    const list = item.examples.map(function (pair) {
-      const saved = App.examples.has(pair[0]);
-      return '<li><p class="ex-en">' + escapeAttr(pair[0]) + '</p><p class="ex-cn">' + escapeAttr(pair[1]) + '</p>' +
-        '<button type="button" class="ex-save' + (saved ? ' is-saved' : '') +
-        '" data-en="' + escapeAttr(pair[0]) + '" data-cn="' + escapeAttr(pair[1]) + '">' +
-        (saved ? '已收藏' : '收藏到例句本') + '</button></li>';
-    }).join('');
-    return '<p class="example-tip"><b>' + escapeAttr(item.label) + '</b>　' + escapeAttr(item.tip) + '</p>' +
-      '<ul class="example-list">' + list + '</ul>';
-  }
-
-  function initRewrite() {
-    const sel = $('#rewrite-type');
-    const settings = App.store.getSettings();
-
-    sel.innerHTML = '<option value="auto">AI 推荐（按语境自动选）</option>' +
-      App.techniques.GROUPS.map(function (group) {
-        return '<optgroup label="' + escapeAttr(group.label) + '">' +
-          group.items.map(function (item) {
-            return '<option value="' + escapeAttr(item.prompt) + '">' + escapeAttr(item.label) + '</option>';
-          }).join('') + '</optgroup>';
-      }).join('');
-
-    const exists = Array.prototype.some.call(sel.options, function (o) { return o.value === settings.rewriteType; });
-    sel.value = exists ? settings.rewriteType : 'auto';
-
-    function renderExamples() {
-      const box = $('#rewrite-examples');
-      box.hidden = false;
-      box.innerHTML = techniqueExamplesHtml(sel.value);
-    }
-
-    sel.addEventListener('change', function () {
-      App.store.saveSettings({ rewriteType: sel.value });
-      renderExamples();
-    });
-    renderExamples();
-
-    $('#rewrite-examples').addEventListener('click', function (e) {
-      const btn = e.target.closest('.ex-save');
-      if (!btn) return;
-      const result = App.examples.add({ en: btn.dataset.en, cn: btn.dataset.cn });
-      if (result.error) {
-        btn.textContent = '保存失败';
-        return;
-      }
-      btn.classList.add('is-saved');
-      btn.textContent = '已收藏';
-    });
-
-    $('#btn-rewrite').addEventListener('click', function () {
-      const text = $('#rewrite-input').value.trim();
-      const target = $('#rewrite-result');
-      if (text.length < 2) {
-        target.hidden = false;
-        target.innerHTML = '<div class="error-card"><strong>先写一句想表达的意思。</strong><span>中文也可以。</span></div>';
-        return;
-      }
+    if (!App.store.hasKey()) {
       target.hidden = false;
-      target.innerHTML = '';
-      const paint = throttlePainter(target);
-      run({
-        trigger: this,
-        statusText: '正在改写…',
-        messages: App.config.rewriteMessages(text, sel.value),
-        buffer: { text: '' },
-        paint: paint,
-        onDone: function (result) {
-          renderSections(target, result);
-          const after = englishLine(App.journal.sectionText(result, '高级英文'));
-          const englishWords = (text.match(/[A-Za-z']+/g) || []).length;
-          if (after && englishWords >= 3) {
-            target.insertAdjacentHTML('afterbegin',
-              '<article class="card"><h3>改写前后对照</h3><p class="diff-line">' +
-              App.md.diffHtml(text, after) +
-              '</p><p class="hint">绿色是新增或替换，红色是被去掉的；只对结构变化，不必逐词一一对应。</p></article>');
-          }
-          target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        }
-      });
-    });
-  }
+      target.innerHTML = '<div class="error-card"><strong>还没配置 API Key。</strong>' +
+        '<span>点右上角「设置」，选一个服务商并填入 Key。</span></div>';
+      openSettings();
+      return;
+    }
 
-  function initEssay() {
-    const typeSel = $('#essay-type');
-    const paraSel = $('#essay-para');
-    const focusSel = $('#essay-focus');
-    const topicSel = $('#topic-pick');
-    const settings = App.store.getSettings();
+    target.hidden = false;
+    target.innerHTML = '';
 
-    typeSel.value = settings.essayType || 'e1_big';
-    focusSel.value = settings.essayFocus || 'full';
-    rebuildParagraphs(settings.essayPara);
-    rebuildTopics();
-    renderBands();
-
-    typeSel.addEventListener('change', function () {
-      App.store.saveSettings({ essayType: typeSel.value });
-      rebuildParagraphs('all');
-      rebuildTopics();
-      renderBands();
-    });
-    paraSel.addEventListener('change', function () {
-      App.store.saveSettings({ essayPara: paraSel.value });
-    });
-    focusSel.addEventListener('change', function () {
-      App.store.saveSettings({ essayFocus: focusSel.value });
-    });
-    topicSel.addEventListener('change', function () {
-      const topic = App.topics.get(topicSel.value);
-      if (topic) $('#essay-topic').value = topic.text;
+    const result = await App.runner.run({
+      trigger: $('#btn-sentence'),
+      statusText: '正在拆句子…',
+      messages: App.config.sentenceMessages(text),
+      buffer: { text: '' },
+      paint: App.runner.throttlePainter(target),
+      onError: function (err) { App.runner.showError(target, err); }
     });
 
-    $('#btn-camera').addEventListener('click', function () { $('#file-camera').click(); });
-    $('#btn-gallery').addEventListener('click', function () { $('#file-gallery').click(); });
-    $('#file-camera').addEventListener('change', onFile);
-    $('#file-gallery').addEventListener('change', onFile);
-
-    $('#btn-reset-image').addEventListener('click', function () {
-      essayState.image = null;
-      $('#preview').hidden = true;
-      $('#upload-actions').hidden = false;
-      resetStage();
-      $('#essay-result').hidden = true;
-      $('#essay-actions').hidden = true;
-      $('#file-camera').value = '';
-      $('#file-gallery').value = '';
-    });
-
-    $('#btn-ocr').addEventListener('click', doOcr);
-    $('#btn-reocr').addEventListener('click', doOcr);
-    $('#btn-grade').addEventListener('click', doGrade);
-    $('#ocr-text').addEventListener('input', function () {
-      updateOcrHint();
-      renderUnknowns();
-    });
-
-    initCrop();
-    initUnknowns();
-    initExport();
-
-    async function onFile(event) {
-      const file = event.target.files && event.target.files[0];
-      if (!file) return;
-      const info = $('#preview-info');
-      try {
-        info.textContent = '正在压缩图片…';
-        $('#preview').hidden = false;
-        $('#upload-actions').hidden = true;
-        const prepared = await App.image.prepare(file);
-        essayState.image = prepared;
-        $('#preview-img').src = prepared.dataURL;
-        info.textContent = prepared.width + '×' + prepared.height + ' · ' + prepared.kb + 'KB';
-        stopCrop();
-        resetStage();
-      } catch (err) {
-        essayState.image = null;
-        $('#preview').hidden = true;
-        $('#upload-actions').hidden = false;
-        $('#essay-result').hidden = false;
-        $('#essay-result').innerHTML = '<div class="error-card"><strong>图片处理失败</strong><span>' +
-          escapeAttr(err.message) + '</span></div>';
-      }
-    }
-
-    function resetStage() {
-      $('#ocr-stage').hidden = true;
-      $('#ocr-hint').textContent = '';
-      $('#ocr-unknowns').hidden = true;
-      $('#ocr-unknowns').innerHTML = '';
-    }
-
-    function meta() {
-      const type = App.config.ESSAY_TYPES[typeSel.value];
-      const para = type.paragraphs.filter(function (p) { return p[0] === paraSel.value; })[0] || ['all', '全文'];
-      return {
-        typeKey: typeSel.value,
-        para: paraSel.value,
-        topic: $('#essay-topic').value.trim(),
-        typeLabel: type.label,
-        paraLabel: para[1]
-      };
-    }
-
-    /* ---------- 框选裁剪 ---------- */
-
-    const crop = { on: false, start: null };
-
-    function stopCrop() {
-      crop.on = false;
-      crop.start = null;
-      $('#crop-box').hidden = true;
-      $('#crop-wrap').classList.remove('is-cropping');
-      const btn = $('#btn-crop');
-      btn.textContent = '框选裁剪';
-      btn.classList.remove('is-on');
-    }
-
-    function initCrop() {
-      const img = $('#preview-img');
-      const wrap = $('#crop-wrap');
-      const box = $('#crop-box');
-
-      $('#btn-crop').addEventListener('click', function () {
-        if (!essayState.image) return;
-        crop.on = !crop.on;
-        this.textContent = crop.on ? '退出裁剪' : '框选裁剪';
-        this.classList.toggle('is-on', crop.on);
-        wrap.classList.toggle('is-cropping', crop.on);
-        box.hidden = true;
-        crop.start = null;
-      });
-
-      img.addEventListener('pointerdown', function (e) {
-        if (!crop.on || !essayState.image) return;
-        e.preventDefault();
-        const rect = wrap.getBoundingClientRect();
-        crop.start = { x: clampX(e.clientX - rect.left, rect.width), y: clampY(e.clientY - rect.top, rect.height), rect: rect };
-        box.hidden = false;
-        box.dataset.rect = '';
-        box.style.left = crop.start.x + 'px';
-        box.style.top = crop.start.y + 'px';
-        box.style.width = '0px';
-        box.style.height = '0px';
-      });
-
-      document.addEventListener('pointermove', function (e) {
-        if (!crop.on || !crop.start) return;
-        const rect = crop.start.rect;
-        const x = clampX(e.clientX - rect.left, rect.width);
-        const y = clampY(e.clientY - rect.top, rect.height);
-        const left = Math.min(x, crop.start.x);
-        const top = Math.min(y, crop.start.y);
-        box.style.left = left + 'px';
-        box.style.top = top + 'px';
-        box.style.width = Math.abs(x - crop.start.x) + 'px';
-        box.style.height = Math.abs(y - crop.start.y) + 'px';
-        box.dataset.rect = JSON.stringify({
-          x: left / rect.width,
-          y: top / rect.height,
-          w: Math.abs(x - crop.start.x) / rect.width,
-          h: Math.abs(y - crop.start.y) / rect.height
-        });
-      });
-
-      document.addEventListener('pointerup', async function () {
-        if (!crop.on || !crop.start) return;
-        crop.start = null;
-        let rect = null;
-        try { rect = JSON.parse(box.dataset.rect || 'null'); } catch (err) { rect = null; }
-        if (!rect || rect.w < 0.04 || rect.h < 0.04) {
-          box.hidden = true;
-          return;
-        }
-        const info = $('#preview-info');
-        info.textContent = '正在裁剪…';
-        try {
-          const cut = await App.image.crop(essayState.image.dataURL, rect);
-          essayState.image = cut;
-          $('#preview-img').src = cut.dataURL;
-          info.textContent = cut.width + '×' + cut.height + ' · ' + cut.kb + 'KB（已裁剪）';
-          stopCrop();
-          resetStage();
-        } catch (err) {
-          info.textContent = '裁剪失败：' + err.message;
-        }
-      });
-    }
-
-    function clampX(v, max) { return Math.max(0, Math.min(max, v)); }
-    function clampY(v, max) { return Math.max(0, Math.min(max, v)); }
-
-    /* ---------- OCR 与 [?] 补词 ---------- */
-
-    function initUnknowns() {
-      const box = $('#ocr-unknowns');
-      box.addEventListener('click', function (e) {
-        const btn = e.target.closest('[data-fill]');
-        if (!btn) return;
-        fillUnknown(Number(btn.dataset.fill));
-      });
-      box.addEventListener('keydown', function (e) {
-        if (e.key !== 'Enter') return;
-        const input = e.target.closest('input[data-i]');
-        if (!input) return;
-        e.preventDefault();
-        fillUnknown(Number(input.dataset.i));
-      });
-    }
-
-    function fillUnknown(index) {
-      const box = $('#ocr-unknowns');
-      const input = box.querySelector('input[data-i="' + index + '"]');
-      if (!input) return;
-      const word = input.value.trim();
-      if (!word) { input.focus(); return; }
-      const ta = $('#ocr-text');
-      let seen = -1;
-      ta.value = ta.value.replace(/\[\?\]/g, function (token) {
-        seen += 1;
-        return seen === index ? word : token;
-      });
-      updateOcrHint();
-      renderUnknowns();
-    }
-
-    function renderUnknowns() {
-      const box = $('#ocr-unknowns');
-      const value = $('#ocr-text').value;
-      const count = (value.match(/\[\?\]/g) || []).length;
-      if (!count) {
-        box.hidden = true;
-        box.innerHTML = '';
-        box.dataset.count = '0';
-        return;
-      }
-      if (box.dataset.count === String(count) && box.innerHTML) return;
-      const kept = {};
-      Array.prototype.forEach.call(box.querySelectorAll('input[data-i]'), function (input) {
-        kept[input.dataset.i] = input.value;
-      });
-      box.dataset.count = String(count);
-      box.hidden = false;
-      let rows = '';
-      for (let i = 0; i < count; i++) {
-        rows += '<div class="unknown-row"><span class="unknown-no">' + (i + 1) + '</span>' +
-          '<input type="text" data-i="' + i + '" spellcheck="false" value="' + escapeAttr(kept[i] || '') + '" ' +
-          'placeholder="第 ' + (i + 1) + ' 处你写的是什么">' +
-          '<button type="button" class="btn ghost small" data-fill="' + i + '">补上</button></div>';
-      }
-      box.innerHTML = '<p class="hint">有 ' + count + ' 处没认出来，凭记忆填一下，会按顺序替换掉 [?]。</p>' + rows;
-    }
-
-    async function doOcr() {
-      if (running) return;
-      if (!essayState.image) {
-        $('#essay-result').hidden = false;
-        $('#essay-result').innerHTML = '<div class="error-card"><strong>先拍照或选一张照片。</strong><span>只需拍要批改的那一段，字迹越大越准。</span></div>';
-        return;
-      }
-      const btn = $('#btn-ocr');
-      const ta = $('#ocr-text');
-      $('#essay-result').hidden = true;
-      $('#essay-actions').hidden = true;
-      ta.value = '';
-      resetStage();
-      const text = await run({
-        trigger: btn,
-        statusText: '正在识别手写…',
-        messages: App.config.ocrMessages(essayState.image.dataURL),
-        onDelta: function (full) { ta.value = full; },
-        onError: function (err) { showError($('#essay-result'), err); }
-      });
-      if (!text) return;
-      const clean = text.replace(/^```[a-z]*\n?/i, '').replace(/```$/, '').trim();
-      if (/^NO_TEXT$/i.test(clean) || clean.length < 8) {
-        $('#essay-result').hidden = false;
-        $('#essay-result').innerHTML = '<div class="error-card"><strong>没识别到可用的英文。</strong><span>换一张光线均匀、作文占满画面的照片再试。</span></div>';
-        return;
-      }
-      ta.value = clean;
-      $('#ocr-stage').hidden = false;
-      updateOcrHint();
-      renderUnknowns();
-      $('#ocr-stage').scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }
-
-    function updateOcrHint() {
-      const value = $('#ocr-text').value;
-      const unknown = (value.match(/\[\?\]/g) || []).length;
-      const words = (value.trim().match(/[A-Za-z']+/g) || []).length;
-      const bits = [];
-      if (words) bits.push('约 ' + words + ' 词');
-      if (unknown) bits.push('还有 ' + unknown + ' 处 [?]');
-      $('#ocr-hint').textContent = bits.join(' · ');
-      $('#ocr-hint').className = unknown ? 'hint warn' : 'hint';
-    }
-
-    /* ---------- 批改（含第二模型交叉打分） ---------- */
-
-    async function doGrade() {
-      const text = $('#ocr-text').value.trim();
-      if (text.length < 20) {
-        $('#essay-result').hidden = false;
-        $('#essay-result').innerHTML = '<div class="error-card"><strong>文本太短。</strong><span>把要批改的段落补全，至少 20 个字符。</span></div>';
-        return;
-      }
-      const target = $('#essay-result');
-      target.hidden = false;
-      target.innerHTML = '';
-      $('#essay-actions').hidden = true;
-
-      const info = meta();
-      const messages = App.config.gradingMessages(info, text, { focus: focusSel.value });
-      const buffer = { text: '' };
-      const paint = throttlePainter(target);
-
-      const primary = await run({
-        trigger: $('#btn-grade'),
-        statusText: '正在按大纲档位批改…',
-        messages: messages,
-        buffer: buffer,
-        paint: paint,
-        onError: function (err) { showError(target, err); }
-      });
-
-      if (!primary) {
-        if (buffer.text) finishGrade(target, text, buffer.text, null, info, messages);
-        return;
-      }
-
-      const alt = await runAlt(messages);
-      finishGrade(target, text, primary, alt, info, messages);
-      target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }
-
-    async function runAlt(messages) {
-      const s = App.store.getSettings();
-      if (!s.altEnabled || !String(s.altKey || '').trim() || !String(s.altModel || '').trim()) return null;
-      const ctrl = new AbortController();
-      running = ctrl;
-      $('#btn-grade').disabled = true;
-      showStatus('正在用第二个模型交叉打分…');
-      try {
-        return await App.api.chat({
-          messages: messages,
-          signal: ctrl.signal,
-          override: {
-            provider: s.altProvider,
-            baseURL: s.altBaseURL,
-            model: s.altModel,
-            apiKey: s.altKey,
-            stream: false
-          }
-        });
-      } catch (err) {
-        return { error: err };
-      } finally {
-        running = null;
-        $('#btn-grade').disabled = false;
-        hideStatus();
-      }
-    }
-
-    function finishGrade(target, text, report, alt, info, messages) {
-      const items = App.journal.parseItems(App.journal.sectionText(report, '错误归类'));
-      const grade = App.journal.parseGrade(report, info.typeKey);
-
-      essayState.report = report;
-      essayState.messages = messages;
-      essayState.meta = Object.assign({ at: Date.now(), topic: info.topic, focus: focusSel.value }, info);
-
-      renderSections(target, App.journal.stripSection(report, '错误归类'));
-
-      /* 错误归类卡片 + 写入复盘 */
-      const recorded = items && Object.keys(items).length
-        ? App.journal.add({
-          typeKey: info.typeKey,
-          label: info.typeLabel,
-          band: grade.bandLabel,
-          score: isNaN(grade.score) ? '' : grade.score + '/' + grade.max,
-          items: items,
-          excerpt: text.slice(0, 60)
-        })
-        : null;
-
-      target.insertAdjacentHTML('beforeend',
-        '<article class="card"><h3>错误归类</h3>' +
-        (items && Object.keys(items).length
-          ? '<div class="chips">' + chipsHtml(items) + '</div>' +
-            '<p class="hint">' + (recorded ? '已记入「复盘」，同类错误会累计成你的弱点画像。' : '格式没读出来，这次没记进复盘。') + '</p>'
-          : '<p class="hint">这次没有可归类的错误（或模型没按格式输出），可以切到「目标分数」模式再批一次。</p>') +
-        '</article>');
-
-      /* 第二模型 */
-      if (alt && alt.error) {
-        const msg = alt.error && alt.error.message ? alt.error.message : '调用失败';
-        target.insertAdjacentHTML('beforeend',
-          '<article class="card"><h3>交叉评分</h3><p class="hint">第二个模型没跑通：' +
-          escapeAttr(msg) + '。主报告不受影响。</p></article>');
-      } else if (alt) {
-        const second = App.journal.parseGrade(alt, info.typeKey);
-        const gap = (grade.bandIndex >= 0 && second.bandIndex >= 0)
-          ? Math.abs(grade.bandIndex - second.bandIndex)
-          : -1;
-        if (gap >= 2) {
-          target.insertAdjacentHTML('beforeend',
-            '<article class="card dispute"><h3>评分有争议</h3>' +
-            '<p>主模型判 <b>' + escapeAttr(grade.bandLabel || '未给档位') + '</b>' +
-            (isNaN(grade.score) ? '' : '（' + grade.score + ' 分）') +
-            '，第二模型判 <b>' + escapeAttr(second.bandLabel || '未给档位') + '</b>' +
-            (isNaN(second.score) ? '' : '（' + second.score + ' 分）') +
-            '，相差 ' + gap + ' 档。按低的那一档准备更稳，也可以把段落补全重新批一次。</p>' +
-            '<div class="md">' + App.md.render(App.journal.sectionText(alt, '档位') || alt) + '</div>' +
-            '</article>');
-        } else if (gap >= 0) {
-          target.insertAdjacentHTML('beforeend',
-            '<article class="card"><h3>交叉评分</h3><p class="hint">第二模型给出的也是' +
-            escapeAttr(second.bandLabel) + (isNaN(second.score) ? '' : '（' + second.score + ' 分）') +
-            '，与主模型一致，这个分数可以信。</p></article>');
-        }
-      }
-
-      /* 追问 */
-      target.insertAdjacentHTML('beforeend',
-        '<article class="card"><h3>继续追问</h3>' +
-        '<div class="row"><input id="follow-input" type="text" spellcheck="false" ' +
-        'placeholder="例如：这句为什么判成搭配错误？我这样写能进第二档吗？">' +
-        '<button id="btn-follow" class="btn">追问</button></div>' +
-        '<div id="follow-result" class="result" hidden></div></article>');
-
-      const followBtn = $('#btn-follow');
-      followBtn.addEventListener('click', function () {
-        const question = $('#follow-input').value.trim();
-        if (question.length < 2) { $('#follow-input').focus(); return; }
-        const box = $('#follow-result');
-        box.hidden = false;
-        box.innerHTML = '';
-        run({
-          trigger: followBtn,
-          statusText: '正在回答追问…',
-          messages: App.config.followUpMessages(messages, report, question),
-          target: box,
-          buffer: { text: '' },
-          paint: throttlePainter(box)
-        });
-      });
-      $('#follow-input').addEventListener('keydown', function (e) {
-        if (e.key === 'Enter') { e.preventDefault(); followBtn.click(); }
-      });
-
-      $('#essay-actions').hidden = false;
-    }
-
-    /* ---------- 导出 ---------- */
-
-    function initExport() {
-      $('#btn-export-md').addEventListener('click', function () {
-        if (!essayState.report) return;
-        const m = essayState.meta || {};
-        const date = new Date(m.at || Date.now());
-        const pad = function (n) { return (n < 10 ? '0' : '') + n; };
-        const stamp = date.getFullYear() + pad(date.getMonth() + 1) + pad(date.getDate()) + '-' + pad(date.getHours()) + pad(date.getMinutes());
-        const lines = [
-          '# 考研英语作文批改报告',
-          '',
-          '- 题型：' + (m.typeLabel || ''),
-          '- 批改范围：' + (m.paraLabel || ''),
-          '- 模式：' + (m.focus === 'target' ? '目标分数（只列必改）' : '完整批改'),
-          '- 时间：' + date.toLocaleString('zh-CN', { hour12: false }),
-          m.topic ? '- 题目：' + m.topic : null,
-          '',
-          '---',
-          '',
-          essayState.report
-        ].filter(function (line) { return line !== null; }).join('\n');
-        const blob = new Blob([lines], { type: 'text/markdown;charset=utf-8' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = '作文批改-' + stamp + '.md';
-        document.body.appendChild(a);
-        a.click();
-        a.remove();
-        setTimeout(function () { URL.revokeObjectURL(url); }, 1000);
-      });
-
-      $('#btn-print').addEventListener('click', function () {
-        window.print();
-      });
-    }
-
-    function rebuildParagraphs(selected) {
-      const type = App.config.ESSAY_TYPES[typeSel.value];
-      paraSel.innerHTML = type.paragraphs.map(function (p) {
-        return '<option value="' + p[0] + '">' + p[1] + '</option>';
-      }).join('');
-      const exists = type.paragraphs.some(function (p) { return p[0] === selected; });
-      paraSel.value = exists ? selected : 'all';
-      App.store.saveSettings({ essayPara: paraSel.value });
-    }
-
-    function rebuildTopics() {
-      const list = App.topics.forType(typeSel.value);
-      topicSel.innerHTML = '<option value="">不从真题库选</option>' + list.map(function (t) {
-        return '<option value="' + t.key + '">' + escapeAttr(t.label) + '</option>';
-      }).join('');
-      topicSel.value = '';
-    }
-
-    function renderBands() {
-      const type = App.config.ESSAY_TYPES[typeSel.value];
-      $('#band-list').innerHTML = type.bands.map(function (b) {
-        return '<li><b>' + escapeAttr(b[0]) + '</b>　' + escapeAttr(b[1]) + '</li>';
-      }).join('');
-      $('#score-guide').querySelector('summary').textContent =
-        '评分档位说明（' + type.max + ' 分／' + type.words + '）';
-    }
+    if (!result) return;
+    const aiSpine = App.review.sectionText(result, '绝对主干')
+      .replace(/^[\s\S]*?[:：]\s*/, '')
+      .replace(/\*\*/g, '')
+      .trim()
+      .split(/\r?\n/)[0] || '';
+    App.runner.renderSections(target, result);
+    const card = spineCard(spine.value.trim(), aiSpine);
+    if (card) target.insertAdjacentHTML('afterbegin', card);
   }
 
   /* ---------------- 复盘 ---------------- */
 
-  function initReview() {
-    const summary = App.journal.summary;
-    const list = App.journal.list;
-
-    renderReview = function () {
-      const s = summary();
-      $('#review-summary').textContent = s.count
-        ? '累计批改 ' + s.count + ' 次，共归类 ' + s.errors + ' 处错误。数目最大的是你最该先补的短板。'
-        : '还没有记录。批改一篇作文后，错误会自动归类到这里。';
-      $('#review-chips').innerHTML = s.ranked.map(function (item) {
-        const span = '<span class="chip">' + escapeAttr(item.name) + ' <b>' + item.count + '</b></span>';
-        return span;
-      }).join('');
-      const rows = list();
-      $('#review-list').innerHTML = rows.length
-        ? rows.map(function (r) {
-          const date = new Date(r.at);
-          const pad = function (n) { return (n < 10 ? '0' : '') + n; };
-          const when = date.getFullYear() + '-' + pad(date.getMonth() + 1) + '-' + pad(date.getDate()) +
-            ' ' + pad(date.getHours()) + ':' + pad(date.getMinutes());
-          return '<article class="card journal-item">' +
-            '<div class="journal-head"><b>' + escapeAttr(r.label || '作文') + '</b>' +
-            '<span class="journal-score">' + escapeAttr([r.band, r.score].filter(Boolean).join(' · ')) + '</span></div>' +
-            '<div class="chips">' + chipsHtml(r.items) + '</div>' +
-            '<p class="hint">' + escapeAttr(when) + (r.excerpt ? '　' + escapeAttr(r.excerpt) + '…' : '') + '</p>' +
-            '</article>';
-        }).join('')
-        : '<p class="hint">空空的，先去批一篇。</p>';
-    };
-
-    $('#btn-clear-journal').addEventListener('click', function () {
-      if (!window.confirm('清空全部复盘记录？这个操作不能撤销。')) return;
-      App.journal.clear();
-      renderReview();
-    });
+  function fmtTime(ts) {
+    if (!ts) return '';
+    const d = new Date(ts);
+    const pad = function (n) { return n < 10 ? '0' + n : String(n); };
+    return (d.getMonth() + 1) + ' 月 ' + d.getDate() + ' 日 ' + pad(d.getHours()) + ':' + pad(d.getMinutes());
   }
 
-  /* ---------------- 语法库 ---------------- */
+  function renderReview() {
+    const summary = App.review.summary();
+    const list = App.review.list();
 
-  function initGrammar() {
-    const catBox = $('#grammar-cats');
-    const input = $('#grammar-q');
-    const listBox = $('#grammar-list');
-    const countBox = $('#grammar-count');
-    let cat = '全部';
+    $('#review-summary').textContent = summary.attempts
+      ? '共判定 ' + summary.attempts + ' 次，累计 ' + summary.wrongTotal + ' 个空需要改。'
+      : '还没有记录。去「模板填空」填一篇并交给 AI 判断，错的空位会自动记到这里。';
 
-    catBox.innerHTML = ['全部'].concat(App.grammar.CATS).map(function (name) {
-      return '<button type="button" class="chip filter-chip' +
-        (name === '全部' ? ' is-active' : '') + '" data-cat="' + escapeAttr(name) + '">' +
-        escapeAttr(name) + '</button>';
+    $('#review-blanks').innerHTML = summary.ranked.slice(0, 12).map(function (item) {
+      return '<span class="chip review-chip">第 ' + item.no + ' 空 · 错 ' + item.count + ' 次</span>';
     }).join('');
 
-    function itemHtml(item, index, savedSet) {
-      const examples = item.examples.map(function (pair) {
-        const saved = savedSet[pair[0].trim().toLowerCase()];
-        return '<li><p class="ex-en">' + escapeAttr(pair[0]) + '</p>' +
-          '<p class="ex-cn">' + escapeAttr(pair[1]) + '</p>' +
-          '<button type="button" class="ex-save' + (saved ? ' is-saved' : '') +
-          '" data-en="' + escapeAttr(pair[0]) + '" data-cn="' + escapeAttr(pair[1]) + '">' +
-          (saved ? '已收藏' : '收藏到例句本') + '</button></li>';
-      }).join('');
-      return '<details class="grammar-item"' + (index === 0 ? ' open' : '') + '>' +
-        '<summary><span class="grammar-title">' + escapeAttr(item.title) + '</span>' +
-        '<span class="grammar-cat">' + escapeAttr(item.cat) + '</span></summary>' +
-        '<div class="grammar-body">' +
-        '<p class="grammar-formula">' + escapeAttr(item.formula) + '</p>' +
-        '<p class="grammar-note">' + escapeAttr(item.note) + '</p>' +
-        '<ul class="example-list">' + examples + '</ul>' +
-        '<p class="grammar-pitfall"><b>易错</b>' + escapeAttr(item.pitfall) + '</p>' +
-        '</div></details>';
-    }
+    $('#review-templates').innerHTML = summary.templates.length
+      ? '<div class="review-table">' + summary.templates.map(function (t) {
+        const rate = t.total ? Math.round((t.wrong / t.total) * 100) : 0;
+        return '<div class="review-row"><span class="review-row-name">' + App.runner.escapeAttr(t.label) + '</span>' +
+          '<span class="review-row-meta">' + t.times + ' 次 · 错 ' + t.wrong + ' / ' + t.total + ' 空（' + rate + '%）</span></div>';
+      }).join('') + '</div>'
+      : '';
 
-    function render() {
-      const items = App.grammar.search(input.value, cat);
-      const savedSet = {};
-      App.examples.list('全部', '').forEach(function (item) {
-        savedSet[item.en.trim().toLowerCase()] = true;
-      });
-      const filtered = String(input.value).trim() !== '' || cat !== '全部';
-      countBox.textContent = filtered
-        ? '匹配到 ' + items.length + ' 个语法点'
-        : '共 ' + items.length + ' 个语法点，点开任意一条看结构、例句和易错提醒';
-      listBox.innerHTML = items.length
-        ? items.map(function (item, index) { return itemHtml(item, index, savedSet); }).join('')
-        : '<p class="hint">没找到，换个关键词试试，比如「虚拟」「倒装」「冠词」或「result in」。</p>';
-    }
-
-    catBox.addEventListener('click', function (e) {
-      const btn = e.target.closest('[data-cat]');
-      if (!btn) return;
-      cat = btn.dataset.cat;
-      Array.prototype.forEach.call(catBox.children, function (chip) {
-        chip.classList.toggle('is-active', chip === btn);
-      });
-      render();
-    });
-
-    listBox.addEventListener('click', function (e) {
-      const btn = e.target.closest('.ex-save');
-      if (!btn) return;
-      const result = App.examples.add({ en: btn.dataset.en, cn: btn.dataset.cn });
-      if (result.error) {
-        btn.textContent = '保存失败';
-        return;
-      }
-      btn.classList.add('is-saved');
-      btn.textContent = '已收藏';
-    });
-
-    input.addEventListener('input', render);
-    renderGrammarList = render;
-    render();
+    $('#review-list').innerHTML = list.length
+      ? list.map(function (r, i) {
+        const chips = (r.wrong && r.wrong.length)
+          ? r.wrong.map(function (no) { return '<span class="chip is-bad">' + no + '</span>'; }).join('')
+          : '<span class="chip is-ok">全过</span>';
+        const detail = (r.detail || []).map(function (d) {
+          return '<li><b>' + d.no + '</b> ' + App.runner.escapeAttr(d.note || '') +
+            (d.fix ? '<span class="review-fix"> → ' + App.runner.escapeAttr(d.fix) + '</span>' : '') + '</li>';
+        }).join('');
+        return '<details class="review-item">' +
+          '<summary><span class="review-item-title">' + App.runner.escapeAttr(r.templateNo + ' ' + r.templateTitle) + '</span>' +
+          '<span class="review-item-meta">' + fmtTime(r.at) + (r.topic ? ' · ' + App.runner.escapeAttr(r.topic) : '') + '</span>' +
+          '<span class="review-item-chips">' + chips + '</span></summary>' +
+          (detail ? '<ul class="review-detail">' + detail + '</ul>' : '<p class="hint">这次没有需要改的空。</p>') +
+          '</details>';
+      }).join('')
+      : '<p class="hint">暂无历史记录。</p>';
   }
 
-  /* ---------------- 例句本 ---------------- */
-
-  function initNotes() {
-    const box = $('#note-box');
-    const enInput = $('#note-en');
-    const cnInput = $('#note-cn');
-    const noteInput = $('#note-note');
-    const catSel = $('#note-cat');
-    const formTip = $('#note-form-tip');
-    const catBox = $('#notes-cats');
-    const listBox = $('#notes-list');
-    const countBox = $('#notes-count');
-    const search = $('#notes-q');
-    const catList = $('#cat-list');
-    const catName = $('#cat-name');
-    const catHint = $('#cat-hint');
-    const tip = $('#notes-tip');
-    let filterCat = '全部';
-    let editingId = null;
-
-    function dateText(at) {
-      if (!at) return '';
-      const d = new Date(at);
-      const pad = function (n) { return n < 10 ? '0' + n : String(n); };
-      return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate());
-    }
-
-    function optionsHtml(selected) {
-      return App.examples.cats().map(function (name) {
-        return '<option value="' + escapeAttr(name) + '"' +
-          (name === selected ? ' selected' : '') + '>' + escapeAttr(name) + '</option>';
-      }).join('');
-    }
-
-    function renderCatSelect(preferred) {
-      const cats = App.examples.cats();
-      const current = preferred || catSel.value;
-      catSel.innerHTML = optionsHtml(current);
-      if (cats.indexOf(current) === -1) catSel.value = App.examples.DEFAULT_CAT;
-    }
-
-    function renderCatChips() {
-      const counts = App.examples.counts();
-      const total = App.examples.list('全部', '').length;
-      catBox.innerHTML = ['全部'].concat(App.examples.cats()).map(function (name) {
-        const n = name === '全部' ? total : (counts[name] || 0);
-        return '<button type="button" class="chip filter-chip' +
-          (name === filterCat ? ' is-active' : '') + '" data-cat="' + escapeAttr(name) + '">' +
-          escapeAttr(name) + ' <b>' + n + '</b></button>';
-      }).join('');
-    }
-
-    function renderCatList() {
-      const counts = App.examples.counts();
-      catList.innerHTML = App.examples.cats().map(function (name) {
-        const del = name === App.examples.DEFAULT_CAT ? '' :
-          '<button type="button" class="link-btn cat-del" data-cat="' + escapeAttr(name) + '">删除</button>';
-        return '<div class="cat-row"><span class="cat-name">' + escapeAttr(name) + '</span>' +
-          '<span class="cat-count">' + (counts[name] || 0) + ' 句</span>' + del + '</div>';
-      }).join('');
-    }
-
-    function itemHtml(item) {
-      return '<article class="note-item" data-id="' + escapeAttr(item.id) + '">' +
-        '<div class="note-head">' +
-        '<span class="note-cat">' + escapeAttr(item.cat) + '</span>' +
-        '<span class="note-date">' + escapeAttr(dateText(item.at)) + '</span>' +
-        '</div>' +
-        '<p class="note-en">' + escapeAttr(item.en) + '</p>' +
-        (item.cn ? '<p class="note-cn">' + escapeAttr(item.cn) + '</p>' : '') +
-        (item.note ? '<p class="note-extra">备注：' + escapeAttr(item.note) + '</p>' : '') +
-        '<div class="note-foot">' +
-        '<label class="note-move-label">分类 <select class="note-move">' + optionsHtml(item.cat) + '</select></label>' +
-        '<button type="button" class="btn ghost small" data-act="edit">编辑</button>' +
-        '<button type="button" class="btn ghost small" data-act="del">删除</button>' +
-        '</div></article>';
-    }
-
-    function renderList() {
-      const keyword = search.value;
-      const items = App.examples.list(filterCat, keyword);
-      const total = App.examples.list('全部', '').length;
-      const filtered = String(keyword).trim() !== '' || filterCat !== '全部';
-
-      if (!total) {
-        listBox.innerHTML = '<p class="hint">例句本还是空的。上面写一句，或在语法库里点例句旁的「收藏到例句本」。</p>';
-        countBox.textContent = '共 0 句';
-      } else if (!items.length) {
-        listBox.innerHTML = '<p class="hint">这个条件下没有例句，换个分类或关键词试试。</p>';
-        countBox.textContent = '匹配到 0 句（共 ' + total + ' 句）';
-      } else {
-        listBox.innerHTML = items.map(itemHtml).join('');
-        countBox.textContent = filtered
-          ? '匹配到 ' + items.length + ' 句（共 ' + total + ' 句）'
-          : '共 ' + total + ' 句，' + App.examples.cats().length + ' 个分类';
-      }
-    }
-
-    function render() {
-      renderCatSelect();
-      renderCatChips();
-      renderCatList();
-      renderList();
-    }
-
-    function exitEdit() {
-      editingId = null;
-      enInput.value = '';
-      cnInput.value = '';
-      noteInput.value = '';
-      $('#btn-note-save').textContent = '保存例句';
-      $('#btn-note-cancel').hidden = true;
-      formTip.textContent = '';
-    }
-
-    function enterEdit(id) {
-      const item = App.examples.list('全部', '').filter(function (i) { return i.id === id; })[0];
-      if (!item) return;
-      editingId = id;
-      enInput.value = item.en;
-      cnInput.value = item.cn;
-      noteInput.value = item.note;
-      renderCatSelect(item.cat);
-      $('#btn-note-save').textContent = '更新例句';
-      $('#btn-note-cancel').hidden = false;
-      formTip.textContent = '正在编辑，改完点「更新例句」。';
-      box.open = true;
-      if (box.scrollIntoView) box.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }
-
-    $('#btn-note-save').addEventListener('click', function () {
-      const en = enInput.value.trim();
-      if (!en) {
-        formTip.textContent = '先写一句英文。';
-        enInput.focus();
-        return;
-      }
-      const payload = { en: en, cn: cnInput.value, note: noteInput.value, cat: catSel.value };
-
-      if (editingId) {
-        const result = App.examples.update(editingId, payload);
-        if (result.error) {
-          formTip.textContent = result.error;
-          return;
-        }
-        exitEdit();
-        render();
-        formTip.textContent = '已更新。';
-        return;
-      }
-
-      const result = App.examples.add(payload);
-      if (result.error) {
-        formTip.textContent = result.error;
-        return;
-      }
-      if (result.existing) {
-        formTip.textContent = '这句已经在例句本里（分类：' + result.existing.cat + '）。';
-        return;
-      }
-      enInput.value = '';
-      cnInput.value = '';
-      noteInput.value = '';
-      formTip.textContent = '已保存到「' + result.item.cat + '」。';
-      render();
-    });
-
-    $('#btn-note-cancel').addEventListener('click', function () {
-      exitEdit();
-      renderCatSelect();
-    });
-
-    catBox.addEventListener('click', function (e) {
-      const btn = e.target.closest('[data-cat]');
-      if (!btn) return;
-      filterCat = btn.dataset.cat;
-      renderCatChips();
-      renderList();
-    });
-
-    search.addEventListener('input', renderList);
-
-    listBox.addEventListener('click', function (e) {
-      const btn = e.target.closest('[data-act]');
-      const card = e.target.closest('.note-item');
-      if (!btn || !card) return;
-      if (btn.dataset.act === 'edit') {
-        enterEdit(card.dataset.id);
-        return;
-      }
-      if (btn.dataset.act === 'del') {
-        if (!window.confirm('删除这条例句？')) return;
-        const result = App.examples.remove(card.dataset.id);
-        if (result.error) {
-          tip.textContent = result.error;
-          return;
-        }
-        if (editingId === card.dataset.id) exitEdit();
-        tip.textContent = '已删除一例句。';
-        render();
-      }
-    });
-
-    listBox.addEventListener('change', function (e) {
-      const sel = e.target.closest('.note-move');
-      const card = e.target.closest('.note-item');
-      if (!sel || !card) return;
-      const result = App.examples.move(card.dataset.id, sel.value);
-      if (result.error) {
-        tip.textContent = result.error;
-        return;
-      }
-      tip.textContent = '已移到「' + sel.value + '」。';
-      render();
-    });
-
-    $('#btn-cat-add').addEventListener('click', function () {
-      const result = App.examples.addCat(catName.value);
-      if (result.error) {
-        catHint.textContent = result.error;
-        return;
-      }
-      catName.value = '';
-      catHint.textContent = '已新建分类「' + result.name + '」。';
-      render();
-      renderCatSelect(result.name);
-    });
-
-    catName.addEventListener('keydown', function (e) {
-      if (e.key === 'Enter') {
-        e.preventDefault();
-        $('#btn-cat-add').click();
-      }
-    });
-
-    catList.addEventListener('click', function (e) {
-      const btn = e.target.closest('.cat-del');
-      if (!btn) return;
-      const name = btn.dataset.cat;
-      if (!window.confirm('删除分类「' + name + '」？里面的例句会移到「未分类」。')) return;
-      const result = App.examples.removeCat(name);
-      if (result.error) {
-        catHint.textContent = result.error;
-        return;
-      }
-      if (filterCat === name) filterCat = '全部';
-      catHint.textContent = '已删除「' + name + '」，例句已移到未分类。';
-      render();
-    });
-
-    $('#btn-notes-export').addEventListener('click', function () {
-      const data = App.examples.exportData();
-      if (!data.items.length) {
-        tip.textContent = '还没有例句可以导出。';
-        return;
-      }
-      const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      const d = new Date();
-      const pad = function (n) { return n < 10 ? '0' + n : String(n); };
-      link.href = url;
-      link.download = '例句本-' + d.getFullYear() + pad(d.getMonth() + 1) + pad(d.getDate()) + '.json';
-      document.body.appendChild(link);
-      link.click();
-      link.remove();
-      setTimeout(function () { URL.revokeObjectURL(url); }, 1000);
-      tip.textContent = '已导出 ' + data.items.length + ' 句。';
-    });
-
-    $('#btn-notes-import').addEventListener('click', function () {
-      $('#file-notes-import').click();
-    });
-
-    $('#file-notes-import').addEventListener('change', function () {
-      const file = this.files[0];
-      if (!file) return;
-      const reader = new FileReader();
-      reader.onload = function () {
-        const result = App.examples.importData(String(reader.result || ''));
-        if (result.error) {
-          tip.textContent = result.error;
-          return;
-        }
-        tip.textContent = '导入完成：新增 ' + result.added + ' 句，跳过 ' + result.skipped + ' 句重复。';
-        render();
-      };
-      reader.onerror = function () { tip.textContent = '读取文件失败。'; };
-      reader.readAsText(file);
-      this.value = '';
-    });
-
-    renderNotes = render;
-    render();
+  function clearReview() {
+    if (!window.confirm('清空全部填空复盘记录？')) return;
+    App.review.clear();
+    renderReview();
   }
 
   /* ---------------- 启动 ---------------- */
 
   function init() {
-    $$('.tab').forEach(function (tab) {
-      tab.addEventListener('click', function () { switchTab(tab.dataset.tab); });
+    $$('.tab').forEach(function (btn) {
+      btn.addEventListener('click', function () { switchTab(btn.dataset.tab); });
     });
-
-    $$('.mode-btn').forEach(function (btn) {
-      btn.addEventListener('click', function () { switchMode(btn.dataset.mode); });
-    });
-    if (App.exam) App.exam.init();
 
     $('#btn-settings').addEventListener('click', openSettings);
     $('#btn-close-settings').addEventListener('click', closeSettings);
     $('#settings').addEventListener('click', function (e) {
-      if (e.target === this) closeSettings();
+      if (e.target === $('#settings')) closeSettings();
     });
+    $('#set-provider').addEventListener('change', function () { fillProvider(this.value); });
+    $('#btn-save').addEventListener('click', saveSettings);
+    $('#btn-test').addEventListener('click', testConnection);
+
+    $('#btn-sentence').addEventListener('click', runSentence);
+    $('#btn-stop').addEventListener('click', App.runner.stop);
+    $('#btn-clear-review').addEventListener('click', clearReview);
+
+    $('#sentence-input').addEventListener('keydown', function (e) {
+      if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') runSentence();
+    });
+
     document.addEventListener('keydown', function (e) {
       if (e.key === 'Escape' && !$('#settings').hidden) closeSettings();
     });
 
-    $('#set-provider').addEventListener('change', function () {
-      const preset = App.config.PROVIDERS[this.value];
-      $('#set-provider-note').textContent = providerNote(this.value);
-      if (preset) {
-        $('#set-baseurl').value = preset.baseURL;
-        $('#set-model').value = preset.model;
-      }
-    });
-
-    $('#set-alt-provider').addEventListener('change', function () {
-      const preset = App.config.PROVIDERS[this.value];
-      $('#set-alt-note').textContent = providerNote(this.value);
-      if (preset) {
-        $('#set-alt-baseurl').value = preset.baseURL;
-        $('#set-alt-model').value = preset.model;
-      }
-    });
-
-    $('#btn-save').addEventListener('click', function () {
-      App.store.saveSettings(currentFormSettings());
-      refreshKeyHint();
-      closeSettings();
-    });
-
-    $('#btn-test').addEventListener('click', async function () {
-      const out = $('#test-result');
-      out.hidden = false;
-      out.className = 'status';
-      out.textContent = '正在测试…';
-      App.store.saveSettings(currentFormSettings());
-      refreshKeyHint();
-      try {
-        const message = await App.api.testConnection();
-        out.className = 'status ok';
-        out.textContent = message;
-      } catch (err) {
-        out.className = 'status bad';
-        out.textContent = err.message + (err.detail ? '（' + err.detail.slice(0, 120) + '）' : '');
-      }
-    });
-
-    $('#btn-stop').addEventListener('click', function () {
-      if (running) running.abort();
-    });
-
-    initSentence();
-    initRewrite();
-    initEssay();
-    initReview();
-    initGrammar();
-    initNotes();
-    refreshKeyHint();
+    refreshKeyDot();
+    App.tpl.init();
   }
 
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', init);
   } else {
     init();
-  }
-
-  /* PWA：注册 Service Worker，装到桌面后断网也能打开（接口调用仍需联网） */
-  if ('serviceWorker' in navigator && window.isSecureContext) {
-    window.addEventListener('load', function () {
-      navigator.serviceWorker.register('sw.js').catch(function () {});
-    });
   }
 })(window.App);

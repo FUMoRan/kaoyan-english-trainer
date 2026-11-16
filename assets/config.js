@@ -1,4 +1,4 @@
-/* 全局配置：服务商预设、题型与评分档位、系统提示词 */
+/* 全局配置：服务商预设与提示词 */
 window.App = window.App || {};
 
 (function (App) {
@@ -13,23 +13,23 @@ window.App = window.App || {};
     moonshot: {
       label: 'Kimi / Moonshot',
       baseURL: 'https://api.moonshot.cn/v1',
-      model: 'moonshot-v1-8k-vision-preview',
-      note: '必须是带 -vision-preview 的视觉模型，普通 moonshot-v1-8k 看不懂图片。',
+      model: 'moonshot-v1-8k',
+      note: '长句拆解与填空判定用普通文本模型即可，不需要视觉模型。',
       keyURL: 'https://platform.moonshot.cn/console/api-keys',
       cors: true
     },
     dashscope: {
       label: '通义千问 / 阿里百炼',
       baseURL: 'https://dashscope.aliyuncs.com/compatible-mode/v1',
-      model: 'qwen-vl-max',
-      note: '有免费额度；qwen-vl-plus 更便宜，qwen-vl-max 手写识别更准。',
+      model: 'qwen-plus',
+      note: '有免费额度；qwen-plus 性价比高，qwen-max 判定更细。',
       keyURL: 'https://bailian.console.aliyun.com/',
       cors: true
     },
     siliconflow: {
       label: '硅基流动 SiliconFlow',
       baseURL: 'https://api.siliconflow.cn/v1',
-      model: 'Qwen/Qwen2.5-VL-72B-Instruct',
+      model: 'Qwen/Qwen2.5-72B-Instruct',
       note: '国内访问稳定、价格低，注册送额度；模型名区分大小写。',
       keyURL: 'https://cloud.siliconflow.cn/account/ak',
       cors: true
@@ -45,7 +45,7 @@ window.App = window.App || {};
     zhipu: {
       label: '智谱 GLM（需代理）',
       baseURL: 'https://open.bigmodel.cn/api/paas/v4',
-      model: 'glm-4v-plus',
+      model: 'glm-4-plus',
       note: '该接口没有开放浏览器跨域，需先部署仓库里 proxy/worker.js，再把它填到 Base URL。',
       keyURL: 'https://bigmodel.cn/usercenter/apikeys',
       cors: false
@@ -57,86 +57,6 @@ window.App = window.App || {};
       note: '任何 OpenAI 兼容接口，Base URL 填到 /v1 为止，模型名照抄服务商文档。',
       keyURL: '',
       cors: null
-    }
-  };
-
-  /* ---------- 题型与评分档位（按考试中心大纲档位整理） ---------- */
-  const ESSAY_TYPES = {
-    e1_big: {
-      label: '英语一 · 大作文（图画/图表，20 分）',
-      max: 20,
-      words: '160–200 词',
-      kind: 'big',
-      bands: [
-        ['第一档 17–20 分', '内容切题，完整完成任务；语言丰富准确，句式有变化，仅有个别不影响理解的小错；结构清晰，衔接自然。'],
-        ['第二档 13–16 分', '内容较切题，任务完成较好；语言基本准确，有一定句式变化，存在少量错误但不影响理解。'],
-        ['第三档 9–12 分', '内容基本切题，任务部分完成；词汇与句式单一，语法、搭配错误较多，部分影响理解。'],
-        ['第四档 5–8 分', '内容偏离题意或明显不充分；词汇贫乏，错误较多且影响理解；多为简单句罗列，缺乏衔接。'],
-        ['第五档 1–4 分', '内容空洞、跑题或严重不足；语言错误密集，难以理解。']
-      ],
-      paragraphs: [
-        ['p1', '第一段（描述图画/图表）'],
-        ['p2', '第二段（原因/分析）'],
-        ['p3', '第三段（评论/建议）'],
-        ['all', '全文']
-      ]
-    },
-    e1_small: {
-      label: '英语一 · 小作文（应用文，10 分）',
-      max: 10,
-      words: '约 100 词',
-      kind: 'small',
-      bands: [
-        ['第一档 9–10 分', '格式规范，信息完整，语域得体；语言准确，仅有个别小错，衔接自然。'],
-        ['第二档 7–8 分', '格式基本正确，信息较完整，语域基本得体；语言基本准确，存在少量错误。'],
-        ['第三档 5–6 分', '格式有缺漏，信息不完整；语言错误较多，部分影响理解。'],
-        ['第四档 3–4 分', '格式错误明显，遗漏主要内容；语言错误多，影响理解。'],
-        ['第五档 1–2 分', '格式混乱，内容严重不足或无法理解。']
-      ],
-      paragraphs: [
-        ['p1', '开头（称呼 + 写信目的）'],
-        ['p2', '主体（具体信息）'],
-        ['p3', '结尾（客套 + 落款）'],
-        ['all', '全文']
-      ]
-    },
-    e2_big: {
-      label: '英语二 · 大作文（图表，15 分）',
-      max: 15,
-      words: '150 词以上',
-      kind: 'big',
-      bands: [
-        ['第一档 13–15 分', '内容切题，数据描述准确完整；语言丰富准确，句式有变化；结构清晰，衔接自然。'],
-        ['第二档 10–12 分', '内容较切题，数据描述较完整；语言基本准确，有少量错误。'],
-        ['第三档 7–9 分', '内容基本切题，数据描述有遗漏或误读；语言单一，错误较多，部分影响理解。'],
-        ['第四档 4–6 分', '内容偏离或数据描述严重不足；词汇贫乏，错误多且影响理解。'],
-        ['第五档 1–3 分', '内容空洞或跑题；语言错误密集，难以理解。']
-      ],
-      paragraphs: [
-        ['p1', '第一段（描述图表数据）'],
-        ['p2', '第二段（分析原因）'],
-        ['p3', '第三段（评论/趋势判断）'],
-        ['all', '全文']
-      ]
-    },
-    e2_small: {
-      label: '英语二 · 小作文（应用文，10 分）',
-      max: 10,
-      words: '约 100 词',
-      kind: 'small',
-      bands: [
-        ['第一档 9–10 分', '格式规范，信息完整，语域得体；语言准确，仅有个别小错，衔接自然。'],
-        ['第二档 7–8 分', '格式基本正确，信息较完整，语域基本得体；语言基本准确，存在少量错误。'],
-        ['第三档 5–6 分', '格式有缺漏，信息不完整；语言错误较多，部分影响理解。'],
-        ['第四档 3–4 分', '格式错误明显，遗漏主要内容；语言错误多，影响理解。'],
-        ['第五档 1–2 分', '格式混乱，内容严重不足或无法理解。']
-      ],
-      paragraphs: [
-        ['p1', '开头（称呼 + 写信目的）'],
-        ['p2', '主体（具体信息）'],
-        ['p3', '结尾（客套 + 落款）'],
-        ['all', '全文']
-      ]
     }
   };
 
@@ -161,162 +81,94 @@ window.App = window.App || {};
     }, { role: 'user', content: sentence }];
   }
 
-  function rewriteMessages(text, type) {
-    const isAuto = type === 'auto';
-    const rules = [
-      '你是考研英语写作教练，帮学生把平铺直叙的表达改成阅卷人愿意给分的写法。',
-      '不要改变原意，不要堆砌辞藻，不要写成模板腔。'
-    ];
-
-    if (isAuto) {
-      rules.push(
-        '先替学生挑手法。可选方向：强调句、倒装、非限制性定语从句、分词短语、同位语、名词化、抽象名词作主语、比较结构、平行结构、因果递进衔接。',
-        '只挑一个主手法，不要叠加；如果原句本身已经干净，硬改反而扣分，就直接说「这句不建议魔改」，再给一版轻微润色。',
-        '严格按下面五个小标题输出，标题文字一字不改：',
-        '## 一、推荐手法',
-        '## 二、高级英文',
-        '## 三、中文翻译',
-        '## 四、结构简析',
-        '## 五、适用提醒',
-        '「推荐手法」先写手法名，再用 30–60 字说明为什么这句适合它，要结合语义或逻辑关系，不要泛泛而谈。'
-      );
-    } else {
-      rules.push(
-        '本次指定手法：' + type + '。',
-        '先判断这个手法是否适合该句语义。不适合就直接说明原因，再给出一种更合适的写法，不要硬凑。',
-        '严格按下面四个小标题输出，标题文字一字不改：',
-        '## 一、高级英文',
-        '## 二、中文翻译',
-        '## 三、结构简析',
-        '## 四、适用提醒'
-      );
-    }
-
-    rules.push(
-      '「高级英文」只给一句，不要给多个版本，也不要加例句。',
-      '「结构简析」30–80 字，说明句子成分如何重组；原句若有语法或搭配问题，先指出再讲结构。',
-      '「适用提醒」说明这句适合大作文还是小作文、什么题材，以及阅卷人可能怎么看，不要鼓励堆模板。'
-    );
-
-    return [{ role: 'system', content: rules.join('\n') }, { role: 'user', content: text }];
+  /* 把模板里的 ①②③ 换成 [1] [2]，避免模型回显圆圈编号 */
+  function numberedText(template) {
+    const circle = '①②③④⑤⑥⑦⑧⑨⑩⑪⑫⑬⑭⑮⑯⑰⑱⑲⑳';
+    return template.paragraphs.map(function (p) {
+      return String(p).replace(/[①-⑳]/g, function (ch) {
+        return '[' + (circle.indexOf(ch) + 1) + ']';
+      });
+    }).join('\n\n');
   }
 
-  function ocrMessages(dataURL) {
-    return [{
-      role: 'system',
-      content: [
-        '你是一位只做转录的助手。任务：把图片中学生手写的英文原样转成文本。',
-        '只转录，不批改、不润色、不补全、不翻译。',
-        '学生写错的拼写和语法必须原样保留，不要替他改。',
-        '看不清的单词写成 [?]，不要猜；连续看不清用一行 [?]。',
-        '保留原有的分段和换行。',
-        '不要输出任何解释、标题或评语。',
-        '如果图片里没有可辨认的英文，只输出：NO_TEXT'
-      ].join('\n')
-    }, {
-      role: 'user',
-      content: [
-        { type: 'text', text: '请转录这张图片中的手写英文。' },
-        { type: 'image_url', image_url: { url: dataURL } }
-      ]
-    }];
+  function blankGuide(template) {
+    return template.blanks.map(function (b) {
+      return b.no + '. ' + b.hint + (b.sample ? '（示例：' + b.sample + '）' : '');
+    }).join('\n');
   }
 
-  function gradingMessages(essay, paragraphText, opts) {
-    const focus = (opts && opts.focus) || 'full';
-    const type = ESSAY_TYPES[essay.typeKey];
-    const bandText = type.bands.map(function (b) { return BULLET + b[0] + '：' + b[1]; }).join('\n');
-    const samples = App.calibration.select(type.kind, essay.typeKey);
-    const paraLabel = (type.paragraphs.find(function (p) { return p[0] === essay.para; }) || ['all', '全文'])[1];
+  function answerSheet(answers) {
+    return answers.map(function (a) {
+      const value = String(a.value || '').trim();
+      return a.no + '. ' + (value || '（未填）');
+    }).join('\n');
+  }
 
-    const head = [
-      '你是考研英语阅卷组组长，按教育部考试中心大纲的评分档位批改中国学生的作文。',
+  function templateMessages(info) {
+    const template = info.template;
+    const total = template.blanks.length;
+
+    const system = [
+      '你是考研英语大作文的填空判卷人。学生按给定的三段模板逐空填写，你只判空，不重写模板。',
       '',
-      '【本次设定】',
-      '题型：' + type.label + '，满分 ' + type.max + ' 分，建议长度 ' + type.words + '。',
-      '批改范围：' + paraLabel + '。',
-      essay.topic ? '题目/图画信息（学生提供）：' + essay.topic : '题目/图画信息：学生未提供，判分时按「缺少题干，估分保守」处理。',
+      '【判定标准】宽容，但守住语法与槽位底线。',
+      '每个空按三件事判：',
+      '1. 槽位对位：填进去的内容是否符合该空在句中的语法角色（名词短语 / 完整分句 / 动词原形 / 介词短语 / 过去分词等）。词性或句式冲突直接判错。',
+      '2. 语法正确：主谓一致、时态、单复数、冠词、介词与动词搭配、拼写。语法错就是错。',
+      '3. 语境一致：与题目主题和上下文能否读通；同一个空在全篇多处出现时视为同一内容，学生只填一次不算漏填。',
+      '判「通过」的情形（从宽）：',
+      '- 意思正确、语法可接受就算通过，不要求和示例答案一致；同义、近义、换一种合理说法都算对。',
+      '- 表达略不地道但没有语法错，判通过，最多附一句优化建议，不得因此判错。',
+      '- 泛指语境下可数名词单复数两可、英式与美式拼写不同、数据写法不同（如 25.4% 与 25.40%），都算对。',
+      '- 学生词数比示例多或少，只要句子读得通就算通过。',
+      '判「需改」的情形：',
+      '- 空着没填；写中文、拼音或汉语提示里的汉字。',
+      '- 词性或句式与槽位冲突（如要求完整分句只给了名词短语；要求动词原形写成 to do 或 doing；要求名词短语写成句子）。',
+      '- 明确的语法错误：主谓不一致、时态错、单复数与限定词冲突、搭配错、拼写错。',
+      '- 与主题无关，导致句子读不通。',
       '',
-      '【评分档位（必须严格使用，不得自创档位）】',
-      bandText,
-      '档内具体分：在所选档位区间内取整数，并说明为什么落在该档的上沿或下沿。',
+      '【输出格式】严格四节，标题文字与顺序不许改，不要增加别的章节。',
+      '## 一、逐空判定',
+      '从 1 到 ' + total + ' 逐空列出，一行一空，格式严格为：',
+      '`1 ✅ 通过 — 一句理由`',
+      '`3 ❌ 需改 — 原因；改为：可替换的英文`',
+      '编号必须用阿拉伯数字，不要用 ①②③，不要用表格，不要合并同类空。',
+      '## 二、必须改的空',
+      '只列 ❌ 的编号，按对整篇的影响从大到小排序，一行一处：`3：你填的 "…" → 建议 "…"`。一处都没有就写：全部通过。',
+      '## 三、誊写版',
+      '把学生答案填回模板，输出完整三段英文：通过的空照用学生原词，❌ 的空用你给出的修改；每处修改后在句末标 [改:编号]。',
+      '不要改动模板的其他措辞，不要增删句子，不要换成你自己的句式。',
+      '## 四、错空记录',
+      '只输出一行：`错空 3,7,12 | 共 ' + total + ' 空`。全部通过写 `错空 无 | 共 ' + total + ' 空`。',
       '',
-      '【评分标尺样本（校准宽严度用，不是官方单篇得分）】',
-      samples,
-      '请按上面的宽严度打分，不要一律给中间分。',
-      '',
-      '【硬性规则】',
-      '1. 若批改范围不是全文：先说明该段在整篇中的功能，再给该段的质量档位，最后给整篇预估分区间，并注明「基于单段的估算」。',
-      '2. 所有错误必须能在给定文本里找到原句，不得虚构；疑似手写识别导致的错误标【疑似识别】，并提醒学生核对。',
-      '3. 禁止空泛表扬（如「语言流畅」「内容充实」）。每条建议都要给出可直接替换的写法。',
-      '4. 学生原文里已经正确、且符合档位要求的表达不要改写。',
-      '5. 不评判字迹与卷面美观，只评判语言与任务完成度。',
-      '',
-      focus === 'target'
-        ? [
-          '【本模式：目标分数模式】',
-          '学生只想知道「离达标还差哪几处」，不要面面俱到。只保留最卡分的改动，其余问题略过。',
-          '',
-          '【输出格式】严格使用以下小标题，顺序不变，不增删：',
-          '## 一、档位与分数',
-          '## 二、达标必改（3 条）',
-          '## 三、错误归类',
-          '',
-          '「一、档位与分数」：先写「当前第X档，给 X/满分」，再写「再改 2–3 处可进第Y档」，三句以内。',
-          '「二、达标必改（3 条）」：只列 3 条，按对提档的影响从大到小排序；每条一行，格式为「原文 → 改为（提档原因）」。只给 3 条，不足 3 条就写实际条数。',
-          '「三、错误归类」：见文末格式要求。'
-        ].join('\n')
-        : [
-          '【输出格式】严格使用以下小标题，顺序不变，不增删：',
-          '## 一、档位与分数',
-          '## 二、硬伤清单',
-          '## 三、中式英语与表达',
-          '## 四、可升级句',
-          '## 五、下一步练习',
-          '## 六、错误归类',
-          '',
-          '「一、档位与分数」：档位 + 具体分/满分 + 三句以内的判分依据。',
-          '「二、硬伤清单」：Markdown 表格，列为 原文 | 改为 | 类型 | 说明；没有明显硬伤就写「未发现明显硬伤」。',
-          '「三、中式英语与表达」：最多 3 条，给出原文与更地道的说法。',
-          '「四、可升级句」：表格，列为 原句 | 升级句 | 手法；最多 3 条，必须贴合该段在整篇中的功能。',
-          '「五、下一步练习」：2 条今天就能做的动作，针对本次暴露的问题。',
-          '「六、错误归类」：见文末格式要求。'
-        ].join('\n'),
-      '',
-      '【错误归类格式（供本地错题本统计，必须一字不差）】',
-      '只输出一行：类别 数量，多个类别用 | 分隔，例如「冠词 2 | 时态 1 | 搭配 3」。',
-      '类别只能从这几个里选：冠词、时态、搭配、中式表达、拼写、单复数、标点、其他。',
-      '数量只统计' + (focus === 'target' ? '「二、达标必改」' : '「二、硬伤清单」与「三、中式英语与表达」') +
-        '里真正指出的错误；没有错误的类别不要写；一处都没有就写「无」。'
+      '【硬性要求】',
+      '- 只判空，不改写模板句式；不评价字迹、不估算考试分数。',
+      '- 不得虚构学生没填的内容；没填的空一律 ❌。',
+      '- 引用学生答案时必须逐字复制，不要替学生改拼写后再引用。',
+      '- 全文 700 字以内，不寒暄，不重复模板原文。'
     ].join('\n');
 
-    return [
-      { role: 'system', content: head },
-      { role: 'user', content: '以下是我要批改的内容（已由我确认识别无误）：\n\n' + paragraphText }
-    ];
-  }
+    const user = [
+      '【模板】' + template.no + '　' + template.kind + ' · ' + template.title,
+      '【适用条件】' + template.use,
+      info.topic ? '【本次练习题目】\n' + info.topic : '【本次练习题目】学生未指定，按通用主题判断即可。',
+      '',
+      '【模板全文】（方括号里的数字是空位编号）',
+      numberedText(template),
+      '',
+      '【空位说明】（第 1 段是汉语提示，括号里是英文示例，仅用于理解槽位，学生不必照抄）',
+      blankGuide(template),
+      '',
+      '【学生填写】',
+      answerSheet(info.answers)
+    ].join('\n');
 
-  /* 批改后的追问：把原报告当上文，只回答新问题 */
-  function followUpMessages(baseMessages, report, question) {
-    return baseMessages.concat([
-      { role: 'assistant', content: report },
-      {
-        role: 'user',
-        content: question + '\n\n（只回答这个问题，可以引用我原文里的句子；不要重写整份批改报告，不要重复已经说过的内容；'
-          + '如果问的是与这篇作文无关的话题，直接说明。控制在 200 字以内。）'
-      }
-    ]);
+    return [{ role: 'system', content: system }, { role: 'user', content: user }];
   }
-
-  const BULLET = '· ';
 
   App.config = {
     PROVIDERS: PROVIDERS,
-    ESSAY_TYPES: ESSAY_TYPES,
     sentenceMessages: sentenceMessages,
-    rewriteMessages: rewriteMessages,
-    ocrMessages: ocrMessages,
-    gradingMessages: gradingMessages,
-    followUpMessages: followUpMessages
+    templateMessages: templateMessages
   };
 })(window.App);

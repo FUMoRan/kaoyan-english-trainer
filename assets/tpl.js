@@ -367,14 +367,22 @@ window.App = window.App || {};
     setTimeout(function () { input.classList.remove('is-flash'); }, 1200);
   }
 
-  function copyEssay() {
-    const text = App.review.sectionText(state.report, '誊写版')
-      .replace(/\[改[:：]\s*\d+\]/g, '')
-      .replace(/\*\*/g, '')
-      .trim();
+  /* 用当前填写内容拼出完整三段；没填的空用 [编号] 占位 */
+  function buildMyEssay() {
+    const t = state.template;
+    if (!t) return '';
+    return t.paragraphs.map(function (p) {
+      return App.templates.splitParagraph(p).map(function (token) {
+        if (token.type === 'text') return token.text;
+        const value = String(state.values[token.no] || '').trim();
+        return value || '[' + token.no + ']';
+      }).join('');
+    }).join('\n\n');
+  }
+
+  function copyText(text, btn) {
     if (!text) return;
     const done = function () {
-      const btn = $('#btn-tpl-copy');
       const old = btn.textContent;
       btn.textContent = '已复制';
       setTimeout(function () { btn.textContent = old; }, 1400);
@@ -384,6 +392,31 @@ window.App = window.App || {};
     } else {
       fallbackCopy(text, done);
     }
+  }
+
+  function copyMine() {
+    const t = state.template;
+    if (!t) return;
+    const btn = $('#btn-tpl-copy-mine');
+    const filled = t.blanks.filter(function (b) {
+      return String(state.values[b.no] || '').trim() !== '';
+    }).length;
+    if (!filled) {
+      const old = btn.textContent;
+      btn.textContent = '先填几个空';
+      setTimeout(function () { btn.textContent = old; }, 1400);
+      return;
+    }
+    copyText(buildMyEssay(), btn);
+  }
+
+  function copyEssay() {
+    const text = App.review.sectionText(state.report, '誊写版')
+      .replace(/\[改[:：]\s*\d+\]/g, '')
+      .replace(/\*\*/g, '')
+      .trim();
+    if (!text) return;
+    copyText(text, $('#btn-tpl-copy'));
   }
 
   function fallbackCopy(text, done) {
@@ -432,6 +465,7 @@ window.App = window.App || {};
     $('#btn-tpl-judge').addEventListener('click', judge);
     $('#btn-tpl-clear').addEventListener('click', clearAnswers);
     $('#btn-tpl-copy').addEventListener('click', copyEssay);
+    $('#btn-tpl-copy-mine').addEventListener('click', copyMine);
 
     $('#tpl-result').addEventListener('click', function (e) {
       const chip = e.target.closest('[data-goto-blank]');
@@ -442,5 +476,5 @@ window.App = window.App || {};
     if (active && active.id) openTemplate(active.id);
   }
 
-  App.tpl = { init: init, open: openTemplate };
+  App.tpl = { init: init, open: openTemplate, fullText: buildMyEssay };
 })(window.App);

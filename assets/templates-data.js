@@ -6,7 +6,7 @@ window.App = window.App || {};
 (function (App) {
   'use strict';
 
-  const CIRCLE = '①②③④⑤⑥⑦⑧⑨⑩⑪⑫⑬⑭⑮⑯⑰⑱⑲⑳';
+  const CIRCLE = '①②③④⑤⑥⑦⑧⑨⑩⑪⑫⑬⑭⑮⑯⑰⑱⑲⑳㉑㉒㉓㉔㉕㉖㉗㉘㉙㉚㉛㉜㉝㉞㉟';
 
   const TEMPLATES = [
   {
@@ -883,6 +883,7 @@ window.App = window.App || {};
   App.templates = {
     list: TEMPLATES,
     steps: STEPS,
+    circles: CIRCLE,
     get: get,
     splitParagraph: splitParagraph
   };

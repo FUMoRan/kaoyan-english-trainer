@@ -777,6 +777,39 @@ window.App = window.App || {};
     if (note) note.textContent = '已保存「' + name + '」，下次在「审题」页底部可以载入。';
   }
 
+  /* 按已保存的 setup 重新组装，供背诵模块复用 */
+  function buildFromSetup(setup) {
+    const data = setup || {};
+    if (!data.sceneId || !A().scene(data.sceneId)) return null;
+    const backup = {
+      typeId: state.typeId,
+      sceneId: state.sceneId,
+      picks: state.picks,
+      reasonPlans: state.reasonPlans,
+      connectiveId: state.connectiveId,
+      visionEnabled: state.visionEnabled
+    };
+    state.sceneId = data.sceneId;
+    state.picks = Object.assign({}, data.picks || {});
+    state.reasonPlans = (data.reasonPlans || []).slice(0, 3);
+    state.connectiveId = data.connectiveId || state.connectiveId;
+    state.visionEnabled = data.visionEnabled !== false;
+    ensureDefaults();
+    const result = assemble();
+    state.typeId = backup.typeId;
+    state.sceneId = backup.sceneId;
+    state.picks = backup.picks;
+    state.reasonPlans = backup.reasonPlans;
+    state.connectiveId = backup.connectiveId;
+    state.visionEnabled = backup.visionEnabled;
+    return result;
+  }
+
+  function savedList() {
+    const list = readJSON(SAVED_KEY, []);
+    return Array.isArray(list) ? list : [];
+  }
+
   function loadCombo(id) {
     const list = readJSON(SAVED_KEY, []);
     const item = list.filter(function (x) { return x.id === id; })[0];
@@ -829,6 +862,8 @@ window.App = window.App || {};
 
   App.combo = {
     show: show,
-    init: function () { bind(); restore(); }
+    init: function () { bind(); restore(); },
+    build: buildFromSetup,
+    saved: savedList
   };
 })(window.App);

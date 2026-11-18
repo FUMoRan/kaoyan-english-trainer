@@ -56,6 +56,7 @@
       <div class="tpl-modes" id="tpl-modes" role="tablist" aria-label="模板模式">
         <button type="button" class="mode-chip is-active" data-tpl-mode="whole" role="tab">整篇模板</button>
         <button type="button" class="mode-chip" data-tpl-mode="combo" role="tab">AI 归来 · 自选模板</button>
+        <button type="button" class="mode-chip" data-tpl-mode="recite" role="tab">背诵</button>
       </div>
 
       <div id="mode-whole">
@@ -70,6 +71,11 @@
           <div id="combo-step-2" class="combo-step" hidden></div>
           <div id="combo-step-3" class="combo-step" hidden></div>
         </div>
+      </div>
+
+      <div id="mode-recite" hidden>
+        <div id="recite-home"></div>
+        <div id="recite-session" hidden></div>
       </div>
 
       <div id="fill-work" hidden>
@@ -181,6 +187,7 @@
   <script src="assets/ai-templates-data.js"></script>
   <script src="assets/fill.js"></script>
   <script src="assets/combo.js"></script>
+  <script src="assets/recite.js"></script>
   <script src="assets/tpl.js"></script>
   <script src="assets/ui.js"></script>
 </body>

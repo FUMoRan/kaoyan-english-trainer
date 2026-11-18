@@ -91,16 +91,19 @@ window.App = window.App || {};
   }
 
   function switchMode(mode) {
-    state.mode = mode === 'combo' ? 'combo' : 'whole';
+    state.mode = mode === 'combo' || mode === 'recite' ? mode : 'whole';
     writeJSON(MODE_KEY, { mode: state.mode });
     setChips();
     $('#fill-work').hidden = true;
     $('#mode-whole').hidden = state.mode !== 'whole';
     $('#mode-combo').hidden = state.mode !== 'combo';
+    $('#mode-recite').hidden = state.mode !== 'recite';
     if (state.mode === 'whole') {
       App.tpl.showPicker();
-    } else if (App.combo) {
-      App.combo.show();
+    } else if (state.mode === 'combo') {
+      if (App.combo) App.combo.show();
+    } else if (App.recite) {
+      App.recite.show();
     }
     window.scrollTo(0, 0);
   }
@@ -119,11 +122,11 @@ window.App = window.App || {};
     });
 
     const saved = readJSON(MODE_KEY, { mode: 'whole' });
-    const mode = saved.mode === 'combo' ? 'combo' : 'whole';
+    const mode = saved.mode === 'combo' || saved.mode === 'recite' ? saved.mode : 'whole';
     const active = readJSON(ACTIVE_KEY, { id: '' }).id;
 
-    if (mode === 'combo') {
-      switchMode('combo');
+    if (mode !== 'whole') {
+      switchMode(mode);
       return;
     }
     state.mode = 'whole';

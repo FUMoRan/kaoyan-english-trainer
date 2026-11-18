@@ -7,7 +7,7 @@ window.App = window.App || {};
   const $ = function (sel) { return document.querySelector(sel); };
   const $$ = function (sel) { return Array.prototype.slice.call(document.querySelectorAll(sel)); };
 
-  const TABS = ['sentence', 'tpl', 'review'];
+  const TABS = ['sentence', 'tpl', 'recite', 'review'];
 
   /* ---------------- 模块切换 ---------------- */
 
@@ -23,6 +23,7 @@ window.App = window.App || {};
       if (panel) panel.hidden = !on;
     });
     if (name === 'review') renderReview();
+    if (name === 'recite' && App.recite) App.recite.show();
     if (name === 'sentence') {
       const input = $('#sentence-input');
       if (input && !input.value) {

@@ -21,7 +21,7 @@
     <div class="topbar-row">
       <div class="brand">
         <h1>考研英语高阶训练器</h1>
-        <p class="sub">长难句拆解 · 大作文模板填空</p>
+        <p class="sub">长难句拆解 · 模板填空 · 模板背诵</p>
       </div>
       <button id="btn-settings" class="btn ghost small" aria-haspopup="dialog">设置<span class="dot" id="key-dot" hidden></span></button>
     </div>
@@ -31,6 +31,7 @@
     <nav class="tabs" role="tablist" aria-label="学习模块">
       <button class="tab is-active" id="tab-sentence" role="tab" data-tab="sentence" aria-selected="true" aria-controls="panel-sentence">长难句拆解</button>
       <button class="tab" id="tab-tpl" role="tab" data-tab="tpl" aria-selected="false" aria-controls="panel-tpl">模板填空</button>
+      <button class="tab" id="tab-recite" role="tab" data-tab="recite" aria-selected="false" aria-controls="panel-recite">背诵</button>
       <button class="tab" id="tab-review" role="tab" data-tab="review" aria-selected="false" aria-controls="panel-review">复盘</button>
     </nav>
 
@@ -56,7 +57,6 @@
       <div class="tpl-modes" id="tpl-modes" role="tablist" aria-label="模板模式">
         <button type="button" class="mode-chip is-active" data-tpl-mode="whole" role="tab">整篇模板</button>
         <button type="button" class="mode-chip" data-tpl-mode="combo" role="tab">AI 归来 · 自选模板</button>
-        <button type="button" class="mode-chip" data-tpl-mode="recite" role="tab">背诵</button>
       </div>
 
       <div id="mode-whole">
@@ -71,11 +71,6 @@
           <div id="combo-step-2" class="combo-step" hidden></div>
           <div id="combo-step-3" class="combo-step" hidden></div>
         </div>
-      </div>
-
-      <div id="mode-recite" hidden>
-        <div id="recite-home"></div>
-        <div id="recite-session" hidden></div>
       </div>
 
       <div id="fill-work" hidden>
@@ -104,6 +99,12 @@
 
         <article id="fill-result" class="result" hidden></article>
       </div>
+    </section>
+
+    <!-- 背诵 -->
+    <section id="panel-recite" class="panel" role="tabpanel" aria-labelledby="tab-recite" hidden>
+      <div id="recite-home"></div>
+      <div id="recite-session" hidden></div>
     </section>
 
     <!-- 复盘 -->
@@ -177,6 +178,25 @@
       </div>
       <div id="saved-manage" class="saved-list"></div>
       <p class="hint" id="saved-note">重命名只改名字；复制会生成独立副本，背诵进度另算。</p>
+    </div>
+  </div>
+
+  <!-- 空位指导 -->
+  <div id="peek-modal" class="modal" hidden>
+    <div class="modal-card peek-card" role="dialog" aria-modal="true" aria-labelledby="peek-title">
+      <div class="modal-head">
+        <h2 id="peek-title">空位</h2>
+        <button type="button" class="btn ghost small" data-peek-close="1">关闭</button>
+      </div>
+      <div class="peek-block">
+        <h3>填什么</h3>
+        <p id="peek-hint"></p>
+      </div>
+      <div class="peek-block">
+        <h3>示例</h3>
+        <p id="peek-sample" class="peek-sample"></p>
+      </div>
+      <p class="hint">示例只用来理解结构，实际写作时换成你题目的主题词、数据或观点。</p>
     </div>
   </div>
 

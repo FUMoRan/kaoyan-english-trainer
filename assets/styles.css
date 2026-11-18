@@ -1079,6 +1079,65 @@ select { appearance: none; background-image: linear-gradient(45deg, transparent 
 .recite-row-side { display: flex; flex-direction: column; align-items: flex-end; gap: 3px; }
 .recite-row-good { font-size: 11.5px; color: var(--text-muted); white-space: nowrap; }
 
+.recite-row-wrap { display: flex; flex-direction: column; gap: 5px; }
+.recite-peek {
+  align-self: flex-end;
+  padding: 2px 7px;
+  border: 0;
+  border-radius: 6px;
+  background: none;
+  color: var(--brand);
+  font-size: 12px;
+  cursor: pointer;
+}
+.recite-peek:hover { background: var(--brand-soft); }
+
+.recite-preview-head { margin-bottom: 12px; }
+.recite-preview-use {
+  margin: 0 0 14px;
+  padding: 10px 12px;
+  background: var(--brand-soft);
+  color: var(--brand-text);
+  border-radius: var(--radius);
+  font-size: 13px;
+}
+.recite-preview-body { display: flex; flex-direction: column; gap: 12px; }
+.preview-para {
+  padding: 14px 16px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-card);
+}
+.preview-para h3 { margin: 0 0 8px; font-size: 12px; font-weight: 500; color: var(--text-muted); }
+.preview-text { margin: 0; font-size: 15px; line-height: 2.1; }
+
+.preview-blank {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 2px;
+  padding: 0 4px;
+  border: 0;
+  border-bottom: 1.5px solid color-mix(in srgb, var(--brand) 60%, transparent);
+  background: none;
+  color: var(--brand);
+  font: inherit;
+  line-height: 1.4;
+  cursor: pointer;
+}
+.preview-blank:hover { background: var(--brand-soft); }
+.preview-blank-line { display: inline-block; width: 34px; height: 1px; }
+.preview-blank-no { font-size: 11px; line-height: 1; }
+
+.peek-block { margin-bottom: 12px; }
+.peek-block h3 { margin: 0 0 4px; font-size: 12px; font-weight: 500; color: var(--text-muted); }
+.peek-block p { margin: 0; font-size: 14px; }
+.peek-sample {
+  padding: 8px 10px;
+  background: var(--surface-muted);
+  border-radius: var(--radius);
+  color: var(--text);
+}
+
 .recite-pill {
   display: inline-flex;
   align-items: center;

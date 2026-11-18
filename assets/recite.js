@@ -36,7 +36,8 @@ window.App = window.App || {};
     revealed: false,
     hint: false,
     aiBusy: false,
-    done: false
+    done: false,
+    previewId: ''
   };
 
   let bound = false;
@@ -569,7 +570,7 @@ window.App = window.App || {};
       const goodPct = stats.total ? Math.round(stats.good / stats.total * 100) : 0;
       const midPct = stats.total ? Math.round(stats.mid / stats.total * 100) : 0;
       const weakPct = Math.max(0, 100 - goodPct - midPct);
-      return '<button type="button" class="recite-row" data-recite-scope="' + esc(col.id) + '">' +
+      const row = '<button type="button" class="recite-row" data-recite-scope="' + esc(col.id) + '">' +
         '<span class="recite-row-main"><b>' + esc(col.label) + '</b>' +
           '<span>' + esc(col.meta) + ' · ' + stats.total + ' 句</span></span>' +
         '<span class="recite-bar" aria-hidden="true">' +
@@ -583,6 +584,10 @@ window.App = window.App || {};
           '<span class="recite-row-good">熟练 ' + stats.good + '</span>' +
         '</span>' +
         '</button>';
+      if (state.tab !== 'whole') return row;
+      return '<div class="recite-row-wrap">' + row +
+        '<button type="button" class="recite-peek" data-recite-peek="' + esc(col.id) + '">看全文与空位指导</button>' +
+        '</div>';
     }).join('');
 
     if (!list) {
@@ -604,6 +609,66 @@ window.App = window.App || {};
       '<div class="recite-list">' + list + '</div>';
     $('#recite-home').hidden = false;
     $('#recite-session').hidden = true;
+  }
+
+  /* ---------------- 整篇：看全文与空位指导 ---------------- */
+
+  function findTemplate(id) {
+    return (App.templates.list || []).filter(function (t) { return t.id === id; })[0] || null;
+  }
+
+  function previewParaHtml(text, circles) {
+    const re = new RegExp('[' + circles + ']', 'g');
+    return esc(text).replace(re, function (ch) {
+      return '<button type="button" class="preview-blank" data-peek-no="' + (circles.indexOf(ch) + 1) + '">' +
+        '<span class="preview-blank-line" aria-hidden="true"></span>' +
+        '<span class="preview-blank-no">' + ch + '</span></button>';
+    });
+  }
+
+  function previewHtml(t) {
+    const circles = App.templates.circles || '';
+    const re = new RegExp('[' + circles + ']', 'g');
+    const total = (t.paragraphs.join('').match(re) || []).length;
+    return '<div class="recite-head recite-preview-head">' +
+        '<button type="button" class="recite-back" data-recite-home>返回</button>' +
+        '<div class="recite-head-main"><h2>' + esc(t.no + ' · ' + t.title) + '</h2>' +
+          '<p>' + esc(t.kind) + ' · 共 ' + total + ' 个空位</p></div>' +
+      '</div>' +
+      (t.use ? '<p class="recite-preview-use">' + esc(t.use) + '</p>' : '') +
+      '<div class="recite-preview-body">' +
+        t.paragraphs.map(function (para, i) {
+          return '<section class="preview-para"><h3>第 ' + (i + 1) + ' 段</h3>' +
+            '<p class="preview-text">' + previewParaHtml(para, circles) + '</p></section>';
+        }).join('') +
+      '</div>' +
+      '<p class="hint">点任意横线空位，查看这一空该填什么。</p>';
+  }
+
+  function renderPreview(col) {
+    if (!col) return;
+    const t = findTemplate(String(col.id).replace(/^whole:/, ''));
+    if (!t) return;
+    state.view = 'preview';
+    state.previewId = t.id;
+    $('#recite-home').hidden = false;
+    $('#recite-session').hidden = true;
+    $('#recite-home').innerHTML = previewHtml(t);
+    window.scrollTo(0, 0);
+  }
+
+  function openPeek(no) {
+    const t = findTemplate(state.previewId);
+    if (!t) return;
+    const blank = (t.blanks || []).filter(function (b) { return Number(b.no) === no; })[0];
+    if (!blank) return;
+    $('#peek-title').textContent = '空位 ' + (blank.label || no);
+    $('#peek-hint').textContent = blank.hint || '按模板语境填入对应的主题词、数据或观点。';
+    $('#peek-sample').textContent = blank.sample || '—';
+    const modal = $('#peek-modal');
+    modal.hidden = false;
+    const close = modal.querySelector('[data-peek-close]');
+    if (close) close.focus();
   }
 
   /* ---------------- 背诵会话 ---------------- */
@@ -1006,6 +1071,18 @@ window.App = window.App || {};
       return;
     }
 
+    const peekBtn = event.target.closest('[data-recite-peek]');
+    if (peekBtn) {
+      renderPreview(findCollection(peekBtn.dataset.recitePeek));
+      return;
+    }
+
+    const blankBtn = event.target.closest('[data-peek-no]');
+    if (blankBtn) {
+      openPeek(Number(blankBtn.dataset.peekNo));
+      return;
+    }
+
     const row = event.target.closest('[data-recite-scope]');
     if (row) {
       startCollection(findCollection(row.dataset.reciteScope), false);
@@ -1024,6 +1101,8 @@ window.App = window.App || {};
     }
 
     if (event.target.closest('[data-recite-goto-combo]')) {
+      const tab = document.querySelector('#tab-tpl');
+      if (tab) tab.click();
       const chip = document.querySelector('#tpl-modes [data-tpl-mode="combo"]');
       if (chip) chip.click();
       return;
@@ -1080,11 +1159,20 @@ window.App = window.App || {};
 
   function bind() {
     if (bound) return;
-    const root = $('#mode-recite');
+    const root = $('#panel-recite');
     if (!root) return;
     root.addEventListener('click', onClick);
     root.addEventListener('input', onInput);
     root.addEventListener('keydown', onKeydown);
+    const modal = $('#peek-modal');
+    if (modal) {
+      modal.addEventListener('click', function (event) {
+        if (event.target === modal || event.target.closest('[data-peek-close]')) modal.hidden = true;
+      });
+      modal.addEventListener('keydown', function (event) {
+        if (event.key === 'Escape') modal.hidden = true;
+      });
+    }
     bound = true;
   }
 
@@ -1094,8 +1182,6 @@ window.App = window.App || {};
     state.collections = buildCollections();
     state.view = 'home';
     state.done = false;
-    $('#mode-recite').hidden = false;
-    $('#fill-work').hidden = true;
     renderHome();
     window.scrollTo(0, 0);
   }

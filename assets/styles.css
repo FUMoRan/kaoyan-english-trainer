@@ -1209,7 +1209,7 @@ select { appearance: none; background-image: linear-gradient(45deg, transparent 
 .recite-gap.is-hint i { font-style: normal; }
 .recite-gap.is-ok {
   border-bottom-color: var(--success);
-  background: color-mix(in srgb, var(--success) 12%, transparent);
+  background: transparent;
   color: var(--success);
 }
 .recite-gap.is-miss {

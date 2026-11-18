@@ -755,22 +755,25 @@ window.App = window.App || {};
     }
     const percent = state.queue.length ? Math.round((state.index + 1) / state.queue.length * 100) : 0;
 
-    const answerBox = state.level <= 1
-      ? '<div class="recite-start-row"><button type="button" class="btn primary" data-recite-level="2">开始挖空</button>' +
-        '<span class="hint">先读一遍，再进入关键词挖空。</span></div>'
-      : '<label class="field recite-answer-field"><span class="label">' +
-          (state.level >= 4 ? '默写整句（淡色可变部分不用写）' : '按顺序填被挖掉的词，用空格分隔') + '</span>' +
-          '<textarea id="recite-input" class="recite-input" rows="' + (state.level >= 4 ? 3 : 2) + '" spellcheck="false" ' +
-          'placeholder="' + (state.level >= 4 ? 'Type the sentence…' : 'missing words…') + '">' + esc(state.answer) + '</textarea>' +
-        '</label>' +
-        '<div class="recite-actions-row">' +
-          '<button type="button" class="btn primary" id="btn-recite-check">检查</button>' +
-          '<button type="button" class="btn ghost" id="btn-recite-reveal">看答案</button>' +
-          '<button type="button" class="btn ghost" id="btn-recite-hint">' + (state.hint ? '收起首字母' : '首字母提示') + '</button>' +
-          (('speechSynthesis' in window)
-            ? '<button type="button" class="btn ghost" id="btn-recite-tts">朗读</button>'
-            : '') +
-        '</div>';
+    const answerBox = state.revealed
+      ? '<div class="recite-result-actions"><button type="button" class="btn primary" id="btn-recite-next">' +
+        (state.index + 1 >= state.queue.length ? '完成本轮' : '下一句') + '</button></div>'
+      : (state.level <= 1
+        ? '<div class="recite-start-row"><button type="button" class="btn primary" data-recite-level="2">开始挖空</button>' +
+          '<span class="hint">先读一遍，再进入关键词挖空。</span></div>'
+        : '<label class="field recite-answer-field"><span class="label">' +
+            (state.level >= 4 ? '默写整句（淡色可变部分不用写）' : '按顺序填被挖掉的词，用空格分隔') + '</span>' +
+            '<textarea id="recite-input" class="recite-input" rows="' + (state.level >= 4 ? 3 : 2) + '" spellcheck="false" ' +
+            'placeholder="' + (state.level >= 4 ? 'Type the sentence…' : 'missing words…') + '">' + esc(state.answer) + '</textarea>' +
+          '</label>' +
+          '<div class="recite-actions-row">' +
+            '<button type="button" class="btn primary" id="btn-recite-check">检查</button>' +
+            '<button type="button" class="btn ghost" id="btn-recite-reveal">看答案</button>' +
+            '<button type="button" class="btn ghost" id="btn-recite-hint">' + (state.hint ? '收起首字母' : '首字母提示') + '</button>' +
+            (('speechSynthesis' in window)
+              ? '<button type="button" class="btn ghost" id="btn-recite-tts">朗读</button>'
+              : '') +
+          '</div>');
 
     $('#recite-session').innerHTML =
       '<div class="recite-head">' +
@@ -785,13 +788,9 @@ window.App = window.App || {};
         levelChips() +
         variablesLine(item) +
         '<p class="recite-sentence">' + sentenceHtml(item, hidden, status) + '</p>' +
-        (state.revealed ? '<p class="recite-revealed">已显示答案，照着读一遍，再点「下一句」。</p>' : '') +
+        (state.revealed ? '<p class="recite-revealed">已显示答案，这一句不计成绩，照着读一遍再下一句。</p>' : '') +
         answerBox +
         (state.result ? resultHtml(item) : '') +
-        (state.revealed && !state.result
-          ? '<div class="recite-result-actions"><button type="button" class="btn primary" id="btn-recite-next">' +
-            (state.index + 1 >= state.queue.length ? '完成本轮' : '下一句') + '</button></div>'
-          : '') +
       '</div>';
 
     const input = $('#recite-input');
@@ -803,7 +802,7 @@ window.App = window.App || {};
 
   function check() {
     const item = currentItem();
-    if (!item || state.level <= 1) return;
+    if (!item || state.level <= 1 || state.revealed) return;
     if (!String(state.answer || '').trim()) {
       const box = $('#recite-result') || $('#recite-session');
       if (box) box.insertAdjacentHTML('beforeend', '<p class="hint recite-warn">先写点内容再检查。</p>');

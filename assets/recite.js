@@ -593,8 +593,14 @@ window.App = window.App || {};
         : '<div class="recite-empty"><b>暂时没有可背的句子</b><span>换一个分类看看。</span></div>';
     }
 
+    const manageRow = state.tab === 'mine' && cols.mine.length
+      ? '<div class="recite-manage-row"><span class="hint">可重命名、复制或删除已保存的模板</span>' +
+        '<button type="button" class="btn ghost small" data-recite-manage>管理</button></div>'
+      : '';
+
     $('#recite-home').innerHTML = hero +
       '<div class="tpl-modes recite-tabs" role="tablist" aria-label="背诵分类">' + tabs + '</div>' +
+      manageRow +
       '<div class="recite-list">' + list + '</div>';
     $('#recite-home').hidden = false;
     $('#recite-session').hidden = true;
@@ -995,6 +1001,11 @@ window.App = window.App || {};
       return;
     }
 
+    if (event.target.closest('[data-recite-manage]')) {
+      if (App.combo && App.combo.manage) App.combo.manage();
+      return;
+    }
+
     const row = event.target.closest('[data-recite-scope]');
     if (row) {
       startCollection(findCollection(row.dataset.reciteScope), false);
@@ -1089,5 +1100,18 @@ window.App = window.App || {};
     window.scrollTo(0, 0);
   }
 
-  App.recite = { show: show, init: bind };
+  function refresh() {
+    state.collections = buildCollections();
+    if (state.view === 'session' && state.collection &&
+        state.collection.id.indexOf('mine:') === 0 && !findCollection(state.collection.id)) {
+      state.view = 'home';
+      state.queue = [];
+      state.index = 0;
+      renderHome();
+      return;
+    }
+    if (state.view === 'home') renderHome();
+  }
+
+  App.recite = { show: show, init: bind, refresh: refresh };
 })(window.App);

@@ -28,6 +28,7 @@ window.App = window.App || {};
 
   let bound = false;
   let focusKey = '';
+  const manageUI = { editId: '', confirmId: '' };
 
   /* ---------------- 存储 ---------------- */
 
@@ -278,19 +279,199 @@ window.App = window.App || {};
         '<p class="tpl-topic-sample-text">' + esc(t.sample).replace(/\n/g, '<br>') + '</p></div>' : '');
   }
 
+  function savedRowHtml(item) {
+    const s = A().scene(item.setup && item.setup.sceneId);
+    const when = item.at ? new Date(item.at).toLocaleDateString('zh-CN') : '';
+    const meta = (s ? s.label : '已失效的场景') + (when ? ' · ' + when : '');
+    return '<div class="saved-row">' +
+      '<div class="saved-main"><b>' + esc(item.name) + '</b><span>' + esc(meta) + '</span></div>' +
+      '<button type="button" class="btn ghost small" data-load-combo="' + esc(item.id) + '">载入</button>' +
+      '<button type="button" class="link-btn danger" data-del-combo="' + esc(item.id) + '">删除</button>' +
+      '</div>';
+  }
+
   function savedHtml() {
     const list = readJSON(SAVED_KEY, []);
     if (!list.length) return '<p class="hint">还没有保存的组合。定好句子后，在预览页可以存成「我的模板」。</p>';
-    return list.map(function (item) {
-      const s = A().scene(item.setup && item.setup.sceneId);
-      const when = item.at ? new Date(item.at).toLocaleDateString('zh-CN') : '';
-      return '<div class="saved-row">' +
-        '<div class="saved-main"><b>' + esc(item.name) + '</b>' +
-        '<span>' + esc(s ? s.label : '已失效的场景') + (when ? ' · ' + when : '') + '</span></div>' +
-        '<button type="button" class="btn ghost small" data-load-combo="' + esc(item.id) + '">载入</button>' +
-        '<button type="button" class="link-btn danger" data-del-combo="' + esc(item.id) + '">删除</button>' +
-        '</div>';
-    }).join('');
+    return list.map(savedRowHtml).join('');
+  }
+
+  /* ---------------- 我的模板管理 ---------------- */
+
+  function manageRowHtml(item) {
+    const s = A().scene(item.setup && item.setup.sceneId);
+    const when = item.at ? new Date(item.at).toLocaleDateString('zh-CN') : '';
+    const meta = (s ? s.label : '已失效的场景') + (when ? ' · ' + when : '');
+    if (manageUI.editId === item.id) {
+      return '<div class="saved-row is-editing">' +
+        '<input type="text" class="saved-name-input" maxlength="24" value="' + esc(item.name) +
+        '" data-manage-input="' + esc(item.id) + '" aria-label="模板名称">' +
+        '<div class="saved-actions">' +
+        '<button type="button" class="btn primary small" data-manage-save="' + esc(item.id) + '">保存</button>' +
+        '<button type="button" class="btn ghost small" data-manage-cancel="1">取消</button>' +
+        '</div></div>';
+    }
+    if (manageUI.confirmId === item.id) {
+      return '<div class="saved-row is-confirming">' +
+        '<div class="saved-main"><b>' + esc(item.name) + '</b><span>删除后不可恢复。</span></div>' +
+        '<div class="saved-actions">' +
+        '<button type="button" class="btn small" data-manage-del-confirm="' + esc(item.id) + '">确认删除</button>' +
+        '<button type="button" class="btn ghost small" data-manage-cancel="1">取消</button>' +
+        '</div></div>';
+    }
+    return '<div class="saved-row">' +
+      '<div class="saved-main"><b>' + esc(item.name) + '</b><span>' + esc(meta) + '</span></div>' +
+      '<div class="saved-actions">' +
+      '<button type="button" class="btn ghost small" data-manage-rename="' + esc(item.id) + '">重命名</button>' +
+      '<button type="button" class="btn ghost small" data-manage-copy="' + esc(item.id) + '">复制</button>' +
+      '<button type="button" class="link-btn danger" data-manage-del="' + esc(item.id) + '">删除</button>' +
+      '</div></div>';
+  }
+
+  function setManageNote(text) {
+    const note = $('#saved-note');
+    if (note) note.textContent = text;
+  }
+
+  function renderManage() {
+    const box = $('#saved-manage');
+    if (!box) return;
+    const list = readJSON(SAVED_KEY, []);
+    box.innerHTML = list.length
+      ? list.map(manageRowHtml).join('')
+      : '<p class="hint">还没有保存的模板。去「模板填空 → 自选模板」拼一篇，预览页就能保存。</p>';
+    const input = box.querySelector('[data-manage-input]');
+    if (input) {
+      input.focus();
+      input.select();
+    }
+  }
+
+  function notifySaved() {
+    const saved = $('#combo-saved');
+    if (saved) saved.innerHTML = savedHtml();
+    if (App.recite && App.recite.refresh) App.recite.refresh();
+  }
+
+  function openManage() {
+    manageUI.editId = '';
+    manageUI.confirmId = '';
+    renderManage();
+    setManageNote('重命名只改名字；复制会生成独立副本，背诵进度另算。');
+    $('#saved-modal').hidden = false;
+  }
+
+  function closeManage() {
+    $('#saved-modal').hidden = true;
+    manageUI.editId = '';
+    manageUI.confirmId = '';
+    renderStep1();
+  }
+
+  function renameCombo(id, name) {
+    const list = readJSON(SAVED_KEY, []);
+    const item = list.filter(function (x) { return x.id === id; })[0];
+    const next = String(name || '').trim().slice(0, 24);
+    if (!item || !next) {
+      manageUI.editId = '';
+      renderManage();
+      return;
+    }
+    item.name = next;
+    writeJSON(SAVED_KEY, list);
+    manageUI.editId = '';
+    renderManage();
+    setManageNote('已重命名为「' + next + '」。');
+    notifySaved();
+  }
+
+  function copyCombo(id) {
+    const list = readJSON(SAVED_KEY, []);
+    const item = list.filter(function (x) { return x.id === id; })[0];
+    if (!item) return;
+    if (list.length >= 30) {
+      setManageNote('最多保存 30 个模板，先删掉一些再复制。');
+      return;
+    }
+    const copy = {
+      id: 'c' + Date.now(),
+      name: (item.name + ' 副本').slice(0, 24),
+      at: Date.now(),
+      setup: JSON.parse(JSON.stringify(item.setup || {}))
+    };
+    list.splice(list.indexOf(item) + 1, 0, copy);
+    writeJSON(SAVED_KEY, list.slice(0, 30));
+    renderManage();
+    setManageNote('已复制为「' + copy.name + '」。');
+    notifySaved();
+  }
+
+  function removeCombo(id) {
+    const list = readJSON(SAVED_KEY, []).filter(function (x) { return x.id !== id; });
+    writeJSON(SAVED_KEY, list);
+    manageUI.confirmId = '';
+    renderManage();
+    setManageNote('已删除。');
+    notifySaved();
+  }
+
+  function onManageClick(event) {
+    const modal = $('#saved-modal');
+    if (!modal) return;
+    if (event.target === modal || event.target.closest('[data-saved-close]')) {
+      closeManage();
+      return;
+    }
+    const rename = event.target.closest('[data-manage-rename]');
+    if (rename) {
+      manageUI.editId = rename.getAttribute('data-manage-rename');
+      manageUI.confirmId = '';
+      renderManage();
+      return;
+    }
+    const save = event.target.closest('[data-manage-save]');
+    if (save) {
+      const id = save.getAttribute('data-manage-save');
+      const input = modal.querySelector('[data-manage-input="' + id + '"]');
+      renameCombo(id, input ? input.value : '');
+      return;
+    }
+    const copy = event.target.closest('[data-manage-copy]');
+    if (copy) {
+      copyCombo(copy.getAttribute('data-manage-copy'));
+      return;
+    }
+    const del = event.target.closest('[data-manage-del]');
+    if (del) {
+      manageUI.confirmId = del.getAttribute('data-manage-del');
+      manageUI.editId = '';
+      renderManage();
+      return;
+    }
+    const confirmDel = event.target.closest('[data-manage-del-confirm]');
+    if (confirmDel) {
+      removeCombo(confirmDel.getAttribute('data-manage-del-confirm'));
+      return;
+    }
+    if (event.target.closest('[data-manage-cancel]')) {
+      manageUI.editId = '';
+      manageUI.confirmId = '';
+      renderManage();
+    }
+  }
+
+  function onManageKey(event) {
+    if (event.key === 'Escape') {
+      event.stopPropagation();
+      manageUI.editId = '';
+      manageUI.confirmId = '';
+      renderManage();
+      return;
+    }
+    if (event.key === 'Enter' && event.target.matches('[data-manage-input]')) {
+      event.preventDefault();
+      renameCombo(event.target.getAttribute('data-manage-input'), event.target.value);
+    }
   }
 
   function renderStep1() {
@@ -330,7 +511,11 @@ window.App = window.App || {};
       '</section>' +
 
       '<section class="combo-block">' +
-      '<h3>③ 我保存过的模板</h3>' +
+      '<div class="saved-head"><h3>③ 我保存过的模板</h3>' +
+      (readJSON(SAVED_KEY, []).length
+        ? '<button type="button" class="btn ghost small" data-manage-open="1">管理</button>'
+        : '') +
+      '</div>' +
       '<div id="combo-saved" class="saved-list">' + savedHtml() + '</div>' +
       '</section>' +
 
@@ -671,7 +856,14 @@ window.App = window.App || {};
     if (loadBtn) { loadCombo(loadBtn.dataset.loadCombo); return; }
 
     const delBtn = target.closest('[data-del-combo]');
-    if (delBtn) { deleteCombo(delBtn.dataset.delCombo); return; }
+    if (delBtn) {
+      openManage();
+      manageUI.confirmId = delBtn.dataset.delCombo;
+      renderManage();
+      return;
+    }
+
+    if (target.closest('[data-manage-open]')) { openManage(); return; }
   }
 
   function onChange(e) {
@@ -827,15 +1019,6 @@ window.App = window.App || {};
     window.scrollTo(0, 0);
   }
 
-  function deleteCombo(id) {
-    const list = readJSON(SAVED_KEY, []);
-    const item = list.filter(function (x) { return x.id === id; })[0];
-    if (!item) return;
-    if (!window.confirm('删除「' + item.name + '」？')) return;
-    writeJSON(SAVED_KEY, list.filter(function (x) { return x.id !== id; }));
-    renderStep1();
-  }
-
   /* ---------------- 对外接口 ---------------- */
 
   function bind() {
@@ -844,6 +1027,11 @@ window.App = window.App || {};
     if (!root) return;
     root.addEventListener('click', onClick);
     root.addEventListener('change', onChange);
+    const modal = $('#saved-modal');
+    if (modal) {
+      modal.addEventListener('click', onManageClick);
+      modal.addEventListener('keydown', onManageKey);
+    }
     bound = true;
   }
 
@@ -864,6 +1052,7 @@ window.App = window.App || {};
     show: show,
     init: function () { bind(); restore(); },
     build: buildFromSetup,
-    saved: savedList
+    saved: savedList,
+    manage: openManage
   };
 })(window.App);

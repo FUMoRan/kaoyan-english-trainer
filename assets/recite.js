@@ -503,9 +503,22 @@ window.App = window.App || {};
     }
     const missing = [];
     const extra = [];
-    for (let a = 0; a < n; a += 1) if (!matchA[a]) missing.push(a);
-    for (let b = 0; b < m; b += 1) if (!matchB[b]) extra.push(b);
-    return { matchA: matchA, missing: missing, extra: extra };
+    const wrong = [];
+    let a = 0;
+    let b = 0;
+    while (a < n || b < m) {
+      if (a < n && matchA[a]) { a += 1; continue; }
+      if (b < m && matchB[b]) { b += 1; continue; }
+      const runA = [];
+      const runB = [];
+      while (a < n && !matchA[a]) { runA.push(a); a += 1; }
+      while (b < m && !matchB[b]) { runB.push(b); b += 1; }
+      const paired = Math.min(runA.length, runB.length);
+      for (let k = 0; k < paired; k += 1) wrong.push({ a: runA[k], b: runB[k] });
+      for (let k = paired; k < runA.length; k += 1) missing.push(runA[k]);
+      for (let k = paired; k < runB.length; k += 1) extra.push(runB[k]);
+    }
+    return { matchA: matchA, missing: missing, extra: extra, wrong: wrong };
   }
 
   /* ---------------- 首页 ---------------- */
@@ -692,17 +705,30 @@ window.App = window.App || {};
         (r.level >= 4 ? '这句已经能整句默写，标为熟练。' : '升到第 ' + Math.min(4, r.level + 1) + ' 级。') +
         (r.ai ? ' AI 复核也通过了。' : '') + '</p>';
     } else {
+      const counts = [];
+      if (r.wrong.length) counts.push('错 ' + r.wrong.length + ' 个');
+      if (r.missing.length) counts.push('漏 ' + r.missing.length + ' 个');
+      if (r.extra.length) counts.push('多写 ' + r.extra.length + ' 个');
       head = '<p class="recite-verdict is-fail"><b>再练一次</b> ' +
-        '本句挖空 ' + hiddenCount + ' 个词，' +
-        (r.missing.length ? '漏了 ' + r.missing.length + ' 个' : '没有漏词') +
-        (r.extra.length ? '，多写 ' + r.extra.length + ' 个' : '') +
+        '本句挖空 ' + hiddenCount + ' 个词，' + (counts.join('、') || '没有写对') +
         '。已降到第 ' + progressOf(item.key).level + ' 级。</p>';
     }
 
-    let extra = '';
-    if (!r.pass && r.extra.length) {
-      extra = '<p class="recite-extra">多写：' + r.extra.map(function (word) { return esc(word.text); }).join('、') + '</p>';
+    const detail = [];
+    if (!r.pass && r.wrong.length) {
+      detail.push('错词：' + r.wrong.map(function (pair) {
+        return esc(pair.expected) + ' → ' + esc(pair.got);
+      }).join('、'));
     }
+    if (!r.pass && r.missing.length) {
+      detail.push('漏写：' + r.missing.map(function (k) {
+        return esc(r.expected[k].display);
+      }).join('、'));
+    }
+    if (!r.pass && r.extra.length) {
+      detail.push('多写：' + r.extra.map(function (word) { return esc(word.display); }).join('、'));
+    }
+    const extra = detail.length ? '<p class="recite-diff">' + detail.join('；') + '</p>' : '';
     let ai = '';
     if (!r.pass && r.level === 4) {
       if (App.store.hasKey()) {
@@ -751,6 +777,9 @@ window.App = window.App || {};
       status = {};
       state.result.expected.forEach(function (row, k) {
         status[row.tokenIndex] = state.result.matchA[k] ? 'is-ok' : 'is-miss';
+      });
+      state.result.wrong.forEach(function (pair) {
+        status[pair.tokenIndex] = 'is-wrong';
       });
     }
     const percent = state.queue.length ? Math.round((state.index + 1) / state.queue.length * 100) : 0;
@@ -813,16 +842,16 @@ window.App = window.App || {};
     const expected = [];
     item.tokens.forEach(function (token, index) {
       if (hidden[index] && token.word && !token.variable) {
-        expected.push({ tokenIndex: index, text: normalizeWord(token.text) });
+        expected.push({ tokenIndex: index, text: normalizeWord(token.text), display: token.text });
       }
     });
     const words = String(state.answer).trim().split(/\s+/).filter(Boolean);
     const got = words.map(function (word) {
-      return { text: normalizeWord(word) };
+      return { text: normalizeWord(word), display: word };
     }).filter(function (row) { return row.text; });
 
     const diff = lcsDiff(expected.map(function (row) { return row.text; }), got.map(function (row) { return row.text; }));
-    const pass = diff.missing.length === 0 && diff.extra.length === 0;
+    const pass = diff.missing.length === 0 && diff.extra.length === 0 && diff.wrong.length === 0;
 
     state.result = {
       pass: pass,
@@ -833,6 +862,13 @@ window.App = window.App || {};
       matchA: diff.matchA,
       missing: diff.missing,
       extra: diff.extra.map(function (index) { return got[index]; }),
+      wrong: diff.wrong.map(function (pair) {
+        return {
+          tokenIndex: expected[pair.a].tokenIndex,
+          expected: expected[pair.a].display,
+          got: got[pair.b].display
+        };
+      }),
       ai: false,
       aiNote: ''
     };

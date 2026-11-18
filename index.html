@@ -14,7 +14,7 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <link rel="icon" type="image/png" href="assets/icons/icon-192.png">
   <link rel="apple-touch-icon" href="assets/icons/icon-192.png">
-  <link rel="stylesheet" href="assets/styles.css">
+  <link rel="stylesheet" href="assets/styles.css?v=12">
 </head>
 <body>
   <header class="topbar">
@@ -207,20 +207,21 @@
     <button id="btn-stop" class="link-btn">停止</button>
   </div>
 
-  <script src="assets/vendor/marked.min.js"></script>
-  <script src="assets/vendor/purify.min.js"></script>
-  <script src="assets/config.js"></script>
-  <script src="assets/storage.js"></script>
-  <script src="assets/api.js"></script>
-  <script src="assets/markdown.js"></script>
-  <script src="assets/runner.js"></script>
-  <script src="assets/review.js"></script>
-  <script src="assets/templates-data.js"></script>
-  <script src="assets/ai-templates-data.js"></script>
-  <script src="assets/fill.js"></script>
-  <script src="assets/combo.js"></script>
-  <script src="assets/recite.js"></script>
-  <script src="assets/tpl.js"></script>
-  <script src="assets/ui.js"></script>
+  <!-- 每次改动静态资源后，把下面的 ?v= 数字加一，避免手机缓存到旧 JS 与新的 HTML 混用 -->
+  <script src="assets/vendor/marked.min.js?v=12"></script>
+  <script src="assets/vendor/purify.min.js?v=12"></script>
+  <script src="assets/config.js?v=12"></script>
+  <script src="assets/storage.js?v=12"></script>
+  <script src="assets/api.js?v=12"></script>
+  <script src="assets/markdown.js?v=12"></script>
+  <script src="assets/runner.js?v=12"></script>
+  <script src="assets/review.js?v=12"></script>
+  <script src="assets/templates-data.js?v=12"></script>
+  <script src="assets/ai-templates-data.js?v=12"></script>
+  <script src="assets/fill.js?v=12"></script>
+  <script src="assets/combo.js?v=12"></script>
+  <script src="assets/recite.js?v=12"></script>
+  <script src="assets/tpl.js?v=12"></script>
+  <script src="assets/ui.js?v=12"></script>
 </body>
 </html>

@@ -14,7 +14,7 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <link rel="icon" type="image/png" href="assets/icons/icon-192.png">
   <link rel="apple-touch-icon" href="assets/icons/icon-192.png">
-  <link rel="stylesheet" href="assets/styles.css?v=12">
+  <link rel="stylesheet" href="assets/styles.css?v=13">
 </head>
 <body>
   <header class="topbar">
@@ -188,6 +188,7 @@
         <h2 id="peek-title">空位</h2>
         <button type="button" class="btn ghost small" data-peek-close="1">关闭</button>
       </div>
+      <p class="peek-meta" id="peek-meta"></p>
       <div class="peek-block">
         <h3>填什么</h3>
         <p id="peek-hint"></p>
@@ -195,6 +196,10 @@
       <div class="peek-block">
         <h3>示例</h3>
         <p id="peek-sample" class="peek-sample"></p>
+      </div>
+      <div class="peek-block">
+        <h3>在全文中的位置</h3>
+        <div id="peek-context" class="peek-context"></div>
       </div>
       <p class="hint">示例只用来理解结构，实际写作时换成你题目的主题词、数据或观点。</p>
     </div>
@@ -208,20 +213,20 @@
   </div>
 
   <!-- 每次改动静态资源后，把下面的 ?v= 数字加一，避免手机缓存到旧 JS 与新的 HTML 混用 -->
-  <script src="assets/vendor/marked.min.js?v=12"></script>
-  <script src="assets/vendor/purify.min.js?v=12"></script>
-  <script src="assets/config.js?v=12"></script>
-  <script src="assets/storage.js?v=12"></script>
-  <script src="assets/api.js?v=12"></script>
-  <script src="assets/markdown.js?v=12"></script>
-  <script src="assets/runner.js?v=12"></script>
-  <script src="assets/review.js?v=12"></script>
-  <script src="assets/templates-data.js?v=12"></script>
-  <script src="assets/ai-templates-data.js?v=12"></script>
-  <script src="assets/fill.js?v=12"></script>
-  <script src="assets/combo.js?v=12"></script>
-  <script src="assets/recite.js?v=12"></script>
-  <script src="assets/tpl.js?v=12"></script>
-  <script src="assets/ui.js?v=12"></script>
+  <script src="assets/vendor/marked.min.js?v=13"></script>
+  <script src="assets/vendor/purify.min.js?v=13"></script>
+  <script src="assets/config.js?v=13"></script>
+  <script src="assets/storage.js?v=13"></script>
+  <script src="assets/api.js?v=13"></script>
+  <script src="assets/markdown.js?v=13"></script>
+  <script src="assets/runner.js?v=13"></script>
+  <script src="assets/review.js?v=13"></script>
+  <script src="assets/templates-data.js?v=13"></script>
+  <script src="assets/ai-templates-data.js?v=13"></script>
+  <script src="assets/fill.js?v=13"></script>
+  <script src="assets/combo.js?v=13"></script>
+  <script src="assets/recite.js?v=13"></script>
+  <script src="assets/tpl.js?v=13"></script>
+  <script src="assets/ui.js?v=13"></script>
 </body>
 </html>

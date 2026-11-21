@@ -630,6 +630,7 @@ window.App = window.App || {};
     const circles = App.templates.circles || '';
     const re = new RegExp('[' + circles + ']', 'g');
     const total = (t.paragraphs.join('').match(re) || []).length;
+    const zhAll = (App.templates.zh || {})[t.id] || [];
     return '<div class="recite-head recite-preview-head">' +
         '<button type="button" class="recite-back" data-recite-home>返回</button>' +
         '<div class="recite-head-main"><h2>' + esc(t.no + ' · ' + t.title) + '</h2>' +
@@ -638,11 +639,17 @@ window.App = window.App || {};
       (t.use ? '<p class="recite-preview-use">' + esc(t.use) + '</p>' : '') +
       '<div class="recite-preview-body">' +
         t.paragraphs.map(function (para, i) {
+          const zhList = zhAll[i] || [];
           return '<section class="preview-para"><h3>第 ' + (i + 1) + ' 段</h3>' +
-            '<p class="preview-text">' + previewParaHtml(para, circles) + '</p></section>';
+            splitSentences(para).map(function (sentence, k) {
+              return '<div class="preview-sentence">' +
+                '<p class="preview-text">' + previewParaHtml(sentence, circles) + '</p>' +
+                (zhList[k] ? '<p class="preview-zh">' + esc(zhList[k]) + '</p>' : '') +
+                '</div>';
+            }).join('') + '</section>';
         }).join('') +
       '</div>' +
-      '<p class="hint">点任意横线空位，查看这一空该填什么。</p>';
+      '<p class="hint">点任意横线空位，查看填法、示例和它在全文中的上下文。</p>';
   }
 
   function renderPreview(col) {
@@ -662,9 +669,33 @@ window.App = window.App || {};
     if (!t) return;
     const blank = (t.blanks || []).filter(function (b) { return Number(b.no) === no; })[0];
     if (!blank) return;
-    $('#peek-title').textContent = '空位 ' + (blank.label || no);
+    const label = blank.label || String(no);
+    const zhAll = (App.templates.zh || {})[t.id] || [];
+    const hits = [];
+    t.paragraphs.forEach(function (para, pi) {
+      splitSentences(para).forEach(function (sentence, si) {
+        if (sentence.indexOf(label) < 0) return;
+        hits.push({
+          para: pi + 1,
+          index: si + 1,
+          en: sentence,
+          zh: (zhAll[pi] || [])[si] || ''
+        });
+      });
+    });
+    $('#peek-title').textContent = '空位 ' + label;
+    $('#peek-meta').textContent = hits.length > 1
+      ? '全文出现 ' + hits.length + ' 次，每处都要填同一个词或同义表达。'
+      : '全文出现 ' + (hits.length || 1) + ' 次。';
     $('#peek-hint').textContent = blank.hint || '按模板语境填入对应的主题词、数据或观点。';
     $('#peek-sample').textContent = blank.sample || '—';
+    $('#peek-context').innerHTML = hits.map(function (hit) {
+      return '<div class="peek-context-item">' +
+        '<span class="peek-where">第 ' + hit.para + ' 段 · 第 ' + hit.index + ' 句</span>' +
+        '<p class="peek-sentence">' + esc(hit.en).split(label).join('<b>' + label + '</b>') + '</p>' +
+        (hit.zh ? '<p class="peek-zh">' + esc(hit.zh) + '</p>' : '') +
+        '</div>';
+    }).join('');
     const modal = $('#peek-modal');
     modal.hidden = false;
     const close = modal.querySelector('[data-peek-close]');

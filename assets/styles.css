@@ -1110,6 +1110,8 @@ select { appearance: none; background-image: linear-gradient(45deg, transparent 
 }
 .preview-para h3 { margin: 0 0 8px; font-size: 12px; font-weight: 500; color: var(--text-muted); }
 .preview-text { margin: 0; font-size: 15px; line-height: 2.1; }
+.preview-sentence + .preview-sentence { margin-top: 10px; padding-top: 10px; border-top: 1px dashed var(--border); }
+.preview-zh { margin: 4px 0 0; font-size: 13px; line-height: 1.7; color: var(--text-muted); }
 
 .preview-blank {
   display: inline-flex;
@@ -1137,6 +1139,17 @@ select { appearance: none; background-image: linear-gradient(45deg, transparent 
   border-radius: var(--radius);
   color: var(--text);
 }
+.peek-meta { margin: 0 0 10px; font-size: 12.5px; color: var(--brand); }
+.peek-context { display: flex; flex-direction: column; gap: 8px; }
+.peek-context-item {
+  padding: 9px 10px;
+  background: var(--surface-muted);
+  border-radius: var(--radius);
+}
+.peek-where { display: block; margin-bottom: 3px; font-size: 11.5px; color: var(--text-muted); }
+.peek-sentence { margin: 0; font-size: 13.5px; line-height: 1.65; }
+.peek-sentence b { color: var(--brand); }
+.peek-zh { margin: 3px 0 0; font-size: 12.5px; line-height: 1.65; color: var(--text-muted); }
 
 .recite-pill {
   display: inline-flex;

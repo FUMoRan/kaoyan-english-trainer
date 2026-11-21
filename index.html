@@ -14,7 +14,7 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <link rel="icon" type="image/png" href="assets/icons/icon-192.png">
   <link rel="apple-touch-icon" href="assets/icons/icon-192.png">
-  <link rel="stylesheet" href="assets/styles.css?v=13">
+  <link rel="stylesheet" href="assets/styles.css?v=14">
 </head>
 <body>
   <header class="topbar">
@@ -60,7 +60,11 @@
       </div>
 
       <div id="mode-whole">
-        <p class="hint tpl-intro">七篇整篇连排模板，按题型选一篇。你只需要把编号空位换成自己的主题词、数据和观点，填完交给 AI 逐空判断。</p>
+        <div class="tpl-kinds" id="tpl-kinds" role="tablist" aria-label="整篇模板分类">
+          <button type="button" class="kind-chip is-active" data-tpl-kind="big" role="tab">大作文 · 7 篇</button>
+          <button type="button" class="kind-chip" data-tpl-kind="small" role="tab">小作文 · 4 篇</button>
+        </div>
+        <p class="hint tpl-intro" id="tpl-intro">七篇整篇连排模板，按题型选一篇。你只需要把编号空位换成自己的主题词、数据和观点，填完交给 AI 逐空判断。</p>
         <div id="tpl-pick" class="tpl-pick"></div>
       </div>
 
@@ -213,20 +217,21 @@
   </div>
 
   <!-- 每次改动静态资源后，把下面的 ?v= 数字加一，避免手机缓存到旧 JS 与新的 HTML 混用 -->
-  <script src="assets/vendor/marked.min.js?v=13"></script>
-  <script src="assets/vendor/purify.min.js?v=13"></script>
-  <script src="assets/config.js?v=13"></script>
-  <script src="assets/storage.js?v=13"></script>
-  <script src="assets/api.js?v=13"></script>
-  <script src="assets/markdown.js?v=13"></script>
-  <script src="assets/runner.js?v=13"></script>
-  <script src="assets/review.js?v=13"></script>
-  <script src="assets/templates-data.js?v=13"></script>
-  <script src="assets/ai-templates-data.js?v=13"></script>
-  <script src="assets/fill.js?v=13"></script>
-  <script src="assets/combo.js?v=13"></script>
-  <script src="assets/recite.js?v=13"></script>
-  <script src="assets/tpl.js?v=13"></script>
-  <script src="assets/ui.js?v=13"></script>
+  <script src="assets/vendor/marked.min.js?v=14"></script>
+  <script src="assets/vendor/purify.min.js?v=14"></script>
+  <script src="assets/config.js?v=14"></script>
+  <script src="assets/storage.js?v=14"></script>
+  <script src="assets/api.js?v=14"></script>
+  <script src="assets/markdown.js?v=14"></script>
+  <script src="assets/runner.js?v=14"></script>
+  <script src="assets/review.js?v=14"></script>
+  <script src="assets/templates-data.js?v=14"></script>
+  <script src="assets/letter-templates-data.js?v=14"></script>
+  <script src="assets/ai-templates-data.js?v=14"></script>
+  <script src="assets/fill.js?v=14"></script>
+  <script src="assets/combo.js?v=14"></script>
+  <script src="assets/recite.js?v=14"></script>
+  <script src="assets/tpl.js?v=14"></script>
+  <script src="assets/ui.js?v=14"></script>
 </body>
 </html>

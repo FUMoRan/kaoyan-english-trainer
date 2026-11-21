@@ -15,7 +15,8 @@ window.App = window.App || {};
 
   const state = {
     template: null,
-    mode: 'whole'
+    mode: 'whole',
+    kind: 'big'
   };
 
   function readJSON(key, fallback) {
@@ -37,9 +38,29 @@ window.App = window.App || {};
 
   /* ---------------- 整篇模板选篇 ---------------- */
 
+  function letterList() {
+    return App.letters && App.letters.list ? App.letters.list : [];
+  }
+
+  function currentList() {
+    return state.kind === 'small' ? letterList() : App.templates.list;
+  }
+
+  function syncKindChips() {
+    document.querySelectorAll('#tpl-kinds [data-tpl-kind]').forEach(function (btn) {
+      btn.classList.toggle('is-active', btn.dataset.tplKind === state.kind);
+    });
+    const intro = $('#tpl-intro');
+    if (intro) {
+      intro.textContent = state.kind === 'small'
+        ? '四篇小作文模板，按题型选一篇：回复信、主动信、通知、纪要。第一段与第三段套话固定，第二段按题干要点填；填完同样交给 AI 逐空判断。'
+        : '七篇整篇连排模板，按题型选一篇。你只需要把编号空位换成自己的主题词、数据和观点，填完交给 AI 逐空判断。';
+    }
+  }
+
   function renderPick() {
     const active = state.template ? state.template.id : '';
-    $('#tpl-pick').innerHTML = App.templates.list.map(function (t) {
+    $('#tpl-pick').innerHTML = currentList().map(function (t) {
       return '<button type="button" class="tpl-card' + (t.id === active ? ' is-active' : '') +
         '" data-tpl="' + t.id + '">' +
         '<span class="tpl-card-top"><b>' + t.no + '</b><span>' + esc(t.kind) + '</span></span>' +
@@ -48,16 +69,20 @@ window.App = window.App || {};
         '<span class="tpl-card-foot">' + t.blanks.length + ' 空 · ' + esc(t.example) + '</span>' +
         '</button>';
     }).join('');
+    syncKindChips();
   }
 
   function headHtml(t) {
-    return '<div class="tpl-head-main"><p class="eyebrow">整篇模板 ' + t.no + ' / 07</p>' +
+    const isSmall = state.kind === 'small';
+    return '<div class="tpl-head-main"><p class="eyebrow">' +
+      (isSmall ? '小作文模板 ' : '整篇模板 ') + t.no + ' / ' + (isSmall ? '04' : '07') + '</p>' +
       '<h2>' + esc(t.kind) + ' · ' + esc(t.title) + '</h2>' +
       '<p class="tpl-use">' + esc(t.use) + '</p></div>';
   }
 
   function openTemplate(id) {
-    const t = App.templates.get(id);
+    const isSmall = state.kind === 'small';
+    const t = isSmall ? (App.letters && App.letters.get(id)) : App.templates.get(id);
     if (!t) return;
     state.template = t;
     writeJSON(ACTIVE_KEY, { id: id });
@@ -68,6 +93,7 @@ window.App = window.App || {};
       bucket: id,
       headHtml: headHtml(t),
       backLabel: '换一篇',
+      showTopic: !isSmall,
       onBack: showPicker
     });
     window.scrollTo(0, 0);
@@ -114,6 +140,17 @@ window.App = window.App || {};
       if (card) openTemplate(card.dataset.tpl);
     });
 
+    document.querySelectorAll('#tpl-kinds [data-tpl-kind]').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        const kind = btn.dataset.tplKind === 'small' ? 'small' : 'big';
+        if (kind === state.kind) return;
+        state.kind = kind;
+        state.template = null;
+        writeJSON(ACTIVE_KEY, { id: '' });
+        renderPick();
+      });
+    });
+
     document.querySelectorAll('#tpl-modes [data-tpl-mode]').forEach(function (btn) {
       btn.addEventListener('click', function () { switchMode(btn.dataset.tplMode); });
     });
@@ -121,6 +158,7 @@ window.App = window.App || {};
     const saved = readJSON(MODE_KEY, { mode: 'whole' });
     const mode = saved.mode === 'combo' ? 'combo' : 'whole';
     const active = readJSON(ACTIVE_KEY, { id: '' }).id;
+    const isLetter = !!(active && App.letters && App.letters.get(active));
 
     if (mode !== 'whole') {
       switchMode(mode);
@@ -128,7 +166,11 @@ window.App = window.App || {};
     }
     state.mode = 'whole';
     setChips();
-    if (active && App.templates.get(active)) openTemplate(active);
+    if (isLetter) state.kind = 'small';
+    if (active && (isLetter || App.templates.get(active))) {
+      renderPick();
+      openTemplate(active);
+    }
   }
 
   App.tpl = {

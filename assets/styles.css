@@ -449,6 +449,26 @@ select { appearance: none; background-image: linear-gradient(45deg, transparent 
   gap: 12px;
 }
 
+.tpl-kinds { display: flex; gap: 6px; margin-bottom: 10px; }
+.kind-chip {
+  padding: 6px 14px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--text-muted);
+  font: inherit;
+  font-size: 12.5px;
+  cursor: pointer;
+  transition: border-color .15s, color .15s, background .15s;
+}
+.kind-chip:hover { border-color: color-mix(in srgb, var(--brand) 45%, var(--border)); }
+.kind-chip.is-active {
+  background: color-mix(in srgb, var(--brand) 10%, var(--surface));
+  border-color: var(--brand);
+  color: var(--text);
+  font-weight: 500;
+}
+
 .tpl-card {
   display: flex;
   flex-direction: column;
@@ -1043,7 +1063,8 @@ select { appearance: none; background-image: linear-gradient(45deg, transparent 
 }
 .recite-resume:hover { text-decoration: underline; }
 
-.recite-tabs { margin: 18px 0 12px; }
+.recite-tabs { margin: 18px 0 12px; flex-wrap: wrap; }
+.recite-tabs .mode-chip { white-space: nowrap; }
 .recite-list { display: flex; flex-direction: column; gap: 8px; }
 .recite-row {
   display: grid;

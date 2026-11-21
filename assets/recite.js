@@ -114,7 +114,7 @@ window.App = window.App || {};
       const ch = s.charAt(i);
       if (ch === '.' || ch === '!' || ch === '?') {
         const rest = s.slice(i + 1);
-        if (/^\s*$/.test(rest) || /^\s+["'“‘(]?[A-Z0-9]/.test(rest)) {
+        if (/^\s*$/.test(rest) || /^\s+["'“‘(]?[A-Z0-9①-⑳]/.test(rest)) {
           out.push(s.slice(start, i + 1).trim());
           start = i + 1;
         }
@@ -242,7 +242,7 @@ window.App = window.App || {};
   /* ---------------- 内容集合 ---------------- */
 
   function buildCollections() {
-    const cols = { whole: [], ai: [], mine: [] };
+    const cols = { whole: [], letter: [], ai: [], mine: [] };
 
     App.templates.list.forEach(function (t) {
       const items = [];
@@ -267,6 +267,32 @@ window.App = window.App || {};
         });
       }
     });
+
+    if (App.letters && App.letters.list) {
+      App.letters.list.forEach(function (t) {
+        const items = [];
+        t.paragraphs.forEach(function (para, pi) {
+          itemsFromChunks(
+            chunksFromCircles(para, t.blanks),
+            {
+              source: 'letter',
+              key: 'l:' + t.id + ':' + pi,
+              label: t.no + ' · ' + t.title,
+              sub: t.kind + ' · 第 ' + (pi + 1) + ' 段'
+            },
+            items
+          );
+        });
+        if (items.length) {
+          cols.letter.push({
+            id: 'letter:' + t.id,
+            label: t.no + ' · ' + t.title,
+            meta: t.kind,
+            items: items
+          });
+        }
+      });
+    }
 
     App.aiTemplates.types.forEach(function (type) {
       type.scenes.forEach(function (sceneId) {
@@ -382,7 +408,7 @@ window.App = window.App || {};
 
   function allCollections() {
     const cols = state.collections || (state.collections = buildCollections());
-    return cols.whole.concat(cols.ai, cols.mine);
+    return cols.whole.concat(cols.letter, cols.ai, cols.mine);
   }
 
   function allItems() {
@@ -559,8 +585,8 @@ window.App = window.App || {};
           : '') +
       '</div>';
 
-    const tabs = ['whole', 'ai', 'mine'].map(function (id) {
-      const label = id === 'whole' ? '整篇模板' : (id === 'ai' ? 'AI 归来句库' : '我的模板');
+    const tabs = ['whole', 'letter', 'ai', 'mine'].map(function (id) {
+      const label = id === 'whole' ? '整篇模板' : (id === 'letter' ? '小作文' : (id === 'ai' ? 'AI 归来句库' : '我的模板'));
       return '<button type="button" class="mode-chip' + (state.tab === id ? ' is-active' : '') +
         '" data-recite-tab="' + id + '">' + label + '</button>';
     }).join('');
@@ -584,7 +610,7 @@ window.App = window.App || {};
           '<span class="recite-row-good">熟练 ' + stats.good + '</span>' +
         '</span>' +
         '</button>';
-      if (state.tab !== 'whole') return row;
+      if (state.tab !== 'whole' && state.tab !== 'letter') return row;
       return '<div class="recite-row-wrap">' + row +
         '<button type="button" class="recite-peek" data-recite-peek="' + esc(col.id) + '">看全文与空位指导</button>' +
         '</div>';
@@ -614,7 +640,15 @@ window.App = window.App || {};
   /* ---------------- 整篇：看全文与空位指导 ---------------- */
 
   function findTemplate(id) {
-    return (App.templates.list || []).filter(function (t) { return t.id === id; })[0] || null;
+    const big = (App.templates.list || []).filter(function (t) { return t.id === id; })[0];
+    if (big) return big;
+    const small = ((App.letters && App.letters.list) || []).filter(function (t) { return t.id === id; })[0];
+    return small || null;
+  }
+
+  function zhOf(t) {
+    return ((App.templates.zh || {})[t.id]) ||
+      ((App.letters && App.letters.zh || {})[t.id]) || [];
   }
 
   function previewParaHtml(text, circles) {
@@ -630,7 +664,7 @@ window.App = window.App || {};
     const circles = App.templates.circles || '';
     const re = new RegExp('[' + circles + ']', 'g');
     const total = (t.paragraphs.join('').match(re) || []).length;
-    const zhAll = (App.templates.zh || {})[t.id] || [];
+    const zhAll = zhOf(t);
     return '<div class="recite-head recite-preview-head">' +
         '<button type="button" class="recite-back" data-recite-home>返回</button>' +
         '<div class="recite-head-main"><h2>' + esc(t.no + ' · ' + t.title) + '</h2>' +
@@ -654,7 +688,7 @@ window.App = window.App || {};
 
   function renderPreview(col) {
     if (!col) return;
-    const t = findTemplate(String(col.id).replace(/^whole:/, ''));
+    const t = findTemplate(String(col.id).replace(/^[a-z]+:/, ''));
     if (!t) return;
     state.view = 'preview';
     state.previewId = t.id;
@@ -670,7 +704,7 @@ window.App = window.App || {};
     const blank = (t.blanks || []).filter(function (b) { return Number(b.no) === no; })[0];
     if (!blank) return;
     const label = blank.label || String(no);
-    const zhAll = (App.templates.zh || {})[t.id] || [];
+    const zhAll = zhOf(t);
     const hits = [];
     t.paragraphs.forEach(function (para, pi) {
       splitSentences(para).forEach(function (sentence, si) {

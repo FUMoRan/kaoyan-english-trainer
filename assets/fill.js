@@ -20,7 +20,8 @@ window.App = window.App || {};
     parsed: null,
     headHtml: '',
     backLabel: '',
-    onBack: null
+    onBack: null,
+    showTopic: true
   };
 
   /* ---------------- 本地草稿 ---------------- */
@@ -420,9 +421,14 @@ window.App = window.App || {};
     state.headHtml = opts.headHtml || '';
     state.backLabel = opts.backLabel || '返回';
     state.onBack = opts.onBack || null;
+    state.showTopic = opts.showTopic !== false;
     state.values = Object.assign({}, loadDraft(), opts.values || {});
     state.report = '';
     state.parsed = null;
+    if (!state.showTopic) state.topic = null;
+
+    const topicBox = $('.tpl-topic');
+    if (topicBox) topicBox.hidden = !state.showTopic;
 
     $('#fill-result').hidden = true;
     $('#fill-result').innerHTML = '';
@@ -431,9 +437,11 @@ window.App = window.App || {};
     renderHead();
     renderBody();
     renderTips();
-    renderTopicSelect();
-    renderTopicBox();
-    loadTopics();
+    if (state.showTopic) {
+      renderTopicSelect();
+      renderTopicBox();
+      loadTopics();
+    }
   }
 
   /* 换句后重排：按占位名保留已填内容 */

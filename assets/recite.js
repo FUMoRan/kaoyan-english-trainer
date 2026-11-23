@@ -222,6 +222,7 @@ window.App = window.App || {};
         source: meta.source,
         label: meta.label,
         sub: meta.sub + (index ? ' · 第 ' + (index + 1) + ' 句' : ''),
+        zh: (meta.zh && meta.zh[index]) || '',
         tokens: tokens,
         fullText: joinTokens(tokens),
         variables: tokens.filter(function (t) { return t.variable; })
@@ -253,7 +254,8 @@ window.App = window.App || {};
             source: 'whole',
             key: 'w:' + t.id + ':' + pi,
             label: t.no + ' · ' + t.title,
-            sub: t.kind + ' · 第 ' + (pi + 1) + ' 段'
+            sub: t.kind + ' · 第 ' + (pi + 1) + ' 段',
+            zh: ((App.templates.zh || {})[t.id] || [])[pi] || []
           },
           items
         );
@@ -278,7 +280,8 @@ window.App = window.App || {};
               source: 'letter',
               key: 'l:' + t.id + ':' + pi,
               label: t.no + ' · ' + t.title,
-              sub: t.kind + ' · 第 ' + (pi + 1) + ' 段'
+              sub: t.kind + ' · 第 ' + (pi + 1) + ' 段',
+              zh: ((App.letters.zh || {})[t.id] || [])[pi] || []
             },
             items
           );
@@ -953,6 +956,7 @@ window.App = window.App || {};
         levelChips() +
         variablesLine(item) +
         '<p class="recite-sentence">' + sentenceHtml(item, hidden, status) + '</p>' +
+        (state.level <= 1 && item.zh ? '<p class="recite-zh">' + esc(item.zh) + '</p>' : '') +
         (state.revealed ? '<p class="recite-revealed">已显示答案，这一句不计成绩，照着读一遍再下一句。</p>' : '') +
         answerBox +
         (state.result ? resultHtml(item) : '') +

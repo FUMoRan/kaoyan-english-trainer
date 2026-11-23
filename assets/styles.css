@@ -1291,6 +1291,13 @@ select { appearance: none; background-image: linear-gradient(45deg, transparent 
   color: var(--text);
   overflow-wrap: anywhere;
 }
+.recite-zh {
+  margin: 8px 0 0;
+  padding: 0 17px;
+  font-size: 13.5px;
+  line-height: 1.8;
+  color: var(--text-muted);
+}
 .recite-var-token {
   padding: 0 3px;
   border-bottom: 1px dotted var(--text-muted);

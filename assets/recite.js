@@ -613,10 +613,10 @@ window.App = window.App || {};
           '<span class="recite-row-good">熟练 ' + stats.good + '</span>' +
         '</span>' +
         '</button>';
-      if (state.tab !== 'whole' && state.tab !== 'letter') return row;
-      return '<div class="recite-row-wrap">' + row +
-        '<button type="button" class="recite-peek" data-recite-peek="' + esc(col.id) + '">看全文与空位指导</button>' +
-        '</div>';
+      const action = (state.tab === 'whole' || state.tab === 'letter')
+        ? '<button type="button" class="recite-peek" data-recite-peek="' + esc(col.id) + '">看全文与空位指导</button>'
+        : '<button type="button" class="recite-peek" data-recite-list="' + esc(col.id) + '">逐句看与背</button>';
+      return '<div class="recite-row-wrap">' + row + action + '</div>';
     }).join('');
 
     if (!list) {
@@ -737,6 +737,55 @@ window.App = window.App || {};
     modal.hidden = false;
     const close = modal.querySelector('[data-peek-close]');
     if (close) close.focus();
+  }
+
+  /* ---------------- 句库：逐句看与背 ---------------- */
+
+  function renderList(col) {
+    if (!col) return;
+    state.view = 'list';
+    const rows = col.items.map(function (item, i) {
+      return '<div class="recite-sentence-item">' +
+        '<div class="recite-sentence-item-main">' +
+          '<span class="recite-sentence-no">' + String(i + 1) + ' / ' + col.items.length + '</span>' +
+          '<p class="recite-sentence-text">' + sentenceHtml(item, {}, null) + '</p>' +
+          (item.zh ? '<p class="recite-sentence-zh">' + esc(item.zh) + '</p>' : '') +
+          '<span class="recite-list-sub">' + esc(item.sub) + '</span>' +
+        '</div>' +
+        '<button type="button" class="btn ghost small" data-recite-one="' + esc(item.key) + '">背这句</button>' +
+        '</div>';
+    }).join('');
+
+    $('#recite-home').hidden = false;
+    $('#recite-session').hidden = true;
+    $('#recite-home').innerHTML =
+      '<div class="recite-head recite-preview-head">' +
+        '<button type="button" class="recite-back" data-recite-home>返回</button>' +
+        '<div class="recite-head-main"><h2>' + esc(col.label) + '</h2>' +
+          '<p>' + esc(col.meta) + ' · 共 ' + col.items.length + ' 句</p></div>' +
+      '</div>' +
+      '<p class="recite-preview-use">逐句看全文，点「背这句」只背这一句；也可以从头连背。</p>' +
+      '<div class="recite-result-actions">' +
+        '<button type="button" class="btn primary" data-recite-list-start="' + esc(col.id) + '">从第一句开始连背</button>' +
+      '</div>' +
+      '<div class="recite-sentence-list">' + rows + '</div>';
+    window.scrollTo(0, 0);
+  }
+
+  function startSingle(key) {
+    const cols = allCollections();
+    for (let i = 0; i < cols.length; i += 1) {
+      const hit = cols[i].items.filter(function (item) { return item.key === key; })[0];
+      if (hit) {
+        state.collection = cols[i];
+        state.queue = [hit];
+        state.index = 0;
+        state.view = 'session';
+        state.done = false;
+        beginItem();
+        return;
+      }
+    }
   }
 
   /* ---------------- 背诵会话 ---------------- */
@@ -1149,6 +1198,24 @@ window.App = window.App || {};
     const blankBtn = event.target.closest('[data-peek-no]');
     if (blankBtn) {
       openPeek(Number(blankBtn.dataset.peekNo));
+      return;
+    }
+
+    const listBtn = event.target.closest('[data-recite-list]');
+    if (listBtn) {
+      renderList(findCollection(listBtn.dataset.reciteList));
+      return;
+    }
+
+    const oneBtn = event.target.closest('[data-recite-one]');
+    if (oneBtn) {
+      startSingle(oneBtn.dataset.reciteOne);
+      return;
+    }
+
+    const listStart = event.target.closest('[data-recite-list-start]');
+    if (listStart) {
+      startCollection(findCollection(listStart.dataset.reciteListStart), false);
       return;
     }
 

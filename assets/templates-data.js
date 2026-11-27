@@ -653,7 +653,7 @@ window.App = window.App || {};
     "title": "双图对比（可套一图一表）",
     "feature": "左右两幅对比图",
     "example": "写作业 vs 躺沙发",
-    "use": "左右两幅对比图用这一篇；若是一幅图画加一张图表，把首段换成表格下方的替换句即可，二、三段不动。",
+    "use": "左右两幅对比图用这一篇；若是一幅图画加一张图表，把首段换成下方的替换句即可，二、三段不动。",
     "paragraphs": [
       "The two cartoons, when placed side by side, present a thought-provoking contrast: ①, whereas ②. Simple as the drawings are, they convey a truth that cannot be overstated: ③.",
       "Several factors, in my view, converge to explain why ③ matters. To begin with, ④, which ⑤. What is more, ⑥ not only ⑦ but also ⑧. Most importantly, were we to ⑨, we would ⑩.",
@@ -745,7 +745,15 @@ window.App = window.App || {};
         "sample": "grow into self-reliant and responsible adults"
       }
     ],
-    "extra": "替换｜一图一表的替换首段：As is vividly depicted in the cartoon and clearly illustrated in the chart above, ①, and ②. 其中①写图画里的人物与动作，②写图表的总体趋势或数值；第二、三段照用。"
+    "alt": {
+      "title": "一图一表 · 替换首段",
+      "text": "As is vividly depicted in the cartoon and clearly illustrated in the chart above, ①, and ②.",
+      "notes": [
+        "① 写图画里的人物与动作，例如：a young man is standing in front of a mirror, admiring his new suit.",
+        "② 写图表的总体趋势或数值，例如：the sales of formal wear have risen by 30% over the past five years.",
+        "第二、三段照用，不用改；替换段里的①②含义与上方双图模板不同，按这里的说明填。"
+      ]
+    }
   },
   {
     "id": "tpl-07",

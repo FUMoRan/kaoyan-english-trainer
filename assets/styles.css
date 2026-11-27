@@ -614,7 +614,23 @@ select { appearance: none; background-image: linear-gradient(45deg, transparent 
 .tpl-sample { margin: 4px 0 0; font-size: 12.5px; }
 .tpl-sample summary { color: var(--text-muted); }
 .tpl-sample-text { margin: 4px 0 0; color: var(--success); word-break: break-word; }
-.tpl-extra { margin: 10px 0 0; line-height: 1.6; }
+
+.tpl-alt {
+  margin: 14px 0 0;
+  padding: 14px 16px;
+  background: color-mix(in srgb, var(--brand) 7%, var(--surface));
+  border: 1px dashed color-mix(in srgb, var(--brand) 45%, var(--border));
+  border-radius: var(--radius);
+}
+.tpl-alt h3 { margin: 0 0 6px; font-size: 13px; font-weight: 600; color: var(--brand-text); }
+.tpl-alt-text { margin: 0; font-size: 14px; line-height: 1.85; overflow-wrap: anywhere; }
+.tpl-alt-notes {
+  margin: 8px 0 0;
+  padding-left: 18px;
+  font-size: 12.5px;
+  line-height: 1.75;
+  color: var(--text-muted);
+}
 
 .tpl-actions {
   position: sticky;

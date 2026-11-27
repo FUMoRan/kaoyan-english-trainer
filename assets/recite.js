@@ -674,6 +674,13 @@ window.App = window.App || {};
           '<p>' + esc(t.kind) + ' · 共 ' + total + ' 个空位</p></div>' +
       '</div>' +
       (t.use ? '<p class="recite-preview-use">' + esc(t.use) + '</p>' : '') +
+      (t.alt
+        ? '<div class="tpl-alt"><h3>' + esc(t.alt.title) + '</h3>' +
+            '<p class="tpl-alt-text">' + esc(t.alt.text) + '</p>' +
+            '<ul class="tpl-alt-notes">' + (t.alt.notes || []).map(function (note) {
+              return '<li>' + esc(note) + '</li>';
+            }).join('') + '</ul></div>'
+        : '') +
       '<div class="recite-preview-body">' +
         t.paragraphs.map(function (para, i) {
           const zhList = zhAll[i] || [];

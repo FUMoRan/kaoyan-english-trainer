@@ -104,8 +104,24 @@ window.App = window.App || {};
             ? '<details class="tpl-sample"><summary>看示例</summary><p class="tpl-sample-text">' + esc(b.sample) + '</p></details>'
             : '') +
           '</div></div>';
-      }).join('') + '</div></details>' +
-      (t.extra ? '<p class="hint tpl-extra">' + esc(t.extra.replace(/^替换｜/, '替换：')) + '</p>' : '');
+      }).join('') + '</div></details>';
+  }
+
+  function renderAlt() {
+    const box = $('#fill-alt');
+    if (!box) return;
+    const alt = state.template && state.template.alt;
+    if (!alt) {
+      box.hidden = true;
+      box.innerHTML = '';
+      return;
+    }
+    box.hidden = false;
+    box.innerHTML = '<h3>' + esc(alt.title) + '</h3>' +
+      '<p class="tpl-alt-text">' + esc(alt.text) + '</p>' +
+      '<ul class="tpl-alt-notes">' + (alt.notes || []).map(function (note) {
+        return '<li>' + esc(note) + '</li>';
+      }).join('') + '</ul>';
   }
 
   function renderHead() {
@@ -435,6 +451,7 @@ window.App = window.App || {};
     $('#btn-fill-copy').hidden = true;
 
     renderHead();
+    renderAlt();
     renderBody();
     renderTips();
     if (state.showTopic) {
